@@ -1,0 +1,11 @@
+# Compiled Object files
+
+Temp/*
+Library/*
+*.sln
+*.csproj
+
+
+
+
+

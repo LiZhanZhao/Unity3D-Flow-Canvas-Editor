@@ -8,7 +8,8 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         
-        string path = Application.dataPath + "/bb.FS";
+        //string path = Application.dataPath + "/bb.FS";
+        string path = Application.dataPath + "/cc.FS";
         FlowScript graph = new FlowScript();
         //FlowScript graph = ScriptableObject.CreateInstance<FlowScript>();
         if (graph.Deserialize(File.ReadAllText(path), true, null) == null)

@@ -24,6 +24,7 @@ namespace NodeCanvas.Framework{
         private int _ID;
         private bool isChecked { get; set; }
         abstract public bool allowAsPrime { get; }
+        private string _nodeDescription;
         
 
         public Graph graph
@@ -32,6 +33,18 @@ namespace NodeCanvas.Framework{
             set { _graph = value; }
         }
 
+        virtual public string description
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_nodeDescription))
+                {
+                    var descAtt = this.GetType().RTGetAttribute<DescriptionAttribute>(false);
+                    _nodeDescription = descAtt != null ? descAtt.description : "No Description";
+                }
+                return _nodeDescription;
+            }
+        }
 
         public bool isBreakpoint
         {

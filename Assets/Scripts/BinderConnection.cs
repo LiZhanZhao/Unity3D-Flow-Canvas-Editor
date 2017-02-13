@@ -106,6 +106,14 @@ namespace FlowCanvas
 #endif
             }
         }
+
+        virtual public void UnBind()
+        {
+            if (sourcePort is FlowOutput)
+            {
+                (sourcePort as FlowOutput).UnBind();
+            }
+        }
     }
 }
 

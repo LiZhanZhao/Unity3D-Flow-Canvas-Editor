@@ -43,6 +43,27 @@ namespace NodeCanvas.Framework
         {
             return _blackboard.GetVariable(name, ofType);
         }
+
+        public Variable AddVariable(string name, Type type)
+        {
+            var variable = _blackboard.AddVariable(name, type);
+            if (onVariableAdded != null)
+            {
+                onVariableAdded(variable);
+            }
+            return variable;
+        }
+
+        ///Add a new variable of name and value
+        public Variable AddVariable(string name, object value)
+        {
+            var variable = _blackboard.AddVariable(name, value);
+            if (onVariableAdded != null)
+            {
+                onVariableAdded(variable);
+            }
+            return variable;
+        }
     }
 }
 

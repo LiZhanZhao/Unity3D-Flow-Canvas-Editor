@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using ParadoxNotion;
+using ParadoxNotion.Design;
 
 namespace NodeCanvas.Framework.Internal
 {
@@ -61,6 +63,52 @@ namespace NodeCanvas.Framework.Internal
                 }
             }
             return null;
+        }
+
+        public Variable AddVariable(string varName, Type type)
+        {
+
+            if (variables.ContainsKey(varName))
+            {
+                var existing = GetVariable(varName, type);
+                if (existing == null)
+                {
+                    Debug.LogError(string.Format("<b>Blackboard:</b> Variable with name '{0}' already exists in blackboard '{1}', but is of different type! Returning null instead of new.", varName, this.name));
+                }
+                else
+                {
+                    Debug.LogWarning(string.Format("<b>Blackboard:</b> Variable with name '{0}' already exists in blackboard '{1}'. Returning existing instead of new.", varName, this.name));
+                }
+                return existing;
+            }
+
+            var dataType = typeof(Variable<>).RTMakeGenericType(new Type[] { type });
+            var newData = (Variable)Activator.CreateInstance(dataType);
+            newData.name = varName;
+            variables[varName] = newData;
+            if (onVariableAdded != null)
+            {
+                onVariableAdded(newData);
+            }
+            return newData;
+        }
+
+        public Variable AddVariable(string varName, object value)
+        {
+
+            if (value == null)
+            {
+                Debug.LogError("<b>Blackboard:</b> You can't use AddVariable with a null value. Use AddVariable(string, Type) to add the new data first");
+                return null;
+            }
+
+            var newData = AddVariable(varName, value.GetType());
+            if (newData != null)
+            {
+                newData.value = value;
+            }
+
+            return newData;
         }
     }
 

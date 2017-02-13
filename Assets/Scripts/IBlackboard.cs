@@ -14,6 +14,8 @@ namespace NodeCanvas.Framework
 
         Variable GetVariableByID(string ID);
         Variable GetVariable(string varName, Type ofType = null);
+
+        Variable AddVariable(string varName, Type type);
     }
 }
 

@@ -231,6 +231,189 @@ namespace NodeCanvas.Framework
 
         abstract public Type varType { get; }
         abstract protected void Bind(Variable data);
+        public bool isNone
+        {
+            get { return name == string.Empty; }
+        }
+
+        public bool useBlackboard
+        {
+            get { return name != null; }
+            set
+            {
+                if (value == false)
+                {
+                    name = null;
+                }
+                if (value == true && name == null)
+                {
+                    name = string.Empty;
+                }
+            }
+        }
+
+        public Variable PromoteToVariable(IBlackboard targetBB)
+        {
+
+            if (string.IsNullOrEmpty(name))
+            {
+                varRef = null;
+                return null;
+            }
+
+            var varName = name;
+            var bbName = targetBB != null ? targetBB.name : string.Empty;
+            if (name.Contains("/"))
+            {
+                var split = name.Split('/');
+                bbName = split[0];
+                varName = split[1];
+                targetBB = GlobalBlackboard.Find(bbName);
+            }
+
+            if (targetBB == null)
+            {
+                varRef = null;
+                Debug.LogError(string.Format("Parameter '{0}' failed to promote to a variable, because Blackboard named '{1}' could not be found.", varName, bbName));
+                return null;
+            }
+
+            varRef = targetBB.AddVariable(varName, varType);
+            if (varRef != null)
+            {
+                Debug.Log(string.Format("Parameter '{0}' (of type '{1}') promoted to a Variable in Blackboard '{2}'.", varName, varType.FriendlyName(), bbName));
+            }
+            else
+            {
+                Debug.LogError(string.Format("Parameter {0} (of type '{1}') failed to promote to a Variable in Blackboard '{2}'.", varName, varType.FriendlyName(), bbName));
+            }
+            return varRef;
+        }
+
+
+    }
+
+    public class BBParameter<T> : BBParameter
+    {
+
+        public BBParameter() { }
+        public BBParameter(T value) { _value = value; }
+
+        //delegates for Variable binding
+        private Func<T> getter;
+        private Action<T> setter;
+
+        protected T _value;
+        new public T value
+        {
+            get
+            {
+                if (getter != null)
+                {
+                    return getter();
+                }
+
+                //Dynamic?
+                if (Application.isPlaying && bb != null && !string.IsNullOrEmpty(name))
+                {
+                    //setting the varRef property also binds it.
+                    varRef = bb.GetVariable(name, typeof(T));
+                    return getter != null ? getter() : default(T);
+                }
+
+                return _value;
+            }
+            set
+            {
+                if (setter != null)
+                {
+                    setter(value);
+                    return;
+                }
+
+                if (isNone)
+                {
+                    return;
+                }
+
+                //Dynamic?
+                if (bb != null && !string.IsNullOrEmpty(name))
+                {
+                    Debug.LogWarning(string.Format("Dynamic Parameter Variable '{0}' Encountered...", name));
+                    //setting the varRef property also binds it
+                    varRef = PromoteToVariable(bb);
+                    if (setter != null) { setter(value); }
+                    return;
+                }
+
+                _value = value;
+            }
+        }
+
+        protected override void Bind(Variable variable)
+        {
+            if (variable == null)
+            {
+                getter = null;
+                setter = null;
+                _value = default(T);
+                return;
+            }
+
+            BindGetter(variable);
+            BindSetter(variable);
+        }
+
+        //Bind the Getter
+        bool BindGetter(Variable variable)
+        {
+            if (variable is Variable<T>)
+            {
+                getter = (variable as Variable<T>).GetValue;
+                return true;
+            }
+
+            if (variable.CanConvertTo(varType))
+            {
+                var func = variable.GetGetConverter(varType);
+                getter = () => { return (T)func(); };
+                return true;
+            }
+
+            return false;
+        }
+
+        //Bind the Setter
+        bool BindSetter(Variable variable)
+        {
+            if (variable is Variable<T>)
+            {
+                setter = (variable as Variable<T>).SetValue;
+                return true;
+            }
+
+            if (variable.CanConvertFrom(varType))
+            {
+                var func = variable.GetSetConverter(varType);
+                setter = (T value) => { func(value); };
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public static implicit operator BBParameter<T>(T value)
+        {
+            return new BBParameter<T> { value = value };
+        }
+
+        public override Type varType
+        {
+            get { return typeof(T); }
+        }
+        
+        
     }
 
 }

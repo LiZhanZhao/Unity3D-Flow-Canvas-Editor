@@ -218,6 +218,18 @@ namespace FlowCanvas
             return (FlowInput)(inputPorts[ID] = new FlowInput(this, name, ID, pointer));
         }
 
+        public ValueInput<T> AddValueInput<T>(string name, string ID = "")
+        {
+            if (string.IsNullOrEmpty(ID)) ID = name;
+            return (ValueInput<T>)(inputPorts[ID] = new ValueInput<T>(this, name, ID));
+        }
+
+        public ValueOutput<T> AddValueOutput<T>(string name, ValueHandler<T> getter, string ID = "")
+        {
+            if (string.IsNullOrEmpty(ID)) ID = name;
+            return (ValueOutput<T>)(outputPorts[ID] = new ValueOutput<T>(this, name, ID, getter));
+        }
+
         // only read property will become ValueOutput,ValueOutput's getter is only get {return value;}
         public ValueOutput AddPropertyOutput(PropertyInfo prop, object instance)
         {

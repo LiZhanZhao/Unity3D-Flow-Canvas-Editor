@@ -18,13 +18,10 @@ public class Test : MonoBehaviour {
         Debug.Log(path);
         FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
         fsc.graph = graph;
+        //fsc.StartBehaviour(graph);
         
 
 
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 }

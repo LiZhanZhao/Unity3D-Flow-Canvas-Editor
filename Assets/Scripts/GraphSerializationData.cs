@@ -15,12 +15,14 @@ namespace NodeCanvas.Framework.Internal {
         public string comments = string.Empty;
         public Vector2 translation = new Vector2(-5000, -5000);
         public float zoomFactor = 1f;
-        public List<Node> nodes = new List<Node>();
-        public List<Connection> connections = new List<Connection>();
-        public Node primeNode = null;
         public List<CanvasGroup> canvasGroups = null;
         public BlackboardSource localBlackboard = null;
 
+        // 节点列表
+        public List<Node> nodes = new List<Node>();
+        // 连线列表
+        public List<Connection> connections = new List<Connection>();
+        public Node primeNode = null;
         public object derivedData;
 
         //required

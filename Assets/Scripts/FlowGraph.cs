@@ -14,6 +14,7 @@ namespace FlowCanvas
         sealed public override bool requiresPrimeNode { get { return false; } }
 
         private bool hasInitialized;
+
         private List<IUpdatable> updatableNodes;
 
         protected override void OnGraphStarted()

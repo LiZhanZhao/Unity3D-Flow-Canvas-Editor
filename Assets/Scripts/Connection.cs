@@ -3,11 +3,13 @@ using System.Collections;
 
 namespace NodeCanvas.Framework
 {
+    // 连线类
     abstract public partial class Connection
     {
         private Node _sourceNode;
         private Node _targetNode;
-
+        private Status _status = Status.Resting;
+        private bool _isDisabled;
         ///The source node of the connection
         public Node sourceNode
         {
@@ -26,8 +28,6 @@ namespace NodeCanvas.Framework
             get { return sourceNode.graph; }
         }
 
-        private Status _status = Status.Resting;
-
         public Status status
         {
             get { return _status; }
@@ -36,14 +36,11 @@ namespace NodeCanvas.Framework
 
         public void Reset(bool recursively = true)
         {
-
             if (status == Status.Resting)
             {
                 return;
             }
-
             status = Status.Resting;
-
             if (recursively)
             {
                 targetNode.Reset(recursively);
@@ -51,8 +48,6 @@ namespace NodeCanvas.Framework
         }
 
         virtual public void OnDestroy() { }
-
-        private bool _isDisabled;
 
         public bool isActive
         {

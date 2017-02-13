@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using FlowCanvas;
 using UnityEngine;
+using ParadoxNotion.Design;
+
 namespace FlowCanvas.Nodes{
 	public class ConstructionEvent : EventNode {
 
         private FlowOutput once;
         private bool called = false;
-
         public override void OnGraphStarted()
         {
             if (!called)
@@ -17,7 +18,15 @@ namespace FlowCanvas.Nodes{
             }
         }
 
-        // 这个方法是在Node的OnValidate中触发的
+        /*
+        // 作为FlowInput
+        [Name("bbb")]
+        public void Test(Flow f)
+        {
+
+        }
+         * */
+
         protected override void RegisterPorts()
         {
             once = AddFlowOutput("Once");

@@ -14,6 +14,12 @@ namespace NodeCanvas.Framework
         private List<UnityEngine.Object> boundGraphObjectReferences;
 
         private Dictionary<Graph, Graph> instances = new Dictionary<Graph, Graph>();
+
+        private static bool isQuiting;
+        public DisableAction disableAction = DisableAction.DisableBehaviour;
+
+        abstract public IBlackboard blackboard { get; set; }
+
         protected void Awake()
         {
             if (graph == null)
@@ -37,7 +43,6 @@ namespace NodeCanvas.Framework
 
                 //Case2: The graph is a bound asset reference. This takes place when instantiating prefabs.
                 //Set object references before GetInstance, so that graph deserialize with correct references.
-                // 直接把Graph._objectReferences 赋值给 boundGraphObjectReferences
                 graph.SetSerializationObjectReferences(boundGraphObjectReferences);
                 graph = GetInstance(graph);
                 return;
@@ -84,39 +89,39 @@ namespace NodeCanvas.Framework
             return originalGraph;
 
 
-            if (originalGraph == null)
-            {
-                return null;
-            }
+//            if (originalGraph == null)
+//            {
+//                return null;
+//            }
 
-            //in editor the instance is always the original
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                return originalGraph;
-            }
-#endif
+//            //in editor the instance is always the original
+//#if UNITY_EDITOR
+//            if (!Application.isPlaying)
+//            {
+//                return originalGraph;
+//            }
+//#endif
 
-            //if its already an instance, return the instance
-            if (instances.Values.Contains(originalGraph))
-            {
-                return originalGraph;
-            }
+//            //if its already an instance, return the instance
+//            if (instances.Values.Contains(originalGraph))
+//            {
+//                return originalGraph;
+//            }
 
-            Graph instance = null;
+//            Graph instance = null;
 
-            //if it's not an instance but rather an asset reference which has been instantiated before, return the instance stored,
-            //otherwise create and store a new instance.
+//            //if it's not an instance but rather an asset reference which has been instantiated before, return the instance stored,
+//            //otherwise create and store a new instance.
 
-            if (!instances.TryGetValue(originalGraph, out instance))
-            {
-                instance = Graph.Clone<Graph>(originalGraph);
-                instances[originalGraph] = instance;
-            }
+//            if (!instances.TryGetValue(originalGraph, out instance))
+//            {
+//                instance = Graph.Clone<Graph>(originalGraph);
+//                instances[originalGraph] = instance;
+//            }
 
-            instance.agent = this;
-            instance.blackboard = this.blackboard;
-            return instance;
+//            instance.agent = this;
+//            instance.blackboard = this.blackboard;
+//            return instance;
         }
 
         protected void OnEnable()
@@ -134,8 +139,7 @@ namespace NodeCanvas.Framework
             DoNothing
         }
 
-        private static bool isQuiting;
-        public DisableAction disableAction = DisableAction.DisableBehaviour;
+        
         protected void OnDisable()
         {
 
@@ -171,7 +175,7 @@ namespace NodeCanvas.Framework
             }
         }
 
-        abstract public IBlackboard blackboard { get; set; }
+        
     }
 
     abstract public class GraphOwner<T> : GraphOwner where T : Graph
@@ -213,6 +217,32 @@ namespace NodeCanvas.Framework
         {
             get { return _graph; }
             set { _graph = (T)value; }
+        }
+
+        public void StartBehaviour(T newGraph)
+        {
+            SwitchBehaviour(newGraph);
+        }
+
+        public void SwitchBehaviour(T newGraph)
+        {
+            SwitchBehaviour(newGraph, null);
+        }
+
+        public void SwitchBehaviour(T newGraph, System.Action<bool> callback)
+        {
+            StopBehaviour();
+            graph = newGraph;
+            StartBehaviour(callback);
+        }
+
+        public void StartBehaviour(System.Action<bool> callback)
+        {
+            graph = GetInstance(graph);
+            if (graph != null)
+            {
+                graph.StartGraph(this, blackboard, true, callback);
+            }
         }
 
 

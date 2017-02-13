@@ -9,12 +9,11 @@ using ParadoxNotion.Services;
 namespace NodeCanvas.Framework
 {
 
-    abstract public partial class Graph : ScriptableObject, ITaskSystem, ISerializationCallbackReceiver
+    abstract public partial class Graph : ScriptableObject, ITaskSystem//, ISerializationCallbackReceiver
     {
         private List<Object> _objectReferences;
         private bool _deserializationFailed = false;
         private string _serializedGraph;
-
         private string _name = string.Empty;
         private string _comments = string.Empty;
         private Vector2 _translation = new Vector2(-5000, -5000);
@@ -24,6 +23,11 @@ namespace NodeCanvas.Framework
         private List<CanvasGroup> _canvasGroups = null;
         private BlackboardSource _localBlackboard = null;
         private bool _isRunning;
+        public event System.Action<bool> OnFinish;
+        private static List<Graph> runningGraphs = new List<Graph>();
+        private float timeStarted;
+        abstract public bool requiresAgent { get; }
+        abstract public bool requiresPrimeNode { get; }
 
         public string graphComments
         {
@@ -48,8 +52,30 @@ namespace NodeCanvas.Framework
             get { return _canvasGroups; }
             set { _canvasGroups = value; }
         }
+        public List<Node> allNodes
+        {
+            get { return _nodes; }
+            private set { _nodes = value; }
+        }
 
+        // GraphSerializationData->graph
+        virtual public void OnDerivedDataDeserialization(object data) { }
+
+        // graph -> GraphSerializationData
         virtual public object OnDerivedDataSerialization() { return null; }
+
+        virtual protected void OnGraphValidate() { }
+
+        virtual protected void OnGraphStarted() { }
+
+        virtual protected void OnGraphUpdate() { }
+
+        virtual protected void OnGraphUnpaused() { }
+
+        virtual protected void OnGraphPaused() { }
+
+        virtual protected void OnGraphStoped() { }
+
 
         public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
         {
@@ -102,7 +128,7 @@ namespace NodeCanvas.Framework
                 Debug.LogError("Can't Load graph, cause of different Graph type serialized and required");
                 return false;
             }
-
+            // data.connections and data.nodes to graph
             data.Reconstruct(this);
 
             //grab the final data and set fields directly
@@ -125,26 +151,23 @@ namespace NodeCanvas.Framework
             return true;
         }
 
-        virtual public void OnDerivedDataDeserialization(object data) { }
+        
 
         public void Validate()
         {
-#if UNITY_EDITOR
-            if (!Application.isPlaying && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                UpdateReferences();
-            }
-#endif
+//#if UNITY_EDITOR
+//            if (!Application.isPlaying && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+//            {
+//                UpdateReferences();
+//            }
+//#endif
 
-            // 调用Node.OnValidata, 注意子类的OnValidate调用，
-            // 
             for (var i = 0; i < allNodes.Count; i++)
             {
                 try { allNodes[i].OnValidate(this); } //validation could be critical. we always continue
                 catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
             }
 
-            // 调用Task的OnValidata
             var allTasks = GetAllTasksOfType<Task>();
             for (var i = 0; i < allTasks.Count; i++)
             {
@@ -152,7 +175,6 @@ namespace NodeCanvas.Framework
                 catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
             }
 
-            // 回调
             OnGraphValidate();
 
             //in runtime and if graph uses local blackboard, initialize property/field binding.
@@ -164,17 +186,13 @@ namespace NodeCanvas.Framework
             }
         }
 
-        public List<Node> allNodes
-        {
-            get { return _nodes; }
-            private set { _nodes = value; }
-        }
+        
 
         public void UpdateReferences()
         {
-            //Update all graph node's BBFields for current Blackboard. (初始化Node的BBFields的字段)
+            //Update all graph node's BBFields for current Blackboard. 
             UpdateNodeBBFields();
-            //Sets all graph Tasks' owner (which is this).(初始化Task)
+            //Sets all graph Tasks' owner (which is this)(Task Node)
             SendTaskOwnerDefaults();
         }
 
@@ -294,8 +312,6 @@ namespace NodeCanvas.Framework
 
             return resultTasks;
         }
-
-        virtual protected void OnGraphValidate() { }
 
         private bool _isPaused;
 
@@ -421,26 +437,18 @@ namespace NodeCanvas.Framework
             return (T)newGraph;
         }
 
-        public event System.Action<bool> OnFinish;
-        abstract public bool requiresAgent { get; }
-        abstract public bool requiresPrimeNode { get; }
-
-        private static List<Graph> runningGraphs = new List<Graph>();
-
-        private float timeStarted;
+        
 
         public void StartGraph(Component agent, IBlackboard blackboard, bool autoUpdate, System.Action<bool> callback = null)
         {
 
-#if UNITY_EDITOR //prevent the user to accidentaly start the graph while its an asset. At least in the editor
-            if (UnityEditor.EditorUtility.IsPersistent(this))
-            {
-                Debug.LogError("<b>Graph:</b> You have tried to start a graph which is an asset, not an instance! You should Instantiate the graph first");
-                return;
-            }
-#endif
-
-            // 已经开始播放的情况，直接不执行
+//#if UNITY_EDITOR //prevent the user to accidentaly start the graph while its an asset. At least in the editor
+//            if (UnityEditor.EditorUtility.IsPersistent(this))
+//            {
+//                Debug.LogError("<b>Graph:</b> You have tried to start a graph which is an asset, not an instance! You should Instantiate the graph first");
+//                return;
+//            }
+//#endif
             if (isRunning)
             {
                 if (callback != null)
@@ -450,15 +458,13 @@ namespace NodeCanvas.Framework
                 Debug.LogWarning("<b>Graph:</b> Graph is already Active.");
                 return;
             }
-
-            // agent == null，也不执行
+            
             if (agent == null && requiresAgent)
             {
                 Debug.LogWarning("<b>Graph:</b> You've tried to start a graph with null Agent.");
                 return;
             }
 
-            // primeNode == null 也不执行
             if (primeNode == null && requiresPrimeNode)
             {
                 Debug.LogWarning("<b>Graph:</b> You've tried to start graph without 'Start' node");
@@ -484,9 +490,9 @@ namespace NodeCanvas.Framework
             }
 
             this.agent = agent;
-            // 赋值GraphOwner的blackboard，直接用GraphOwner的
             this.blackboard = blackboard;
 
+            // deal with Task node and node BBField
             UpdateReferences();
 
             // 添加回调
@@ -495,13 +501,9 @@ namespace NodeCanvas.Framework
                 this.OnFinish = callback;
             }
 
-            // 标记正在播放
             isRunning = true;
-
-            //将目前这个graph添加到runningGraphs列表中
             runningGraphs.Add(this);
 
-            // 赋值更新，直接调用FlowGraph OnGraphUpdate
             if (autoUpdate)
             {
                 MonoManager.current.onUpdate += UpdateGraph;
@@ -510,15 +512,14 @@ namespace NodeCanvas.Framework
             if (!isPaused)
             {
                 timeStarted = Time.time;
-                // 调用FlowGraph 的 OnGraphStarted
                 OnGraphStarted();
             }
             else
             {
                 OnGraphUnpaused();
             }
-            // place at the end?
-            // 所有的Node都执行OnGraphStarted
+
+            // all node call OnGraphStarted
             for (var i = 0; i < allNodes.Count; i++)
             {
                 if (!isPaused)
@@ -536,13 +537,7 @@ namespace NodeCanvas.Framework
 
         public void UpdateGraph() { OnGraphUpdate(); }
 
-        virtual protected void OnGraphStarted() { }
-
-        virtual protected void OnGraphUpdate() { }
-
-        virtual protected void OnGraphUnpaused() { }
-
-        virtual protected void OnGraphPaused() { }
+        
 
         public void Pause()
         {
@@ -594,15 +589,15 @@ namespace NodeCanvas.Framework
             }
         }
 
-        virtual protected void OnGraphStoped() { }
+        
 
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {
-            Serialize();
-        }
-        void ISerializationCallbackReceiver.OnAfterDeserialize() {
-            Deserialize();
-        }
+        //void ISerializationCallbackReceiver.OnBeforeSerialize()
+        //{
+        //    Serialize();
+        //}
+        //void ISerializationCallbackReceiver.OnAfterDeserialize() {
+        //    Deserialize();
+        //}
 
         private bool hasDeserialized = false;
 

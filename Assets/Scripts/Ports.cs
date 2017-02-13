@@ -151,6 +151,7 @@ namespace FlowCanvas{
         }
     }
 
+
     abstract public class ValueInput : Port
     {
         public ValueInput() { }

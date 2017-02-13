@@ -15,6 +15,16 @@ namespace NodeCanvas.Framework{
     abstract public partial class Node
     {
         private Graph _graph;
+        private List<Connection> _inConnections = new List<Connection>();
+        private List<Connection> _outConnections = new List<Connection>();
+        private bool _isBreakpoint = false;
+        private Status _status = Status.Resting;
+        private string _nodeName;
+        private string _name;
+        private int _ID;
+        private bool isChecked { get; set; }
+        abstract public bool allowAsPrime { get; }
+        
 
         public Graph graph
         {
@@ -22,7 +32,6 @@ namespace NodeCanvas.Framework{
             set { _graph = value; }
         }
 
-        private bool _isBreakpoint = false;
 
         public bool isBreakpoint
         {
@@ -30,11 +39,17 @@ namespace NodeCanvas.Framework{
             set { _isBreakpoint = value; }
         }
 
-        private Status _status = Status.Resting;
+        
         public Status status
         {
             get { return _status; }
             protected set { _status = value; }
+        }
+
+        public int ID
+        {
+            get { return _ID; }
+            set { _ID = value; }
         }
 
         virtual public string name
@@ -56,8 +71,7 @@ namespace NodeCanvas.Framework{
             set { customName = value; }
         }
 
-        private string _nodeName;
-        private string _name;
+        
 
         private string customName
         {
@@ -70,10 +84,7 @@ namespace NodeCanvas.Framework{
             get { return graph != null ? graph.agent : null; }
         }
 
-        private List<Connection> _inConnections = new List<Connection>();
-        
-        private List<Connection> _outConnections = new List<Connection>();
-
+        ///All incomming connections to this node
         public List<Connection> inConnections
         {
             get { return _inConnections; }
@@ -87,12 +98,10 @@ namespace NodeCanvas.Framework{
             protected set { _outConnections = value; }
         }
 
-        virtual public void OnGraphStarted() { }
-
-        virtual public void OnValidate(Graph assignedGraph) { }
+        
 
         virtual protected void OnReset() { }
-        private bool isChecked { get; set; }
+        
         public void Reset(bool recursively = true)
         {
 
@@ -108,17 +117,6 @@ namespace NodeCanvas.Framework{
                 outConnections[i].Reset(recursively);
             }
             isChecked = false;
-        }
-
-        virtual public void OnChildDisconnected(int connectionIndex) { }
-        virtual public void OnParentDisconnected(int connectionIndex) { }
-
-        private int _ID;
-
-        public int ID
-        {
-            get { return _ID; }
-            set { _ID = value; }
         }
 
         public int AssignIDToGraph(int lastID)
@@ -156,12 +154,17 @@ namespace NodeCanvas.Framework{
             }
         }
 
-        abstract public bool allowAsPrime { get; }
+        
+
+        virtual public void OnGraphStarted() { }
+        // call when create node
+        virtual public void OnValidate(Graph assignedGraph) { }
 
         virtual public void OnGraphUnpaused() { }
-
         virtual public void OnGraphPaused() { }
 
         virtual public void OnGraphStoped() { }
+        virtual public void OnChildDisconnected(int connectionIndex) { }
+        virtual public void OnParentDisconnected(int connectionIndex) { }
     }
 }

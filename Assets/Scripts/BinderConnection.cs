@@ -17,6 +17,13 @@ namespace FlowCanvas
             get { return sourcePort != null ? sourcePort.ID : _sourcePortName; }
             private set { _sourcePortName = value; }
         }
+
+        public string targetPortID
+        {
+            get { return targetPort != null ? targetPort.ID : _targetPortName; }
+            private set { _targetPortName = value; }
+        }
+
         public Port sourcePort
         {
             get
@@ -32,9 +39,26 @@ namespace FlowCanvas
             }
         }
 
+        public Port targetPort
+        {
+            get
+            {
+                if (_targetPort == null)
+                {
+                    if (targetNode is FlowNode)
+                    { //In case it's 'MissingNode'
+                        _targetPort = (targetNode as FlowNode).GetInputPort(_targetPortName);
+                    }
+                }
+                return _targetPort;
+            }
+        }
+        
+
         public void GatherAndValidateSourcePort()
         {
             _sourcePort = null;
+            
             if (sourcePort != null && TypeConverter.HasConvertion(sourcePort.type, bindingType))
             {
                 sourcePort.connections++;
@@ -63,25 +87,7 @@ namespace FlowCanvas
             }
         }
 
-        public Port targetPort
-        {
-            get
-            {
-                if (_targetPort == null)
-                {
-                    if (targetNode is FlowNode)
-                    { //In case it's 'MissingNode'
-                        _targetPort = (targetNode as FlowNode).GetInputPort(_targetPortName);
-                    }
-                }
-                return _targetPort;
-            }
-        }
-        public string targetPortID
-        {
-            get { return targetPort != null ? targetPort.ID : _targetPortName; }
-            private set { _targetPortName = value; }
-        }
+        
 
         virtual public void Bind()
         {

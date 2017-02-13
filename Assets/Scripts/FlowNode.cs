@@ -14,6 +14,18 @@ namespace FlowCanvas
     {
         private Dictionary<string, Port> inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         private Dictionary<string, Port> outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
+        sealed public override bool allowAsPrime { get { return false; } }
+
+        private Port[] orderedInputs;
+        private Port[] orderedOutputs;
+        private ValueInput firstValuePort;
+        private Dictionary<string, object> _inputPortValues;
+
+        // be critical, this is will init inputPorts and outputPorts
+        sealed public override void OnValidate(Graph flowGraph)
+        {
+            GatherPorts();
+        }
 
         public void SetStatus(Status status)
         {
@@ -41,16 +53,9 @@ namespace FlowCanvas
             return output;
         }
 
-        public FlowOutput AddFlowOutput(string name, string ID = "")
-        {
-            if (string.IsNullOrEmpty(ID)) ID = name;
-            return (FlowOutput)(outputPorts[ID] = new FlowOutput(this, name, ID));
-        }
+        
 
-        sealed public override void OnValidate(Graph flowGraph)
-        {
-            GatherPorts();
-        }
+        
 
         public void GatherPorts()
         {
@@ -67,9 +72,7 @@ namespace FlowCanvas
             ValidateConnections();
         }
 
-        private Port[] orderedInputs;
-        private Port[] orderedOutputs;
-        private ValueInput firstValuePort;
+        
 
         void OnPortsGatheredInEditor()
         {
@@ -78,6 +81,7 @@ namespace FlowCanvas
             firstValuePort = orderedInputs.OfType<ValueInput>().FirstOrDefault();
         }
 
+        // Validate
         void ValidateConnections()
         {
 
@@ -105,7 +109,7 @@ namespace FlowCanvas
             return input;
         }
 
-        private Dictionary<string, object> _inputPortValues;
+        
 
         void DeserializeInputPortValues()
         {
@@ -128,15 +132,21 @@ namespace FlowCanvas
             }
         }
 
+        // notice : this is a virtual function
         virtual protected void RegisterPorts()
         {
             DoReflectionBasedRegistration();
         }
 
+        
         void DoReflectionBasedRegistration()
         {
-
             //FlowInputs. All void methods with one Flow parameter.
+            //example
+            /*
+            [Name("bbb")]
+            public void Test(Flow f){} ----> flowInput
+            * */
             foreach (var method in this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var parameters = method.GetParameters();
@@ -166,7 +176,7 @@ namespace FlowCanvas
 
                 if (typeof(Delegate).RTIsAssignableFrom(field.FieldType))
                 {
-
+                    //[Name("xxx")]
                     var nameAtt = field.RTGetAttribute<NameAttribute>(false);
                     var name = nameAtt != null ? nameAtt.name : field.Name.SplitCamelCase();
 
@@ -196,12 +206,19 @@ namespace FlowCanvas
             }
         }
 
+        public FlowOutput AddFlowOutput(string name, string ID = "")
+        {
+            if (string.IsNullOrEmpty(ID)) ID = name;
+            return (FlowOutput)(outputPorts[ID] = new FlowOutput(this, name, ID));
+        }
+
         public FlowInput AddFlowInput(string name, FlowHandler pointer, string ID = "")
         {
             if (string.IsNullOrEmpty(ID)) ID = name;
             return (FlowInput)(inputPorts[ID] = new FlowInput(this, name, ID, pointer));
         }
 
+        // only read property will become ValueOutput,ValueOutput's getter is only get {return value;}
         public ValueOutput AddPropertyOutput(PropertyInfo prop, object instance)
         {
 
@@ -215,13 +232,14 @@ namespace FlowCanvas
             var name = nameAtt != null ? nameAtt.name : prop.Name.SplitCamelCase();
 
             var getterType = typeof(ValueHandler<>).RTMakeGenericType(new Type[] { prop.PropertyType });
+            // RTGetGetMethod : 当在派生类中重写时，返回此属性的公共或非公共 get 访问器
             var getter = prop.RTGetGetMethod().RTCreateDelegate(getterType, instance);
             var portType = typeof(ValueOutput<>).RTMakeGenericType(new Type[] { prop.PropertyType });
             var port = (ValueOutput)Activator.CreateInstance(portType, new object[] { this, name, name, getter });
             return (ValueOutput)(outputPorts[name] = port);
         }
 
-        sealed public override bool allowAsPrime { get { return false; } }
+        
 
         public BinderConnection GetInputConnectionForPortID(string ID)
         {
@@ -234,7 +252,7 @@ namespace FlowCanvas
             {
                 return;
             }
-            // 寻找第一个ValueInput Port
+
             var instanceInput = inputPorts.Values.OfType<ValueInput>().FirstOrDefault();
             if (instanceInput != null && !instanceInput.isConnected && instanceInput.isDefaultValue)
             {

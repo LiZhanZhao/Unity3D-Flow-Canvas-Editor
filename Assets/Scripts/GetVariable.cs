@@ -6,26 +6,18 @@ namespace FlowCanvas.Nodes
 {
     public class GetVariable<T> : VariableNode
     {
-
-        public BBParameter<T> value;
+        public T value;
 
         protected override void RegisterPorts()
         {
-            AddValueOutput<T>("Value", () => { return value.value; });
+            AddValueOutput<T>("Value", () => { return value; });
         }
 
         public override void SetVariable(object o)
         {
-
-            if (o is Variable<T>)
-            {
-                value.name = (o as Variable<T>).name;
-                return;
-            }
-
             if (o is T)
             {
-                value.value = (T)o;
+                value = (T)o;
                 return;
             }
 

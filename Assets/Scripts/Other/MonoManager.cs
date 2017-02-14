@@ -3,7 +3,8 @@ using System;
 using UnityEngine;
 
 
-namespace ParadoxNotion.Services {
+namespace NodeCanvas.Framework
+{
 
     ///Singleton. Automatically added when needed, collectively calls methods that needs updating amongst other things relevant to MonoBehaviours
     public class MonoManager : MonoBehaviour {

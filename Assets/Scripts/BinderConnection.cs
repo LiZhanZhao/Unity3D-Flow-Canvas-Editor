@@ -67,7 +67,7 @@ namespace FlowCanvas
             }
             else
             {
-                graph.RemoveConnection(this, false);
+                graph.RemoveConnection(this);
             }
         }
 
@@ -85,7 +85,7 @@ namespace FlowCanvas
             }
             else
             {
-                graph.RemoveConnection(this, false);
+                graph.RemoveConnection(this);
             }
         }
 

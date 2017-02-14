@@ -2,32 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using NodeCanvas.Framework.Internal;
-//using ParadoxNotion.Serialization;
 using System.Linq;
-using ParadoxNotion.Services;
+
 
 namespace NodeCanvas.Framework
 {
 
-    abstract public partial class Graph : ScriptableObject, ITaskSystem//, ISerializationCallbackReceiver
+    abstract public partial class Graph : ScriptableObject//, ISerializationCallbackReceiver
     {
-        private List<Object> _objectReferences;
+        //private List<Object> _objectReferences;
+        //private string _serializedGraph;
+        //private bool hasDeserialized = false;
+
         private bool _deserializationFailed = false;
-        private string _serializedGraph;
         private List<Node> _nodes = new List<Node>();
         private Node _primeNode = null;
-        private BlackboardSource _localBlackboard = null;
         private bool _isRunning;
         public event System.Action<bool> OnFinish;
-        private static List<Graph> runningGraphs = new List<Graph>();
         private float timeStarted;
         abstract public bool requiresAgent { get; }
         abstract public bool requiresPrimeNode { get; }
 
-        private bool hasDeserialized = false;
-
-        abstract public bool useLocalBlackboard { get; }
-        private IBlackboard _blackboard;
+        
 
         public List<Node> allNodes
         {
@@ -53,100 +49,48 @@ namespace NodeCanvas.Framework
 
         virtual protected void OnGraphStoped() { }
 
-        public bool Deserialize(GraphSerializationData data, bool validate, List<UnityEngine.Object> objectReferences)
+        public bool Deserialize(GraphSerializationData data, bool validate)
         {
             if (data == null)
             {
                 return false;
             }
 
-            if (objectReferences == null)
-            {
-                objectReferences = this._objectReferences;
-            }
-
             try
             {
-                //deserialize provided serialized graph into a new GraphSerializationData object and load it
-                //var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
                 if (LoadGraphData(data, validate) == true)
                 {
                     this._deserializationFailed = false;
-                    //this._serializedGraph = serializedGraph;
-                    this._objectReferences = objectReferences;
-                    //return data;
                     return true;
                 }
 
                 _deserializationFailed = true;
-                //return null;
                 return false;
             }
             catch (System.Exception e)
             {
-                //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
                 Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
                 _deserializationFailed = true;
-                //return null;
                 return false;
             }
 
         }
 
-        //public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
-        //{
-        //    if (string.IsNullOrEmpty(serializedGraph))
-        //    {
-        //        return null;
-        //    }
-
-        //    //the list to load the references from. If not provided externaly we load from the local list (which is the case most times)
-        //    if (objectReferences == null)
-        //    {
-        //        objectReferences = this._objectReferences;
-        //    }
-
-        //    try
-        //    {
-        //        //deserialize provided serialized graph into a new GraphSerializationData object and load it
-        //        var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
-        //        if (LoadGraphData(data, validate) == true)
-        //        {
-        //            this._deserializationFailed = false;
-        //            this._serializedGraph = serializedGraph;
-        //            this._objectReferences = objectReferences;
-        //            return data;
-        //        }
-
-        //        _deserializationFailed = true;
-        //        return null;
-        //    }
-        //    catch (System.Exception e)
-        //    {
-        //        //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
-        //        Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
-        //        _deserializationFailed = true;
-        //        return null;
-        //    }
-        //}
+        
 
         bool LoadGraphData(GraphSerializationData data, bool validate)
         {
-
             if (data == null)
             {
                 Debug.LogError("Can't Load graph, cause of null GraphSerializationData provided");
                 return false;
             }
 
-            
             // data.connections and data.nodes to graph
             data.Reconstruct(this);
 
             this._nodes = data.nodes;
             this._primeNode = data.primeNode;
-
-            //this._localBlackboard = data.localBlackboard;
 
             //IMPORTANT: Validate should be called in all deserialize cases outside of Unity's 'OnAfterDeserialize',
             //like for example when loading from json, or manualy calling this outside of OnAfterDeserialize.
@@ -168,141 +112,14 @@ namespace NodeCanvas.Framework
                 catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
             }
 
-            var allTasks = GetAllTasksOfType<Task>();
-            for (var i = 0; i < allTasks.Count; i++)
-            {
-                try { allTasks[i].OnValidate(this); } //validation could be critical. we always continue
-                catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
-            }
-
             OnGraphValidate();
-
-            //in runtime and if graph uses local blackboard, initialize property/field binding.
-            //'null' target gameObject (since localBlackboard can only have static bindings).
-            //'false' so that setter is not called.
-            if (Application.isPlaying && useLocalBlackboard)
-            {
-                localBlackboard.InitializePropertiesBinding(null, false);
-            }
         }
 
-        
-
-        public void UpdateReferences()
-        {
-            //Update all graph node's BBFields for current Blackboard. 
-            UpdateNodeBBFields();
-            //Sets all graph Tasks' owner (which is this)(Task Node)
-            SendTaskOwnerDefaults();
-        }
-
-        void UpdateNodeBBFields()
-        {
-            for (var i = 0; i < allNodes.Count; i++)
-            {
-                BBParameter.SetBBFields(allNodes[i], blackboard);
-            }
-        }
-        public void SendTaskOwnerDefaults()
-        {
-            var tasks = GetAllTasksOfType<Task>();
-            for (var i = 0; i < tasks.Count; i++)
-            {
-                tasks[i].SetOwnerSystem(this);
-            }
-        }
-
-        
-
-        public BlackboardSource localBlackboard
-        {
-            get
-            {
-                if (ReferenceEquals(_localBlackboard, null))
-                {
-                    _localBlackboard = new BlackboardSource();
-                    _localBlackboard.name = "Local Blackboard";
-                }
-                return _localBlackboard;
-            }
-        }
-
-        public IBlackboard blackboard
-        {
-            get
-            {
-                if (useLocalBlackboard) { return localBlackboard; }
-                return _blackboard;
-            }
-            set
-            {
-                if (_blackboard != value)
-                {
-                    if (isRunning) { return; }
-                    if (useLocalBlackboard) { return; }
-                    _blackboard = value;
-                }
-            }
-        }
 
         public bool isRunning
         {
             get { return _isRunning; }
             private set { _isRunning = value; }
-        }
-
-        public List<T> GetAllTasksOfType<T>() where T : Task
-        {
-
-            var tasks = new List<Task>();
-            var resultTasks = new List<T>();
-
-            // 
-            for (var i = 0; i < allNodes.Count; i++)
-            {
-                var node = allNodes[i];
-                if (node is ITaskAssignable && (node as ITaskAssignable).task != null)
-                {
-                    tasks.Add((node as ITaskAssignable).task);
-                }
-
-                if (node is ISubTasksContainer)
-                {
-                    tasks.AddRange((node as ISubTasksContainer).GetTasks());
-                }
-
-                for (var j = 0; j < node.outConnections.Count; j++)
-                {
-                    var c = node.outConnections[j];
-                    if (c is ITaskAssignable && (c as ITaskAssignable).task != null)
-                    {
-                        tasks.Add((c as ITaskAssignable).task);
-                    }
-                    if (c is ISubTasksContainer)
-                    {
-                        tasks.AddRange((c as ISubTasksContainer).GetTasks());
-                    }
-                }
-            }
-
-            for (var i = 0; i < tasks.Count; i++)
-            {
-                var task = tasks[i];
-                if (task is ActionList)
-                {
-                    resultTasks.AddRange((task as ActionList).actions.OfType<T>());
-                }
-                if (task is ConditionList)
-                {
-                    resultTasks.AddRange((task as ConditionList).conditions.OfType<T>());
-                }
-                if (task is T)
-                {
-                    resultTasks.Add((T)task);
-                }
-            }
-
-            return resultTasks;
         }
 
         private bool _isPaused;
@@ -321,7 +138,7 @@ namespace NodeCanvas.Framework
             set { _agent = value; }
         }
 
-        public void RemoveConnection(Connection connection, bool recordUndo = true)
+        public void RemoveConnection(Connection connection)
         {
 
             //for live editing
@@ -330,12 +147,6 @@ namespace NodeCanvas.Framework
                 connection.Reset();
             }
 
-            if (recordUndo)
-            {
-                RecordUndo("Delete Connection");
-            }
-
-            //callbacks
             connection.OnDestroy();
             connection.sourceNode.OnChildDisconnected(connection.sourceNode.outConnections.IndexOf(connection));
             connection.targetNode.OnParentDisconnected(connection.targetNode.inConnections.IndexOf(connection));
@@ -347,10 +158,6 @@ namespace NodeCanvas.Framework
             UpdateNodeIDs(false);
         }
 
-        void RecordUndo(string name)
-        {
-
-        }
 
         public Node primeNode
         {
@@ -370,8 +177,6 @@ namespace NodeCanvas.Framework
                         if (_primeNode != null) _primeNode.Reset();
                         if (value != null) value.Reset();
                     }
-
-                    RecordUndo("Set Start");
 
                     _primeNode = value;
                     UpdateNodeIDs(true);
@@ -408,21 +213,8 @@ namespace NodeCanvas.Framework
                 allNodes = allNodes.OrderBy(node => node.ID).ToList();
             }
         }
-        public void SetSerializationObjectReferences(List<UnityEngine.Object> references)
-        {
-            this._objectReferences = references;
-        }
 
-        public static T Clone<T>(T graph) where T : Graph
-        {
-            var newGraph = (T)Instantiate(graph);
-            newGraph.name = newGraph.name.Replace("(Clone)", "");
-            return (T)newGraph;
-        }
-
-        
-
-        public void StartGraph(Component agent, IBlackboard blackboard, bool autoUpdate, System.Action<bool> callback = null)
+        public void StartGraph(Component agent, bool autoUpdate, System.Action<bool> callback = null)
         {
             if (isRunning)
             {
@@ -446,29 +238,7 @@ namespace NodeCanvas.Framework
                 return;
             }
 
-            if (blackboard == null)
-            {
-                if (agent != null)
-                {
-                    Debug.Log("<b>Graph:</b> Graph started without blackboard. Looking for blackboard on agent '" + agent.gameObject + "'...", agent.gameObject);
-                    blackboard = agent.GetComponent(typeof(IBlackboard)) as IBlackboard;
-                    if (blackboard != null)
-                    {
-                        Debug.Log("<b>Graph:</b> Blackboard found");
-                    }
-                }
-                if (blackboard == null)
-                {
-                    Debug.LogWarning("<b>Graph:</b> Started with null Blackboard. Using Local instead...");
-                    blackboard = localBlackboard;
-                }
-            }
-
             this.agent = agent;
-            this.blackboard = blackboard;
-
-            // deal with Task node and node BBField
-            UpdateReferences();
 
             // 添加回调
             if (callback != null)
@@ -477,7 +247,6 @@ namespace NodeCanvas.Framework
             }
 
             isRunning = true;
-            runningGraphs.Add(this);
 
             if (autoUpdate)
             {
@@ -522,7 +291,6 @@ namespace NodeCanvas.Framework
                 return;
             }
 
-            runningGraphs.Remove(this);
             MonoManager.current.onUpdate -= UpdateGraph;
 
             isRunning = false;
@@ -543,7 +311,6 @@ namespace NodeCanvas.Framework
                 return;
             }
 
-            runningGraphs.Remove(this);
             MonoManager.current.onUpdate -= UpdateGraph;
 
             isRunning = false;
@@ -634,5 +401,41 @@ namespace NodeCanvas.Framework
         //    this.Deserialize(_serializedGraph, false, _objectReferences);
         //}
 
+        //public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
+        //{
+        //    if (string.IsNullOrEmpty(serializedGraph))
+        //    {
+        //        return null;
+        //    }
+
+        //    //the list to load the references from. If not provided externaly we load from the local list (which is the case most times)
+        //    if (objectReferences == null)
+        //    {
+        //        objectReferences = this._objectReferences;
+        //    }
+
+        //    try
+        //    {
+        //        //deserialize provided serialized graph into a new GraphSerializationData object and load it
+        //        var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
+        //        if (LoadGraphData(data, validate) == true)
+        //        {
+        //            this._deserializationFailed = false;
+        //            this._serializedGraph = serializedGraph;
+        //            this._objectReferences = objectReferences;
+        //            return data;
+        //        }
+
+        //        _deserializationFailed = true;
+        //        return null;
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
+        //        Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
+        //        _deserializationFailed = true;
+        //        return null;
+        //    }
+        //}
     }
 }

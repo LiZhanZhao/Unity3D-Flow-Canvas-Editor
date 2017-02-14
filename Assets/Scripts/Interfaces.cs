@@ -8,19 +8,5 @@ namespace NodeCanvas.Framework
         void Update();
     }
 
-    public interface ISubParametersContainer
-    {
-        BBParameter[] GetIncludeParseParameters();
-    }
-    public interface ITaskAssignable
-    {
-        Task task { get; set; }
-    }
-
-    public interface ISubTasksContainer
-    {
-        Task[] GetTasks();
-    }
-
 }
 

@@ -16,9 +16,6 @@ namespace FlowCanvas
         private Dictionary<string, Port> outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         sealed public override bool allowAsPrime { get { return false; } }
 
-        private Port[] orderedInputs;
-        private Port[] orderedOutputs;
-        private ValueInput firstValuePort;
         private Dictionary<string, object> _inputPortValues;
 
         // be critical, this is will init inputPorts and outputPorts
@@ -63,22 +60,7 @@ namespace FlowCanvas
             inputPorts.Clear();
             outputPorts.Clear();
             RegisterPorts();
-
-#if UNITY_EDITOR
-            OnPortsGatheredInEditor();
-#endif
-
-            DeserializeInputPortValues();
             ValidateConnections();
-        }
-
-        
-
-        void OnPortsGatheredInEditor()
-        {
-            orderedInputs = inputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowInput) ? 0 : 1).ToArray();
-            orderedOutputs = outputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowOutput) ? 0 : 1).ToArray();
-            firstValuePort = orderedInputs.OfType<ValueInput>().FirstOrDefault();
         }
 
         // Validate
@@ -107,29 +89,6 @@ namespace FlowCanvas
             Port input = null;
             inputPorts.TryGetValue(ID, out input);
             return input;
-        }
-
-        
-
-        void DeserializeInputPortValues()
-        {
-
-            if (_inputPortValues == null)
-            {
-                return;
-            }
-
-            foreach (var pair in _inputPortValues)
-            {
-                Port inputPort = null;
-                if (inputPorts.TryGetValue(pair.Key, out inputPort))
-                {
-                    if (inputPort is ValueInput && pair.Value != null && inputPort.type.RTIsAssignableFrom(pair.Value.GetType()))
-                    {
-                        (inputPort as ValueInput).serializedValue = pair.Value;
-                    }
-                }
-            }
         }
 
         // notice : this is a virtual function
@@ -256,27 +215,6 @@ namespace FlowCanvas
         public BinderConnection GetInputConnectionForPortID(string ID)
         {
             return inConnections.OfType<BinderConnection>().FirstOrDefault(c => c.targetPortID == ID);
-        }
-
-        public void AssignSelfInstancePort()
-        {
-            if (graphAgent == null)
-            {
-                return;
-            }
-
-            var instanceInput = inputPorts.Values.OfType<ValueInput>().FirstOrDefault();
-            if (instanceInput != null && !instanceInput.isConnected && instanceInput.isDefaultValue)
-            {
-                if (instanceInput.type == typeof(GameObject))
-                {
-                    instanceInput.serializedValue = graphAgent.gameObject;
-                }
-                if (typeof(Component).RTIsAssignableFrom(instanceInput.type))
-                {
-                    instanceInput.serializedValue = graphAgent.GetComponent(instanceInput.type);
-                }
-            }
         }
 
         public void BindPorts()

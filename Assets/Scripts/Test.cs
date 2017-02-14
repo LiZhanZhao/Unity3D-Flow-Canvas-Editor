@@ -30,7 +30,6 @@ public class Test : MonoBehaviour {
         ConstructionEvent onAwakeNode = new ConstructionEvent();
 
         GetVariable<float> getVarFloat = new GetVariable<float>();
-        getVarFloat.value = new BBParameter<float>();
         getVarFloat.SetVariable(10.0f);
 
         SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
@@ -40,7 +39,6 @@ public class Test : MonoBehaviour {
         data.nodes.Add(logNodeWrapper);
 
         ////// Connections
-        //BinderConnection connection1 = new BinderConnection();
         BinderConnection<object> connection1 = new BinderConnection<object>();
         connection1.sourcePortID = "Value";
         connection1.sourceNode = getVarFloat;
@@ -58,7 +56,7 @@ public class Test : MonoBehaviour {
 
 
         FlowScript graph = new FlowScript();
-        if (!graph.Deserialize(data, true, null))
+        if (!graph.Deserialize(data, true))
         {
             Debug.LogError("Can not Deserialize File");
         }

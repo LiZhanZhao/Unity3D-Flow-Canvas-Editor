@@ -7,10 +7,7 @@ namespace FlowCanvas
 {
 
     abstract public class FlowGraph : Graph {
-        public override bool useLocalBlackboard { get { return false; } }
-
         sealed public override bool requiresAgent { get { return false; } }
-
         sealed public override bool requiresPrimeNode { get { return false; } }
 
         private bool hasInitialized;
@@ -44,8 +41,7 @@ namespace FlowCanvas
                     if (allNodes[i] is FlowNode)
                     {
                         var flowNode = (FlowNode)allNodes[i];
-                        flowNode.AssignSelfInstancePort();
-                        // 绑定好flow的关系
+                        //flowNode.AssignSelfInstancePort();
                         flowNode.BindPorts();
                     }
                 }

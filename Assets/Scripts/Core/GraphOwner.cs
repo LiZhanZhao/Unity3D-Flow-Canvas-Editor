@@ -7,27 +7,17 @@ namespace NodeCanvas.Framework
 {
     abstract public class GraphOwner : MonoBehaviour
     {
-        abstract public Graph graph { get; set; }
-
-        private string boundGraphSerialization;
-
-        private List<UnityEngine.Object> boundGraphObjectReferences;
-
-        private Dictionary<Graph, Graph> instances = new Dictionary<Graph, Graph>();
-
-        private static bool isQuiting;
-        public DisableAction disableAction = DisableAction.DisableBehaviour;
-
-
-
         public enum EnableAction
         {
             EnableBehaviour,
             DoNothing
         }
 
+        abstract public Graph graph { get; set; }
+        private static bool isQuiting;
         private bool startCalled = false;
         public EnableAction enableAction = EnableAction.EnableBehaviour;
+        public DisableAction disableAction = DisableAction.DisableBehaviour;
         
 
         protected void Start()

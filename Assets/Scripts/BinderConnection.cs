@@ -102,10 +102,6 @@ namespace FlowCanvas
             if (sourcePort is FlowOutput && targetPort is FlowInput)
             {
                 (sourcePort as FlowOutput).BindTo((FlowInput)targetPort);
-
-#if UNITY_EDITOR && DO_EDITOR_BINDING
-				(sourcePort as FlowOutput).Append( (f)=> {BlinkStatus(f);} );
-#endif
             }
         }
 

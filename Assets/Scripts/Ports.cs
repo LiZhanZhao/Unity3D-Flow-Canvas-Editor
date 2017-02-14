@@ -21,6 +21,7 @@ namespace FlowCanvas{
         }
     }
 
+    // 
     abstract public class Port {
         public Port() { }
         public Port(FlowNode parent, string name, string ID)
@@ -39,9 +40,6 @@ namespace FlowCanvas{
         ///The display name of the port
         public string name { get; private set; }
 
-        ///The position of the port in the context of it's parent (editor use)
-        public Vector2 pos { get; set; }
-
         ///The number of connections the port currently has
         public int connections { get; set; }
 
@@ -54,25 +52,27 @@ namespace FlowCanvas{
         ///The type of the port
         abstract public Type type { get; }
 
-        ///Helper method to determine if a port can accept further connections
-        public bool CanAcceptConnections()
-        {
-            if (this is ValueOutput || (this is FlowOutput && !this.isConnected))
-            {
-                return true;
-            }
-            if (this is FlowInput || (this is ValueInput && !this.isConnected))
-            {
-                return true;
-            }
-            return false;
-        }
     }
+
+    public class FlowInput : Port
+    {
+        public FlowInput(FlowNode parent, string name, string ID, FlowHandler pointer)
+            : base(parent, name, ID)
+        {
+            this.pointer = pointer;
+        }
+
+        ///Used for port binding
+        public FlowHandler pointer { get; private set; }
+        ///The type of the port which is always type of Flow
+        public override Type type { get { return typeof(Flow); } }
+    }
+
     public class FlowOutput : Port
     {
         public FlowOutput(FlowNode parent, string name, string ID) : base(parent, name, ID) { }
 
-        ///Used for port binding
+        ///Used for port binding, this is usually FlowInput's pointer
         public FlowHandler pointer { get; private set; }
         ///The type of the port which is always type of Flow
         public override Type type { get { return typeof(Flow); } }
@@ -83,47 +83,9 @@ namespace FlowCanvas{
             if (pointer != null && !parent.graph.isPaused)
             {
                 f.ticks++;
-
-#if UNITY_EDITOR
-
-                if (parent.isBreakpoint)
-                {
-                    ParadoxNotion.Services.MonoManager.current.StartCoroutine(BreakWait(f));
-                    return;
-                }
-
-                Continue(f);
-
-#else
-
-				pointer(f);
-
-#endif
+                pointer(f);
             }
         }
-
-#if UNITY_EDITOR //Breakpoint helpers
-        System.Collections.IEnumerator BreakWait(Flow f)
-        {
-            UnityEngine.Debug.LogWarning(string.Format("FlowScript Breakpoint Reached: Node '{0}'", parent.name), parent.graphAgent);
-            UnityEngine.Debug.Break();
-            parent.SetStatus(NodeCanvas.Status.Running);
-            yield return null;
-            parent.SetStatus(NodeCanvas.Status.Resting);
-            Continue(f);
-        }
-
-        void Continue(Flow f)
-        {
-            try { pointer(f); }
-            catch (Exception e)
-            {
-                var connection = parent.GetOutputConnectionForPortID(ID);
-                var targetNode = (FlowNode)connection.targetNode;
-                targetNode.Fail(string.Format("{0}\n{1}", e.Message, e.StackTrace));
-            }
-        }
-#endif
 
 
         ///Bind the port to the target FlowInput
@@ -152,6 +114,44 @@ namespace FlowCanvas{
     }
 
 
+
+    abstract public class ValueOutput : Port
+    {
+        public ValueOutput() { }
+        public ValueOutput(FlowNode parent, string name, string ID) : base(parent, name, ID) { }
+
+        ///Used only in case that a binder required casting cause of different port types
+        abstract public object GetValue();
+    }
+
+    public class ValueOutput<T> : ValueOutput
+    {
+        public ValueOutput() { }
+
+        //normal
+        public ValueOutput(FlowNode parent, string name, string ID, ValueHandler<T> getter)
+            : base(parent, name, ID)
+        {
+            this.getter = getter;
+        }
+
+        //casted
+        public ValueOutput(FlowNode parent, string name, string ID, ValueHandler<object> getter)
+            : base(parent, name, ID)
+        {
+            this.getter = () => { return (T)getter(); };
+        }
+
+        ///Used for port binding
+        public ValueHandler<T> getter { get; private set; }
+
+        ///Used only in case that a binder required casting cause of different port types
+        public override object GetValue() { return (object)getter(); }
+        ///The type of the port
+        public override Type type { get { return typeof(T); } }
+    }
+
+
     abstract public class ValueInput : Port
     {
         public ValueInput() { }
@@ -169,19 +169,7 @@ namespace FlowCanvas{
         abstract public override Type type { get; }
     }
 
-    public class FlowInput : Port
-    {
-        public FlowInput(FlowNode parent, string name, string ID, FlowHandler pointer)
-            : base(parent, name, ID)
-        {
-            this.pointer = pointer;
-        }
-
-        ///Used for port binding
-        public FlowHandler pointer { get; private set; }
-        ///The type of the port which is always type of Flow
-        public override Type type { get { return typeof(Flow); } }
-    }
+    
 
     public class ValueInput<T> : ValueInput
     {
@@ -199,22 +187,7 @@ namespace FlowCanvas{
             {
                 if (getter != null)
                 {
-
-#if UNITY_EDITOR
-
-                    try { return getter(); }
-                    catch (Exception e)
-                    {
-                        var connection = parent.GetInputConnectionForPortID(ID);
-                        var targetNode = (FlowNode)connection.sourceNode;
-                        targetNode.Fail(string.Format("{0}\n{1}", e.Message, e.StackTrace));
-                    }
-
-#else
-
-					return getter();
-
-#endif
+                    return getter();
                 }
 
                 return _value;
@@ -245,12 +218,13 @@ namespace FlowCanvas{
         ///Binds the port to the target source ValueOutput port
         public override void BindTo(ValueOutput source)
         {
+            // if ValueOutput have same type T
             if (source is ValueOutput<T>)
             {
                 this.getter = (source as ValueOutput<T>).getter;
                 return;
             }
-
+            // is source is have same type T, this is convert 
             var func = (ValueHandler<object>)TypeConverter.GetConverterFuncFromTo(source.type, typeof(T), source.GetValue);
             this.getter = () => { return (T)func(); };
         }
@@ -268,50 +242,6 @@ namespace FlowCanvas{
         }
     }
 
-    abstract public class ValueOutput : Port
-    {
-        public ValueOutput() { }
-        public ValueOutput(FlowNode parent, string name, string ID) : base(parent, name, ID) { }
-
-        ///Creates a generic instance of ValueOutput
-        public static ValueOutput CreateInstance(Type t, FlowNode parent, string name, string ID, ValueHandler<object> getter)
-        {
-            if (getter == null)
-            { //add a dummy to avoid ambigeus contructors
-                getter = () => { return null; };
-            }
-            return (ValueOutput)Activator.CreateInstance(typeof(ValueOutput<>).RTMakeGenericType(new Type[] { t }), new object[] { parent, name, ID, getter });
-        }
-
-        ///Used only in case that a binder required casting cause of different port types
-        abstract public object GetValue();
-    }
-
-    public class ValueOutput<T> : ValueOutput 
-    {
-        public ValueOutput() { }
-
-        //normal
-        public ValueOutput(FlowNode parent, string name, string ID, ValueHandler<T> getter)
-            : base(parent, name, ID)
-        {
-            this.getter = getter;
-        }
-
-        //casted
-        public ValueOutput(FlowNode parent, string name, string ID, ValueHandler<object> getter)
-            : base(parent, name, ID)
-        {
-            this.getter = () => { return (T)getter(); };
-        }
-
-        ///Used for port binding
-        public ValueHandler<T> getter { get; private set; }
-
-        ///Used only in case that a binder required casting cause of different port types
-        public override object GetValue() { return (object)getter(); }
-        ///The type of the port
-        public override Type type { get { return typeof(T); } }
-    }
+    
 
 }

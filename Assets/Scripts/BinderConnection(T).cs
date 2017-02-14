@@ -1,6 +1,4 @@
-﻿#define DO_EDITOR_BINDING //comment this out to test the real performance without editor binding specifics
-
-using UnityEngine;
+﻿using UnityEngine;
 using ParadoxNotion;
 using NodeCanvas;
 

@@ -27,18 +27,6 @@ namespace FlowCanvas
 
             for (var i = 0; i < allNodes.Count; i++)
             {
-                // 如果是MacroNodeWrapper 类型的Node的情况的话
-                //if (allNodes[i] is MacroNodeWrapper)
-                //{
-                //    var macroNode = (MacroNodeWrapper)allNodes[i];
-                //    if (macroNode.macro != null)
-                //    {
-                //        macroNode.CheckInstance();
-                //        macroNode.macro.StartGraph(agent, blackboard, false, null);
-                //    }
-                //}
-
-                // 把继承IUpdatable的Node添加到updatableNodes中
                 if (!hasInitialized)
                 {
                     if (allNodes[i] is IUpdatable)
@@ -80,18 +68,7 @@ namespace FlowCanvas
 
         protected override void OnGraphStoped()
         {
-            //for (var i = 0; i < allNodes.Count; i++)
-            //{
-            //    var node = allNodes[i];
-            //    if (node is MacroNodeWrapper)
-            //    {
-            //        var macroNode = (MacroNodeWrapper)node;
-            //        if (macroNode.macro != null)
-            //        {
-            //            macroNode.macro.Stop();
-            //        }
-            //    }
-            //}
+
         }
     }
 }

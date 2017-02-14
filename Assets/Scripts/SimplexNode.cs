@@ -41,7 +41,7 @@ namespace FlowCanvas.Nodes
             }
         }
 
-
+        // get Invoke method parameters
         protected ParameterInfo[] parameters
         {
             get { return this.GetType().GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).GetParameters(); }

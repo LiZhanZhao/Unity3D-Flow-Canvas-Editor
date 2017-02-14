@@ -4,7 +4,6 @@ using ParadoxNotion.Design;
 using NodeCanvas.Framework;
 
 namespace FlowCanvas.Nodes{
-    [DoNotList]
 	///Wraps a SimplexNode
     ///
 	public class SimplexNodeWrapper<T> : FlowNode where T:SimplexNode {

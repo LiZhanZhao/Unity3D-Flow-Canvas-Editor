@@ -13,22 +13,64 @@ public class Test : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        FlowGraph graph = GetCustomGraph();
+        //FlowGraph graph = GetCustomGraphOnce();
+        FlowGraph graph = GetCustomGraphUpdate();
         FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
         fsc.graph = graph;
         //fsc.StartBehaviour(graph);
         
 	}
 
+    FlowScript GetCustomGraphUpdate()
+    {
+        GraphSerializationData data = new GraphSerializationData();
+        data.version = 1.0f;
 
-    FlowScript GetCustomGraph()
+        ///// Nodes
+        MouseEvents meNode = new MouseEvents();
+
+        GetVariable<float> getVarFloat = new GetVariable<float>();
+        getVarFloat.SetVariable(10.0f);
+
+        SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
+
+        data.nodes.Add(meNode);
+        data.nodes.Add(getVarFloat);
+        data.nodes.Add(logNodeWrapper);
+
+        ////// Connections
+        BinderConnection<object> connection1 = new BinderConnection<object>();
+        connection1.sourcePortID = "Value";
+        connection1.sourceNode = getVarFloat;
+        connection1.targetPortID = "Obj";
+        connection1.targetNode = logNodeWrapper;
+
+        BinderConnection connection2 = new BinderConnection();
+        connection2.sourcePortID = "Down";
+        connection2.sourceNode = meNode;
+        connection2.targetPortID = " ";
+        connection2.targetNode = logNodeWrapper;
+
+        data.connections.Add(connection1);
+        data.connections.Add(connection2);
+
+
+        FlowScript graph = new FlowScript();
+        if (!graph.Deserialize(data, true))
+        {
+            Debug.LogError("Can not Deserialize File");
+        }
+        return graph;
+    }
+
+    FlowScript GetCustomGraphOnce()
     {
         GraphSerializationData data = new GraphSerializationData();
         data.version = 1.0f;
 
         ///// Nodes
         ConstructionEvent onAwakeNode = new ConstructionEvent();
-
+        
         GetVariable<float> getVarFloat = new GetVariable<float>();
         getVarFloat.SetVariable(10.0f);
 

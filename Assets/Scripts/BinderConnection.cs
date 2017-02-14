@@ -15,13 +15,15 @@ namespace FlowCanvas
         public string sourcePortID
         {
             get { return sourcePort != null ? sourcePort.ID : _sourcePortName; }
-            private set { _sourcePortName = value; }
+            //private set { _sourcePortName = value; }
+            set { _sourcePortName = value; }
         }
 
         public string targetPortID
         {
             get { return targetPort != null ? targetPort.ID : _targetPortName; }
-            private set { _targetPortName = value; }
+            //private set { _targetPortName = value; }
+            set { _targetPortName = value; }
         }
 
         public Port sourcePort

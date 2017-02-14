@@ -14,14 +14,16 @@ namespace NodeCanvas.Framework
         public Node sourceNode
         {
             get { return _sourceNode; }
-            protected set { _sourceNode = value; }
+            //protected set { _sourceNode = value; }
+            set { _sourceNode = value; }
         }
 
         ///The target node of the connection
         public Node targetNode
         {
             get { return _targetNode; }
-            protected set { _targetNode = value; }
+            //protected set { _targetNode = value; }
+            set { _targetNode = value; }
         }
         protected Graph graph
         {

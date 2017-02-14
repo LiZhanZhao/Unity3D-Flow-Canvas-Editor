@@ -29,6 +29,8 @@ namespace NodeCanvas.Framework
         abstract public bool requiresAgent { get; }
         abstract public bool requiresPrimeNode { get; }
 
+        private bool hasDeserialized = false;
+
         public string graphComments
         {
             get { return _comments; }
@@ -76,15 +78,13 @@ namespace NodeCanvas.Framework
 
         virtual protected void OnGraphStoped() { }
 
-
-        public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
+        public bool Deserialize(GraphSerializationData data, bool validate, List<UnityEngine.Object> objectReferences)
         {
-            if (string.IsNullOrEmpty(serializedGraph))
+            if (data == null)
             {
-                return null;
+                return false;
             }
 
-            //the list to load the references from. If not provided externaly we load from the local list (which is the case most times)
             if (objectReferences == null)
             {
                 objectReferences = this._objectReferences;
@@ -93,26 +93,67 @@ namespace NodeCanvas.Framework
             try
             {
                 //deserialize provided serialized graph into a new GraphSerializationData object and load it
-                var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
+                //var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
                 if (LoadGraphData(data, validate) == true)
                 {
                     this._deserializationFailed = false;
-                    this._serializedGraph = serializedGraph;
+                    //this._serializedGraph = serializedGraph;
                     this._objectReferences = objectReferences;
-                    return data;
+                    //return data;
+                    return true;
                 }
 
                 _deserializationFailed = true;
-                return null;
+                //return null;
+                return false;
             }
             catch (System.Exception e)
             {
                 //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
                 Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
                 _deserializationFailed = true;
-                return null;
+                //return null;
+                return false;
             }
+
         }
+
+        //public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
+        //{
+        //    if (string.IsNullOrEmpty(serializedGraph))
+        //    {
+        //        return null;
+        //    }
+
+        //    //the list to load the references from. If not provided externaly we load from the local list (which is the case most times)
+        //    if (objectReferences == null)
+        //    {
+        //        objectReferences = this._objectReferences;
+        //    }
+
+        //    try
+        //    {
+        //        //deserialize provided serialized graph into a new GraphSerializationData object and load it
+        //        var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
+        //        if (LoadGraphData(data, validate) == true)
+        //        {
+        //            this._deserializationFailed = false;
+        //            this._serializedGraph = serializedGraph;
+        //            this._objectReferences = objectReferences;
+        //            return data;
+        //        }
+
+        //        _deserializationFailed = true;
+        //        return null;
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
+        //        Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
+        //        _deserializationFailed = true;
+        //        return null;
+        //    }
+        //}
 
         bool LoadGraphData(GraphSerializationData data, bool validate)
         {
@@ -599,65 +640,65 @@ namespace NodeCanvas.Framework
         //    Deserialize();
         //}
 
-        private bool hasDeserialized = false;
+        
 
-        public void Serialize()
-        {
-            if (_objectReferences != null && _objectReferences.Count > 0 && _objectReferences.Any(o => o != null))
-            { //Unity requires double deserialize for UnityObject refs.
-                hasDeserialized = false;
-            }
+//        public void Serialize()
+//        {
+//            if (_objectReferences != null && _objectReferences.Count > 0 && _objectReferences.Any(o => o != null))
+//            { //Unity requires double deserialize for UnityObject refs.
+//                hasDeserialized = false;
+//            }
 
-#if UNITY_EDITOR //we only serialize in the editor
-            if (JSONSerializer.applicationPlaying)
-            {
-                return;
-            }
+//#if UNITY_EDITOR //we only serialize in the editor
+//            if (JSONSerializer.applicationPlaying)
+//            {
+//                return;
+//            }
 
-            ///Serialize the graph and returns the serialized json string
-            /// _serializedGraph 保存的就是Json String，注意_objectReferences也参与序列化
-            _serializedGraph = this.Serialize(false, _objectReferences);
+//            ///Serialize the graph and returns the serialized json string
+//            /// _serializedGraph 保存的就是Json String，注意_objectReferences也参与序列化
+//            _serializedGraph = this.Serialize(false, _objectReferences);
 
-            //notify owner. This is used for bound graphs
-            var owner = agent != null && agent is GraphOwner ? (GraphOwner)agent : null;
-            //if (owner != null)
-            //{
-            //    owner.OnGraphSerialized(this);
-            //}
-#endif
-        }
+//            //notify owner. This is used for bound graphs
+//            var owner = agent != null && agent is GraphOwner ? (GraphOwner)agent : null;
+//            //if (owner != null)
+//            //{
+//            //    owner.OnGraphSerialized(this);
+//            //}
+//#endif
+//        }
 
-        public string Serialize(bool pretyJson, List<UnityEngine.Object> objectReferences)
-        {
-            //if something went wrong on deserialization, dont serialize back, but rather keep what we had
-            // 反序列化失败的情况
-            if (_deserializationFailed)
-            {
-                _deserializationFailed = false;
-                return _serializedGraph;
-            }
+        //public string Serialize(bool pretyJson, List<UnityEngine.Object> objectReferences)
+        //{
+        //    //if something went wrong on deserialization, dont serialize back, but rather keep what we had
+        //    // 反序列化失败的情况
+        //    if (_deserializationFailed)
+        //    {
+        //        _deserializationFailed = false;
+        //        return _serializedGraph;
+        //    }
 
-            //the list to save the references in. If not provided externaly we save into the local list
-            if (objectReferences == null)
-            {
-                objectReferences = this._objectReferences = new List<Object>();
-            }
+        //    //the list to save the references in. If not provided externaly we save into the local list
+        //    if (objectReferences == null)
+        //    {
+        //        objectReferences = this._objectReferences = new List<Object>();
+        //    }
 
-            UpdateNodeIDs(true);
-            // 这里就把一个Graph的数据填充到GraphSerializationData结构中，再变成Json String
-            // 注意这里，objectReferences也传进去的，理解为，也序列化objectReferences
-            return JSONSerializer.Serialize(typeof(GraphSerializationData), new GraphSerializationData(this), pretyJson, objectReferences);
-        }
+        //    UpdateNodeIDs(true);
+        //    // 这里就把一个Graph的数据填充到GraphSerializationData结构中，再变成Json String
+        //    // 注意这里，objectReferences也传进去的，理解为，也序列化objectReferences
+        //    return JSONSerializer.Serialize(typeof(GraphSerializationData), new GraphSerializationData(this), pretyJson, objectReferences);
+        //}
 
-        public void Deserialize()
-        {
-            if (hasDeserialized && JSONSerializer.applicationPlaying)
-            { //avoid double call if not needed (UnityObject refs).
-                return;
-            }
-            hasDeserialized = true;
-            this.Deserialize(_serializedGraph, false, _objectReferences);
-        }
+        //public void Deserialize()
+        //{
+        //    if (hasDeserialized && JSONSerializer.applicationPlaying)
+        //    { //avoid double call if not needed (UnityObject refs).
+        //        return;
+        //    }
+        //    hasDeserialized = true;
+        //    this.Deserialize(_serializedGraph, false, _objectReferences);
+        //}
 
     }
 }

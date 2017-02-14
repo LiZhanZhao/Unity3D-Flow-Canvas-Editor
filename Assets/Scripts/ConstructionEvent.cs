@@ -12,9 +12,10 @@ namespace FlowCanvas.Nodes{
         {
             if (!called)
             {
+                Debug.Log("*** OnAwake ***");
                 called = true;
                 once.Call(new Flow(1));
-                Debug.Log("111111111111");
+                
             }
         }
 

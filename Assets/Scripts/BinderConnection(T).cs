@@ -17,7 +17,6 @@ namespace FlowCanvas{
 				return;
 			}
 
-
 			DoNormalBinding(sourcePort, targetPort);
 			
 		}

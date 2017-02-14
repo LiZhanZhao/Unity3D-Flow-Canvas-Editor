@@ -34,9 +34,12 @@ public class Test : MonoBehaviour {
 
         SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
 
+        FinishNode finish = new FinishNode();
+
         data.nodes.Add(meNode);
         data.nodes.Add(getVarFloat);
         data.nodes.Add(logNodeWrapper);
+        data.nodes.Add(finish);
 
         ////// Connections
         BinderConnection<object> connection1 = new BinderConnection<object>();
@@ -51,8 +54,15 @@ public class Test : MonoBehaviour {
         connection2.targetPortID = " ";
         connection2.targetNode = logNodeWrapper;
 
+        BinderConnection connection3 = new BinderConnection();
+        connection3.sourceNode = meNode;
+        connection3.sourcePortID = "Up";
+        connection3.targetNode = finish;
+        connection3.targetPortID = "In";
+
         data.connections.Add(connection1);
         data.connections.Add(connection2);
+        data.connections.Add(connection3);
 
 
         FlowScript graph = new FlowScript();

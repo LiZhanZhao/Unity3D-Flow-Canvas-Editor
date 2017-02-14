@@ -6,17 +6,7 @@ using System.Collections.Generic;
 namespace NodeCanvas.Framework.Internal {
     public class GraphSerializationData
     {
-
-        private readonly float SerializationVersion = 2.6f;
-
         public float version;
-        public System.Type type;
-        public string name = string.Empty;
-        public string comments = string.Empty;
-        public Vector2 translation = new Vector2(-5000, -5000);
-        public float zoomFactor = 1f;
-        public List<CanvasGroup> canvasGroups = null;
-        public BlackboardSource localBlackboard = null;
 
         // 节点列表
         public List<Node> nodes = new List<Node>();
@@ -31,19 +21,10 @@ namespace NodeCanvas.Framework.Internal {
         //Construct
         public GraphSerializationData(Graph graph)
         {
-
-            this.version = SerializationVersion;
-            this.type = graph.GetType();
-            this.name = graph.name;
-            this.comments = graph.graphComments;
-            this.translation = graph.translation;
-            this.zoomFactor = graph.zoomFactor;
-            this.nodes = graph.allNodes;
-            this.canvasGroups = graph.canvasGroups;
-            this.localBlackboard = graph.localBlackboard;
-
             //connections are serialized seperately and not part of their parent node
+            this.nodes = graph.allNodes;
             var structConnections = new List<Connection>();
+
             for (var i = 0; i < nodes.Count; i++)
             {
                 for (var j = 0; j < nodes[i].outConnections.Count; j++)

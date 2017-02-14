@@ -14,13 +14,8 @@ namespace NodeCanvas.Framework
         private List<Object> _objectReferences;
         private bool _deserializationFailed = false;
         private string _serializedGraph;
-        private string _name = string.Empty;
-        private string _comments = string.Empty;
-        private Vector2 _translation = new Vector2(-5000, -5000);
-        private float _zoomFactor = 1f;
         private List<Node> _nodes = new List<Node>();
         private Node _primeNode = null;
-        private List<CanvasGroup> _canvasGroups = null;
         private BlackboardSource _localBlackboard = null;
         private bool _isRunning;
         public event System.Action<bool> OnFinish;
@@ -31,29 +26,9 @@ namespace NodeCanvas.Framework
 
         private bool hasDeserialized = false;
 
-        public string graphComments
-        {
-            get { return _comments; }
-            set { _comments = value; }
-        }
+        abstract public bool useLocalBlackboard { get; }
+        private IBlackboard _blackboard;
 
-        public Vector2 translation
-        {
-            get { return _translation; }
-            set { _translation = value; }
-        }
-
-        public float zoomFactor
-        {
-            get { return _zoomFactor; }
-            set { _zoomFactor = value; }
-        }
-
-        public List<CanvasGroup> canvasGroups
-        {
-            get { return _canvasGroups; }
-            set { _canvasGroups = value; }
-        }
         public List<Node> allNodes
         {
             get { return _nodes; }
@@ -164,23 +139,14 @@ namespace NodeCanvas.Framework
                 return false;
             }
 
-            if (data.type != this.GetType())
-            {
-                Debug.LogError("Can't Load graph, cause of different Graph type serialized and required");
-                return false;
-            }
+            
             // data.connections and data.nodes to graph
             data.Reconstruct(this);
 
-            //grab the final data and set fields directly
-            this._name = data.name;
-            this._comments = data.comments;
-            this._translation = data.translation;
-            this._zoomFactor = data.zoomFactor;
             this._nodes = data.nodes;
             this._primeNode = data.primeNode;
-            this._canvasGroups = data.canvasGroups;
-            this._localBlackboard = data.localBlackboard;
+
+            //this._localBlackboard = data.localBlackboard;
 
             //IMPORTANT: Validate should be called in all deserialize cases outside of Unity's 'OnAfterDeserialize',
             //like for example when loading from json, or manualy calling this outside of OnAfterDeserialize.
@@ -196,13 +162,6 @@ namespace NodeCanvas.Framework
 
         public void Validate()
         {
-//#if UNITY_EDITOR
-//            if (!Application.isPlaying && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-//            {
-//                UpdateReferences();
-//            }
-//#endif
-
             for (var i = 0; i < allNodes.Count; i++)
             {
                 try { allNodes[i].OnValidate(this); } //validation could be critical. we always continue
@@ -253,8 +212,7 @@ namespace NodeCanvas.Framework
             }
         }
 
-        abstract public bool useLocalBlackboard { get; }
-        private IBlackboard _blackboard;
+        
 
         public BlackboardSource localBlackboard
         {
@@ -274,13 +232,6 @@ namespace NodeCanvas.Framework
             get
             {
                 if (useLocalBlackboard) { return localBlackboard; }
-#if UNITY_EDITOR
-                if (_blackboard == null || _blackboard.Equals(null))
-                { //done for when user removes bb component in editor.
-                    return null;
-                }
-#endif
-
                 return _blackboard;
             }
             set
@@ -392,22 +343,13 @@ namespace NodeCanvas.Framework
             connection.sourceNode.outConnections.Remove(connection);
             connection.targetNode.inConnections.Remove(connection);
 
-//#if UNITY_EDITOR
-//            //TODO: FIX in accessors?
-//            currentSelection = null;
-//#endif
 
             UpdateNodeIDs(false);
         }
 
         void RecordUndo(string name)
         {
-//#if UNITY_EDITOR
-//            if (!Application.isPlaying)
-//            {
-//                UnityEditor.Undo.RecordObject(this, name);
-//            }
-//#endif
+
         }
 
         public Node primeNode
@@ -482,14 +424,6 @@ namespace NodeCanvas.Framework
 
         public void StartGraph(Component agent, IBlackboard blackboard, bool autoUpdate, System.Action<bool> callback = null)
         {
-
-//#if UNITY_EDITOR //prevent the user to accidentaly start the graph while its an asset. At least in the editor
-//            if (UnityEditor.EditorUtility.IsPersistent(this))
-//            {
-//                Debug.LogError("<b>Graph:</b> You have tried to start a graph which is an asset, not an instance! You should Instantiate the graph first");
-//                return;
-//            }
-//#endif
             if (isRunning)
             {
                 if (callback != null)

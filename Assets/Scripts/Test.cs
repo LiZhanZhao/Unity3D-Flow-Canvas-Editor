@@ -23,12 +23,8 @@ public class Test : MonoBehaviour {
 
     FlowScript GetCustomGraph()
     {
-        
         GraphSerializationData data = new GraphSerializationData();
-        data.version = 2.6f;
-        data.type = typeof(FlowCanvas.FlowScript);
-        data.name = "FlowCanvas.FlowScript";
-        data.localBlackboard = new BlackboardSource();
+        data.version = 1.0f;
 
         ///// Nodes
         ConstructionEvent onAwakeNode = new ConstructionEvent();

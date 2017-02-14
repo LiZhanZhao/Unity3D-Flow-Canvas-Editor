@@ -51,9 +51,6 @@ namespace FlowCanvas
         }
 
         
-
-        
-
         public void GatherPorts()
         {
 

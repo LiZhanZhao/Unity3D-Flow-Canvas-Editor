@@ -25,7 +25,6 @@ namespace NodeCanvas.Framework
             startCalled = true;
             if (enableAction == EnableAction.EnableBehaviour)
             {
-                // 开始执行主要的流程
                 StartBehaviour();
             }
         }
@@ -34,7 +33,6 @@ namespace NodeCanvas.Framework
         {
             if (graph != null)
             {
-                // blackboard 会调用GraphOwner<T>里面的，顺便初始化了，GraphOwner<T> 的 _blackboard
                 graph.StartGraph(this, true);
             }
         }

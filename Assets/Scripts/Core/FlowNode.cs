@@ -12,8 +12,8 @@ namespace FlowCanvas
 {
     abstract public class FlowNode : Node
     {
-        private Dictionary<string, Port> inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
-        private Dictionary<string, Port> outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
+        private Dictionary<string, Port> _inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
+        private Dictionary<string, Port> _outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         sealed public override bool allowAsPrime { get { return false; } }
 
         private Dictionary<string, object> _inputPortValues;
@@ -46,7 +46,7 @@ namespace FlowCanvas
         public Port GetOutputPort(string ID)
         {
             Port output = null;
-            outputPorts.TryGetValue(ID, out output);
+            _outputPorts.TryGetValue(ID, out output);
             return output;
         }
 
@@ -54,8 +54,8 @@ namespace FlowCanvas
         public void GatherPorts()
         {
 
-            inputPorts.Clear();
-            outputPorts.Clear();
+            _inputPorts.Clear();
+            _outputPorts.Clear();
             RegisterPorts();
             ValidateConnections();
         }
@@ -84,7 +84,7 @@ namespace FlowCanvas
         public Port GetInputPort(string ID)
         {
             Port input = null;
-            inputPorts.TryGetValue(ID, out input);
+            _inputPorts.TryGetValue(ID, out input);
             return input;
         }
 
@@ -156,7 +156,7 @@ namespace FlowCanvas
                         var getterType = typeof(ValueHandler<>).RTMakeGenericType(new Type[] { delType });
                         var getter = port.GetType().GetMethod("get_value").RTCreateDelegate(getterType, port);
                         field.SetValue(this, getter);
-                        inputPorts[name] = port;
+                        _inputPorts[name] = port;
                     }
                 }
             }
@@ -165,25 +165,31 @@ namespace FlowCanvas
         public FlowOutput AddFlowOutput(string name, string ID = "")
         {
             if (string.IsNullOrEmpty(ID)) ID = name;
-            return (FlowOutput)(outputPorts[ID] = new FlowOutput(this, name, ID));
+            return (FlowOutput)(_outputPorts[ID] = new FlowOutput(this, name, ID));
         }
 
         public FlowInput AddFlowInput(string name, FlowHandler pointer, string ID = "")
         {
             if (string.IsNullOrEmpty(ID)) ID = name;
-            return (FlowInput)(inputPorts[ID] = new FlowInput(this, name, ID, pointer));
+            return (FlowInput)(_inputPorts[ID] = new FlowInput(this, name, ID, pointer));
         }
 
         public ValueInput<T> AddValueInput<T>(string name, string ID = "")
         {
             if (string.IsNullOrEmpty(ID)) ID = name;
-            return (ValueInput<T>)(inputPorts[ID] = new ValueInput<T>(this, name, ID));
+            return (ValueInput<T>)(_inputPorts[ID] = new ValueInput<T>(this, name, ID));
+        }
+
+        public ValueInput AddValueInput(Port port, string name, string ID = "")
+        {
+            if (string.IsNullOrEmpty(ID)) ID = name;
+            return (ValueInput)(_inputPorts[ID] = port);
         }
 
         public ValueOutput<T> AddValueOutput<T>(string name, ValueHandler<T> getter, string ID = "")
         {
             if (string.IsNullOrEmpty(ID)) ID = name;
-            return (ValueOutput<T>)(outputPorts[ID] = new ValueOutput<T>(this, name, ID, getter));
+            return (ValueOutput<T>)(_outputPorts[ID] = new ValueOutput<T>(this, name, ID, getter));
         }
 
         // only read property will become ValueOutput,ValueOutput's getter is only get {return value;}
@@ -204,7 +210,7 @@ namespace FlowCanvas
             var getter = prop.RTGetGetMethod().RTCreateDelegate(getterType, instance);
             var portType = typeof(ValueOutput<>).RTMakeGenericType(new Type[] { prop.PropertyType });
             var port = (ValueOutput)Activator.CreateInstance(portType, new object[] { this, name, name, getter });
-            return (ValueOutput)(outputPorts[name] = port);
+            return (ValueOutput)(_outputPorts[name] = port);
         }
 
         

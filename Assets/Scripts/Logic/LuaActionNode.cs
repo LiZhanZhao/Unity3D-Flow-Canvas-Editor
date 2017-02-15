@@ -24,13 +24,23 @@ namespace FlowCanvas.Nodes
             get { return "LuaNode"; }
         }
 
-        
-
         public void Update()
         {
-
+            if (!UpdateAction())
+            {
+                EndAction();
+            }
         }
         override public void OnGraphStarted() {
+            Debug.Log("LuaActionNode On Graph Started");
+            // when Update return true, will call
+            //_out.Call(new Flow(1));
+            InitAction();
+        }
+
+        void InitAction()
+        {
+            // 生成Key
             List<object> argValue = new List<object>();
             foreach (string argName in _argNames)
             {
@@ -51,9 +61,21 @@ namespace FlowCanvas.Nodes
             testLuaFunc.Push(args);
             testLuaFunc.PCall();
             testLuaFunc.EndPCall();
+        }
 
-            // when Update return true, will call
-            //_out.Call(new Flow(1));
+        void BeginAction()
+        {
+            
+        }
+
+        bool UpdateAction()
+        {
+            return false;
+        }
+
+        void EndAction()
+        {
+
         }
 
         override public void OnGraphStoped() { }
@@ -61,7 +83,9 @@ namespace FlowCanvas.Nodes
         protected override void RegisterPorts()
         {
             _out = AddFlowOutput("Out");
-            _in = AddFlowInput("In", (Flow f) => { _out.Call(f); });
+            _in = AddFlowInput("In", (Flow f) => {
+                BeginAction();
+            });
             AutoGenerateValueInput(_luaFilePath);
             
         }

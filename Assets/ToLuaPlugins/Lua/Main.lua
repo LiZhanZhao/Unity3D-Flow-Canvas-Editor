@@ -82,5 +82,5 @@ SMGetOutputData = function(moduleName, inputDatasArr, outputDataKey)
  		table.insert(intputDatasTab, inputDatasArr[i])
  	end
 
- 	gStoryManager:GetOutputData(moduleName, intputDatasTab, outputDataKey)
+ 	return gStoryManager:GetOutputData(moduleName, intputDatasTab, outputDataKey)
 end

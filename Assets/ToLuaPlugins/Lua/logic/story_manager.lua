@@ -38,10 +38,7 @@ CStoryManager.GetOutputData = function(self, commandName, inputDatas, outputData
 	local modPath = DEFAULT_STORY_COMMAND_DIR .. commandName
 	local mod = Import(modPath)
 	assert(mod ~= nil, string.format("%s not exist", modPath))
-
-	if mod then
-		mod.Main(inputDatas, outputDataKey)
-	end
+	return mod.Main(inputDatas, outputDataKey)
 end
 
 

@@ -167,7 +167,7 @@ public class Test : MonoBehaviour {
         getTargets.SetVariable(new string[] { "A1", "A2" });
 
         LuaActionNode luaNode = new LuaActionNode();
-        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/rotate.lua";
+        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
         luaNode.Config(configFile);
 
         data.nodes.Add(onAwakeNode);

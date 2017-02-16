@@ -96,6 +96,14 @@ namespace FlowCanvas.Nodes
         {
             Debug.Log("**** C# EndAction");
             _isFinish = true;
+
+            LuaState state = LuaClient.GetMainState();
+            LuaFunction delActionFunc = state.GetFunction("SMDelAction");
+            delActionFunc.BeginPCall();
+            delActionFunc.Push(_actionKey);
+            delActionFunc.PCall();
+            delActionFunc.EndPCall();
+
             _out.Call(new Flow(1));
         }
 

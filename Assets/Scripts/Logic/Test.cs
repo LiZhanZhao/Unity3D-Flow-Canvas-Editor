@@ -162,7 +162,7 @@ public class Test : MonoBehaviour {
 
         //SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
         LuaActionNode luaNode = new LuaActionNode();
-        string configFile = Application.dataPath + "/Lua/ActionConfig.lua";
+        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/ActionConfig.lua";
         luaNode.Config(configFile);
 
         data.nodes.Add(onAwakeNode);

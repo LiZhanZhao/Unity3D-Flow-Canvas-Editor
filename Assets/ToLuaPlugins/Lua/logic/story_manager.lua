@@ -1,6 +1,7 @@
 CStoryManager = class() 
 
-local DEFAULT_AI_ACTION_DIR = "logic/"
+local DEFAULT_AI_ACTION_DIR = "logic/ai_action/"
+local DEFAULT_STORY_COMMAND_DIR = "logic/story_command/"
 
 CStoryManager.Init = function(self)
 	print("*** StoryManager *** ")
@@ -33,6 +34,15 @@ CStoryManager.UpdateAction = function(self, actKey, deltaTime)
 	return act:IsFinish()
 end
 
+CStoryManager.GetOutputData = function(self, commandName, inputDatas, outputDataKey)
+	local modPath = DEFAULT_STORY_COMMAND_DIR .. commandName
+	local mod = Import(modPath)
+	assert(mod ~= nil, string.format("%s not exist", modPath))
+
+	if mod then
+		mod.Main(inputDatas, outputDataKey)
+	end
+end
 
 
 

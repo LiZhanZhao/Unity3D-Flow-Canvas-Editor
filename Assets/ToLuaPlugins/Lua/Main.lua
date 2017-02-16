@@ -40,6 +40,8 @@ end
 -- actTargets, actArgsValue -> C# array
 SMAddAction = function(actKey, actClsName, actTargetsArr, actArgsValueArr)
 	-- A1,A2,A3...
+	assert(actTargetsArr)
+	assert(actArgsValueArr)
  	local actTargetsTab = {}
  	local len = actTargetsArr.Length
  	for i = 0, len - 1 do
@@ -68,6 +70,17 @@ SMUpdateAction = function(actKey, deltaTime)
 	end
 end
 
--- SMDelAction = function(actKey)
--- 	return gStoryManager:DelAction(actKey)
--- end
+SMDelAction = function(actKey)
+	return gStoryManager:DelAction(actKey)
+end
+
+SMGetOutputData = function(moduleName, inputDatasArr, outputDataKey)
+	assert(inputDatasArr)
+	local intputDatasTab = {}
+ 	local len = inputDatasArr.Length
+ 	for i = 0, len - 1 do
+ 		table.insert(intputDatasTab, inputDatasArr[i])
+ 	end
+
+ 	gStoryManager:GetOutputData(moduleName, intputDatasTab, outputDataKey)
+end

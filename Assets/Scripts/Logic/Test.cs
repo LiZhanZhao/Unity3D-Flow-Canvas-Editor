@@ -157,25 +157,43 @@ public class Test : MonoBehaviour {
         ///// Nodes
         ConstructionEvent onAwakeNode = new ConstructionEvent();
 
-        GetVariable<float> getVarFloat = new GetVariable<float>();
-        getVarFloat.SetVariable(10.0f);
+        GetVariable<float> getVarSpeed = new GetVariable<float>();
+        getVarSpeed.SetVariable(10.0f);
 
-        //SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
+        GetVariable<float> getVarTime = new GetVariable<float>();
+        getVarTime.SetVariable(5.0f);
+
+        GetVariable<string[]> getTargets = new GetVariable<string[]>();
+        getTargets.SetVariable(new string[] { "A1", "A2" });
+
         LuaActionNode luaNode = new LuaActionNode();
-        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/ActionConfig.lua";
+        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/rotate.lua";
         luaNode.Config(configFile);
 
         data.nodes.Add(onAwakeNode);
-        data.nodes.Add(getVarFloat);
-        //data.nodes.Add(logNodeWrapper);
+        data.nodes.Add(getVarSpeed);
         data.nodes.Add(luaNode);
+        data.nodes.Add(getTargets);
+        data.nodes.Add(getVarTime);
 
         ////// Connections
         BinderConnection<float> connection1 = new BinderConnection<float>();
         connection1.sourcePortID = "Value";
-        connection1.sourceNode = getVarFloat;
-        connection1.targetPortID = "pos";
+        connection1.sourceNode = getVarSpeed;
+        connection1.targetPortID = "speed";
         connection1.targetNode = luaNode;
+
+        BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
+        connection3.sourcePortID = "Value";
+        connection3.sourceNode = getTargets;
+        connection3.targetPortID = "Targets";
+        connection3.targetNode = luaNode;
+
+        BinderConnection<float> connection4 = new BinderConnection<float>();
+        connection4.sourcePortID = "Value";
+        connection4.sourceNode = getVarTime;
+        connection4.targetPortID = "time";
+        connection4.targetNode = luaNode;
 
         BinderConnection connection2 = new BinderConnection();
         connection2.sourcePortID = "Once";
@@ -183,8 +201,12 @@ public class Test : MonoBehaviour {
         connection2.targetPortID = "In";
         connection2.targetNode = luaNode;
 
+
+
         data.connections.Add(connection1);
         data.connections.Add(connection2);
+        data.connections.Add(connection3);
+        data.connections.Add(connection4);
 
 
         FlowScript graph = new FlowScript();

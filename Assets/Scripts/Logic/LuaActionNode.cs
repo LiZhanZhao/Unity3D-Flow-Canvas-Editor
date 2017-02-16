@@ -9,13 +9,19 @@ using LuaInterface;
 
 namespace FlowCanvas.Nodes
 {
-    public class LuaActionNode : FlowNode
+    public class LuaActionNode : FlowNode, IUpdatable
     {
+        public static UInt32 counter = 0;
         private string _luaFilePath = "";
+        private string _luaFileName = "";
         private List<string> _argNames = new List<string>();
 
         private FlowInput _in;
         private FlowOutput _out;
+        private ValueInput<string[]> _targetIn;
+
+        private string _actionKey = "";
+        private bool _isFinish = false;
 
         private const string kBeginConfig = "--BEGIN_CONFIG--";
         private const string kEndConfig = "--END_CONFIG--";
@@ -26,21 +32,17 @@ namespace FlowCanvas.Nodes
 
         public void Update()
         {
-            if (!UpdateAction())
+            if (!_isFinish && UpdateAction())
             {
                 EndAction();
             }
         }
-        override public void OnGraphStarted() {
-            Debug.Log("LuaActionNode On Graph Started");
-            // when Update return true, will call
-            //_out.Call(new Flow(1));
-            InitAction();
-        }
+        //override public void OnGraphStarted() {
+        //}
 
-        void InitAction()
+        void BeginAction()
         {
-            // 生成Key
+            _isFinish = false;
             List<object> argValue = new List<object>();
             foreach (string argName in _argNames)
             {
@@ -52,30 +54,49 @@ namespace FlowCanvas.Nodes
                 }
             }
 
+            string[] targets = null ;
+            if (_targetIn.value == null)
+            {
+                targets = new string[] { };
+            }
+            else
+            {
+                targets = _targetIn.value;
+            }
+            
+
             LuaState state = LuaClient.GetMainState();
-            LuaFunction testLuaFunc = state.GetFunction("TestFuncArgsTable");
+            LuaFunction addActionFunc = state.GetFunction("SMAddAction");
             string[] keys = _argNames.ToArray();
             object[] args = argValue.ToArray();
-            testLuaFunc.BeginPCall();
-            testLuaFunc.Push(keys);
-            testLuaFunc.Push(args);
-            testLuaFunc.PCall();
-            testLuaFunc.EndPCall();
-        }
-
-        void BeginAction()
-        {
-            
+            addActionFunc.BeginPCall();
+            addActionFunc.Push(_actionKey);
+            addActionFunc.Push(_luaFileName);
+            addActionFunc.Push(targets);
+            addActionFunc.Push(args);
+            addActionFunc.PCall();
+            addActionFunc.EndPCall();
         }
 
         bool UpdateAction()
         {
-            return false;
+            LuaState state = LuaClient.GetMainState();
+            LuaFunction updateActionFunc = state.GetFunction("SMUpdateAction");
+            updateActionFunc.BeginPCall();
+            updateActionFunc.Push(_actionKey);
+            updateActionFunc.Push(Time.deltaTime);
+            updateActionFunc.PCall();
+            bool isFinish = updateActionFunc.CheckBoolean();  
+            updateActionFunc.EndPCall();
+            return isFinish;
+
         }
 
         void EndAction()
         {
-
+            Debug.Log("**** C# EndAction");
+            _isFinish = true;
+            _out.Call(new Flow(1));
         }
 
         override public void OnGraphStoped() { }
@@ -86,6 +107,9 @@ namespace FlowCanvas.Nodes
             _in = AddFlowInput("In", (Flow f) => {
                 BeginAction();
             });
+
+            _targetIn = AddValueInput<string[]>("Targets");
+
             AutoGenerateValueInput(_luaFilePath);
             
         }
@@ -124,6 +148,9 @@ namespace FlowCanvas.Nodes
         public void Config(string luaFilePath)
         {
             _luaFilePath = luaFilePath;
+            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFilePath);
+            _actionKey = _luaFileName + (counter++).ToString();
+
         }
 
         

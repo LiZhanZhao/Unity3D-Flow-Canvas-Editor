@@ -67,7 +67,7 @@ namespace FlowCanvas
             }
             else
             {
-                Debug.LogWarning("*** Remove Connection");
+                Debug.LogWarning("************************************* Remove Connection");
                 graph.RemoveConnection(this);
             }
         }
@@ -86,7 +86,7 @@ namespace FlowCanvas
             }
             else
             {
-                Debug.LogWarning("*** Remove Connection");
+                Debug.LogWarning("************************************* Remove Connection");
                 graph.RemoveConnection(this);
             }
         }

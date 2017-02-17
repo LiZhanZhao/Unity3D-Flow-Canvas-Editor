@@ -1,10 +1,12 @@
 
---BEGIN_CONFIG--
+--BEGIN_VALUE_INPUT_CONFIG--
 local config = {
     speed = "System.Single",
     time = "System.Single"
 }
---END_CONFIG--
+--END_VALUE_INPUT_CONFIG--
+
+
 
 local AIActionBase = Import("logic/action_base").CAIAction
 

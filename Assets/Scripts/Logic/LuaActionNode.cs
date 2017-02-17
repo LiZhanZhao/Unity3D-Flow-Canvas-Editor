@@ -50,6 +50,7 @@ namespace FlowCanvas.Nodes
             }
 
             string[] targets = null ;
+            // if this lua , this will call lua function
             if (_targetValueIn.value == null)
             {
                 targets = new string[] { };

@@ -41,11 +41,12 @@ namespace FlowCanvas.Nodes
                 }
             }
 
+            object[] args = argValue.ToArray();
             LuaState state = LuaClient.GetMainState();
             LuaFunction getDataFunc = state.GetFunction("SMGetOutputData");
             getDataFunc.BeginPCall();
             getDataFunc.Push(_luaFileName);
-            getDataFunc.Push(argValue);
+            getDataFunc.Push(args);
             getDataFunc.Push(key);
             getDataFunc.PCall();
             object data = getDataFunc.CheckObject(t);

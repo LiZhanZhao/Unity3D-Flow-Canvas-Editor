@@ -67,7 +67,6 @@ namespace FlowCanvas.Nodes
                     string argName = keyValue[0].Trim();
                     string argType = keyValue[1].Trim();
                     argType = argType.Replace("\"", "");
-                    Debug.Log(argName + "   " + argType);
                     resDic.Add(argName, argType);
                 }
                 

@@ -67,11 +67,13 @@ namespace FlowCanvas
             }
             else
             {
-                Debug.LogWarning("************************************* Remove Connection");
+                Debug.LogWarning(string.Format("<color=red>RemoveConnection Source : </color> sourcePort : {0}  bindingType : {1}",
+                    sourcePort.type.ToString(), bindingType.ToString()));
                 graph.RemoveConnection(this);
             }
         }
 
+        // 获得如果BInderConnection 是泛型的话，就获得泛型类型，不是就获得Flow
         private System.Type bindingType
         {
             get { return GetType().RTIsGenericType() ? GetType().RTGetGenericArguments()[0] : typeof(Flow); }
@@ -86,7 +88,8 @@ namespace FlowCanvas
             }
             else
             {
-                Debug.LogWarning("************************************* Remove Connection");
+                Debug.LogWarning(string.Format("<color=red>RemoveConnection Target : </color> targetPort:{0}  bindingType:{1}",
+                    targetPort.type.ToString(), bindingType.ToString()));
                 graph.RemoveConnection(this);
             }
         }

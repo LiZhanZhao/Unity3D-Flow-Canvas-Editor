@@ -54,9 +54,7 @@ SMAddAction = function(actKey, actClsName, actTargetsArr, actArgsValueArr)
  	len = actArgsValueArr.Length
 	for i = 0, len - 1 do
  		table.insert(actArgsValuesTab, actArgsValueArr[i])
- 	end 	
-
- 	-- ******* deal with the actTargetsArr ****************
+ 	end
 
 	gStoryManager:AddAction(actKey, actClsName, actTargetsTab, actArgsValuesTab)
 end

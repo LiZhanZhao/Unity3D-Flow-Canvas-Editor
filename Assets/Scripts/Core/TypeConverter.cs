@@ -21,88 +21,48 @@ namespace FlowCanvas
                 return func;
             }
 
-            if (typeof(IConvertible).RTIsAssignableFrom(targetType) && typeof(IConvertible).RTIsAssignableFrom(sourceType))
-            {
-                return () => { return Convert.ChangeType(func(), targetType); };
-            }
-
-
-            ///CUSTOM CONVENIENCE CONVERTIONS
-
-            //from anything to string
-            if (targetType == typeof(string) && sourceType != typeof(Flow))
-            {
-                return () => { try { return func().ToString(); } catch { return null; } };
-            }
-
-            //from component to Vector3 (position)
-            if (targetType == typeof(Vector3) && typeof(Component).RTIsAssignableFrom(sourceType))
-            {
-                return () => { try { return (func() as Component).transform.position; } catch { return Vector3.zero; } };
-            }
-
-            //from gameobject to Vector3 (position)
-            if (targetType == typeof(Vector3) && sourceType == typeof(GameObject))
-            {
-                return () => { try { return (func() as GameObject).transform.position; } catch { return Vector3.zero; } };
-            }
-
-            //from component to component
-            if (typeof(Component).RTIsAssignableFrom(targetType) && typeof(Component).RTIsAssignableFrom(sourceType))
-            {
-                return () => { try { return (func() as Component).GetComponent(targetType); } catch { return null; } };
-            }
-
-            //from gameobject to component
-            if (typeof(Component).RTIsAssignableFrom(targetType) && sourceType == typeof(GameObject))
-            {
-                return () => { try { return (func() as GameObject).GetComponent(targetType); } catch { return null; } };
-            }
-
-            //from component to gameobject
-            if (targetType == typeof(GameObject) && typeof(Component).RTIsAssignableFrom(sourceType))
-            {
-                return () => { try { return (func() as Component).gameObject; } catch { return null; } };
-            }
-
-            //Object to bool. Similar to unity checks if it's null
-            if (targetType == typeof(bool) && typeof(UnityEngine.Object).RTIsAssignableFrom(sourceType))
-            {
-                return () => { return (func() as UnityEngine.Object) != null; };
-            }
-
-            //DOWNCASTING
             if (targetType.RTIsSubclassOf(sourceType))
             {
                 return func;
             }
 
-            //From IList to IList
-            if (typeof(IList).RTIsAssignableFrom(sourceType) && typeof(IList).RTIsAssignableFrom(targetType))
-            {
-                try
-                {
-                    var elementFrom = sourceType.IsArray ? sourceType.GetElementType() : sourceType.GetGenericArguments()[0];
-                    var elementTo = targetType.IsArray ? targetType.GetElementType() : targetType.GetGenericArguments()[0];
-                    if (elementTo.RTIsAssignableFrom(elementFrom))
-                    {
-                        return () =>
-                        {
-                            var list = new List<object>();
-                            var target = func() as IList;
-                            for (var i = 0; i < target.Count; i++) { list.Add(target[i]); }
-                            return targetType.RTIsArray() ? (object)list.ToArray() : (object)list.ToList();
-                        };
-                    }
-                }
-                catch { return null; }
-            }
+            //if (typeof(IConvertible).RTIsAssignableFrom(targetType) && typeof(IConvertible).RTIsAssignableFrom(sourceType))
+            //{
+            //    return () => { return Convert.ChangeType(func(), targetType); };
+            //}
 
-            ///This is slooow...Check last.
-            if (sourceType.RTGetMethods().Any(m => m.ReturnType == targetType && (m.Name == "op_Implicit" || m.Name == "op_Explicit")))
-            {
-                return func;
-            }
+
+            ///CUSTOM CONVENIENCE CONVERTIONS
+
+            //from anything to string
+            //if (targetType == typeof(string) && sourceType != typeof(Flow))
+            //{
+            //    return () => { try { return func().ToString(); } catch { return null; } };
+            //}
+
+            //DOWNCASTING
+            
+
+            //From IList to IList
+            //if (typeof(IList).RTIsAssignableFrom(sourceType) && typeof(IList).RTIsAssignableFrom(targetType))
+            //{
+            //    try
+            //    {
+            //        var elementFrom = sourceType.IsArray ? sourceType.GetElementType() : sourceType.GetGenericArguments()[0];
+            //        var elementTo = targetType.IsArray ? targetType.GetElementType() : targetType.GetGenericArguments()[0];
+            //        if (elementTo.RTIsAssignableFrom(elementFrom))
+            //        {
+            //            return () =>
+            //            {
+            //                var list = new List<object>();
+            //                var target = func() as IList;
+            //                for (var i = 0; i < target.Count; i++) { list.Add(target[i]); }
+            //                return targetType.RTIsArray() ? (object)list.ToArray() : (object)list.ToList();
+            //            };
+            //        }
+            //    }
+            //    catch { return null; }
+            //}
 
             return null;
         }

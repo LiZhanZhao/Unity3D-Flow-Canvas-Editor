@@ -24,24 +24,12 @@ namespace FlowCanvas
             GatherPorts();
         }
 
-        public void SetStatus(Status status)
-        {
-            this.status = status;
-        }
-
         public BinderConnection GetOutputConnectionForPortID(string ID)
         {
             return outConnections.OfType<BinderConnection>().FirstOrDefault(c => c.sourcePortID == ID);
         }
 
-        public void Fail(string error = null)
-        {
-            status = Status.Failure;
-            if (error != null)
-            {
-                Debug.LogError(string.Format("<b>Flow Execution Error:</b> '{0}' - '{1}'", this.name, error), graph.agent);
-            }
-        }
+        
 
         public Port GetOutputPort(string ID)
         {

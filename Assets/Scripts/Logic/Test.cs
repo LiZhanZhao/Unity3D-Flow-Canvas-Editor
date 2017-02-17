@@ -155,13 +155,13 @@ public class Test : MonoBehaviour {
         data.version = 1.0f;
 
         ///// Nodes
-        ConstructionEvent onAwakeNode = new ConstructionEvent();
+        RootNode onAwakeNode = new RootNode();
 
         GetVariable<float> getVarSpeed = new GetVariable<float>();
         getVarSpeed.SetVariable(10.0f);
 
         GetVariable<float> getVarTime = new GetVariable<float>();
-        getVarTime.SetVariable(0.0f);
+        getVarTime.SetVariable(3.0f);
 
         string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
         LuaCommandNode getTargets = new LuaCommandNode();
@@ -185,7 +185,6 @@ public class Test : MonoBehaviour {
         connection1.targetNode = luaNode;
 
         BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
-        //BinderConnection<string> connection3 = new BinderConnection<string>();
         connection3.sourcePortID = "target1";
         connection3.sourceNode = getTargets;
         connection3.targetPortID = "Targets";

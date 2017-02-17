@@ -4,7 +4,7 @@ using UnityEngine;
 using ParadoxNotion.Design;
 
 namespace FlowCanvas.Nodes{
-	public class ConstructionEvent : EventNode {
+	public class RootNode : FlowNode {
 
         private FlowOutput once;
         private bool called = false;

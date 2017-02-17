@@ -19,6 +19,8 @@ namespace FlowCanvas.Nodes
         protected const string kBeginConfigFlowOutput = "--BEGIN_FLOW_OUTPUT_CONFIG--";
         protected const string kEndConfigFlowOutput = "--END_FLOW_OUTPUT_CONFIG--";
 
+        protected const int kConfigArgLength = 3;
+
         protected string _luaFilePath = "";
         protected string _luaFileName = "";
         
@@ -53,12 +55,22 @@ namespace FlowCanvas.Nodes
             for (int i = 0; i < args.Length; i++)
             {
                 string arg = args[i];
-                string[] keyValue = arg.Split('=');
-                string argName = keyValue[0].Trim();
-                string argType = keyValue[1].Trim();
-                argType = argType.Replace("\"", "");
-                Debug.Log(argName + "   " + argType);
-                resDic.Add(argName, argType);
+
+                if (arg.Length >= kConfigArgLength)
+                {
+                    string[] keyValue = arg.Split('=');
+                    if (keyValue.Length != 2)
+                    {
+                        return false;
+                    }
+
+                    string argName = keyValue[0].Trim();
+                    string argType = keyValue[1].Trim();
+                    argType = argType.Replace("\"", "");
+                    Debug.Log(argName + "   " + argType);
+                    resDic.Add(argName, argType);
+                }
+                
             }
 
             return true;
@@ -106,6 +118,7 @@ namespace FlowCanvas.Nodes
                 AddValueInput(port, argName);
                 _autoValueInputs.Add(port);
                 _autoValueInputArgNames.Add(argName);
+                
             }
         }
 
@@ -124,7 +137,7 @@ namespace FlowCanvas.Nodes
             //    string argType = conf.Value;
             //    Type t = Type.GetType(argType);
             //    var portType = typeof(ValueOutput<>).RTMakeGenericType(new Type[] { t });
-            //    var port = (ValueOutput)Activator.CreateInstance(portType, new object[] { this, argName, argName });
+            //    var port = (ValueOutput)Activator.CreateInstance(portType, new object[] { this, argName, {} });
             //}
 
         }

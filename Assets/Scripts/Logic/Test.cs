@@ -43,7 +43,7 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
     void Start()
     {
-        Debug.Log(typeof(AnimationCurve).ToString());
+        Debug.Log(typeof(string).ToString());
         //System.Type t = System.Type.GetType("System.Float");
         InitLuaEnv();
         FlowGraph graph = GetCustomGraphLua();
@@ -163,11 +163,12 @@ public class Test : MonoBehaviour {
         GetVariable<float> getVarTime = new GetVariable<float>();
         getVarTime.SetVariable(2.0f);
 
-        GetVariable<string[]> getTargets = new GetVariable<string[]>();
-        getTargets.SetVariable(new string[] { "A1", "A2" });
+        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
+        LuaCommandNode getTargets = new LuaCommandNode();
+        getTargets.Config(configFile);
 
         LuaActionNode luaNode = new LuaActionNode();
-        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
+        configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
         luaNode.Config(configFile);
 
         data.nodes.Add(onAwakeNode);
@@ -183,8 +184,8 @@ public class Test : MonoBehaviour {
         connection1.targetPortID = "speed";
         connection1.targetNode = luaNode;
 
-        BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
-        connection3.sourcePortID = "Value";
+        BinderConnection<string> connection3 = new BinderConnection<string>();
+        connection3.sourcePortID = "targets";
         connection3.sourceNode = getTargets;
         connection3.targetPortID = "Targets";
         connection3.targetNode = luaNode;

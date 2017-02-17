@@ -9,22 +9,18 @@ using LuaInterface;
 
 namespace FlowCanvas.Nodes
 {
-    public class LuaActionNode : FlowNode, IUpdatable
+    public class LuaActionNode : LuaNode, IUpdatable
     {
         public static UInt32 counter = 0;
-        private string _luaFilePath = "";
-        private string _luaFileName = "";
-        private List<string> _argNames = new List<string>();
+        
+        
 
-        private FlowInput _in;
-        private FlowOutput _out;
-        private ValueInput<string[]> _targetIn;
+        private FlowInput _flowIn;
+        private ValueInput<string[]> _targetValueIn;
 
         private string _actionKey = "";
         private bool _isFinish = false;
 
-        private const string kBeginConfig = "--BEGIN_CONFIG--";
-        private const string kEndConfig = "--END_CONFIG--";
         public override string name
         {
             get { return "LuaNode"; }
@@ -44,7 +40,7 @@ namespace FlowCanvas.Nodes
         {
             _isFinish = false;
             List<object> argValue = new List<object>();
-            foreach (string argName in _argNames)
+            foreach (string argName in _autoValueInputArgNames)
             {
                 Port p = GetInputPort(argName);
                 if (p is ValueInput)
@@ -55,19 +51,18 @@ namespace FlowCanvas.Nodes
             }
 
             string[] targets = null ;
-            if (_targetIn.value == null)
+            if (_targetValueIn.value == null)
             {
                 targets = new string[] { };
             }
             else
             {
-                targets = _targetIn.value;
+                targets = _targetValueIn.value;
             }
             
 
             LuaState state = LuaClient.GetMainState();
             LuaFunction addActionFunc = state.GetFunction("SMAddAction");
-            string[] keys = _argNames.ToArray();
             object[] args = argValue.ToArray();
             addActionFunc.BeginPCall();
             addActionFunc.Push(_actionKey);
@@ -104,61 +99,39 @@ namespace FlowCanvas.Nodes
             delActionFunc.PCall();
             delActionFunc.EndPCall();
 
-            _out.Call(new Flow(1));
+            CallFlowOutputs();
         }
+
+        void CallFlowOutputs()
+        {
+            for (int i = 0; i < _autoFlowOuts.Count; i++)
+            {
+                _autoFlowOuts[i].Call(new Flow(1));
+            }
+        }
+
 
         override public void OnGraphStoped() { }
 
         protected override void RegisterPorts()
         {
-            _out = AddFlowOutput("Out");
-            _in = AddFlowInput("In", (Flow f) => {
+            // FlowInput
+            _flowIn = AddFlowInput("In", (Flow f) =>
+            {
                 BeginAction();
             });
 
-            _targetIn = AddValueInput<string[]>("Targets");
+            // valueInput
+            _targetValueIn = AddValueInput<string[]>("Targets");
 
-            AutoGenerateValueInput(_luaFilePath);
+            AutoGeneratePort();
             
         }
 
-        private void AutoGenerateValueInput(string luaFilePath)
+        override public void Config(string luaFilePath)
         {
-            if (!string.IsNullOrEmpty(luaFilePath))
-            {
-                string fileContext = System.IO.File.ReadAllText(luaFilePath);
-                int beginIndex = fileContext.IndexOf(kBeginConfig);
-                int endIndex = fileContext.IndexOf(kEndConfig);
-                string configContext = fileContext.Substring(beginIndex, endIndex - beginIndex);
-                beginIndex = configContext.IndexOf("{") + 1;
-                endIndex = configContext.IndexOf("}") - 1;
-                string argsContext = configContext.Substring(beginIndex, endIndex - beginIndex);
-                string[] args = argsContext.Split(',');
-                for (int i = 0; i < args.Length; i++)
-                {
-                    string arg = args[i];
-                    string[] keyValue = arg.Split('=');
-                    string argName = keyValue[0].Trim();
-                    string argType = keyValue[1].Trim();
-                    argType = argType.Replace("\"", "");
-                    Debug.Log(argName + "   " + argType);
-                    Type t = Type.GetType(argType);
-                    var portType = typeof(ValueInput<>).RTMakeGenericType(new Type[] { t });
-                    var port = (ValueInput)Activator.CreateInstance(portType, new object[] { this, argName, argName });
-                    AddValueInput(port, argName);
-                    _argNames.Add(argName);
-                }
-            }
-        }
-
-        
-
-        public void Config(string luaFilePath)
-        {
-            _luaFilePath = luaFilePath;
-            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFilePath);
+            base.Config(luaFilePath);
             _actionKey = _luaFileName + (counter++).ToString();
-
         }
 
         

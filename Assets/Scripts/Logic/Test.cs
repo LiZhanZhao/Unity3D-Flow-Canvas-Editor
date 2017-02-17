@@ -161,7 +161,7 @@ public class Test : MonoBehaviour {
         getVarSpeed.SetVariable(10.0f);
 
         GetVariable<float> getVarTime = new GetVariable<float>();
-        getVarTime.SetVariable(5.0f);
+        getVarTime.SetVariable(2.0f);
 
         GetVariable<string[]> getTargets = new GetVariable<string[]>();
         getTargets.SetVariable(new string[] { "A1", "A2" });

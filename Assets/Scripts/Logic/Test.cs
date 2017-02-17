@@ -6,14 +6,85 @@ using NodeCanvas.Framework;
 using NodeCanvas.Framework.Internal;
 using System.Collections.Generic;
 using FlowCanvas.Nodes;
-using LuaInterface;
+using ParadoxNotion.Serialization;
 
 public class Test : MonoBehaviour {
 
-    //void Start()
-    //{
-    //    InitLuaEnv();
-    //}
+    void Start()
+    {
+        TestDeserializeJson();
+    }
+
+    void TestDeserializeJson()
+    {
+        GraphSerializationData data = new GraphSerializationData();
+        data.version = 1.0f;
+
+        ///// Nodes
+        RootNode onAwakeNode = new RootNode();
+
+        GetVariable<float> getVarSpeed = new GetVariable<float>();
+        getVarSpeed.SetVariable(10.0f);
+
+        GetVariable<float> getVarTime = new GetVariable<float>();
+        getVarTime.SetVariable(0.0f);
+
+        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
+        LuaCommandNode getTargets = new LuaCommandNode();
+        getTargets.Config(configFile);
+
+        LuaActionNode luaNode = new LuaActionNode();
+        configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
+        luaNode.Config(configFile);
+
+        onAwakeNode.ID = 1;
+        getVarSpeed.ID = 2;
+        luaNode.ID = 3;
+        getTargets.ID = 4;
+        getVarTime.ID = 5;
+
+        data.nodes.Add(onAwakeNode);
+        data.nodes.Add(getVarSpeed);
+        data.nodes.Add(luaNode);
+        data.nodes.Add(getTargets);
+        data.nodes.Add(getVarTime);
+
+        ////// Connections
+        BinderConnection<float> connection1 = new BinderConnection<float>();
+        connection1.sourcePortID = "Value";
+        connection1.sourceNode = getVarSpeed;
+        connection1.targetPortID = "speed";
+        connection1.targetNode = luaNode;
+
+        BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
+        connection3.sourcePortID = "target1";
+        connection3.sourceNode = getTargets;
+        connection3.targetPortID = "Targets";
+        connection3.targetNode = luaNode;
+
+        BinderConnection<float> connection4 = new BinderConnection<float>();
+        connection4.sourcePortID = "Value";
+        connection4.sourceNode = getVarTime;
+        connection4.targetPortID = "time";
+        connection4.targetNode = luaNode;
+
+        BinderConnection connection2 = new BinderConnection();
+        connection2.sourcePortID = "Once";
+        connection2.sourceNode = onAwakeNode;
+        connection2.targetPortID = "In";
+        connection2.targetNode = luaNode;
+
+
+
+        data.connections.Add(connection1);
+        data.connections.Add(connection2);
+        data.connections.Add(connection3);
+        data.connections.Add(connection4);
+
+        string testJsonStr = JSONSerializer.Serialize(typeof(GraphSerializationData), data, true);
+        System.IO.File.WriteAllText(Application.dataPath + "/aa.json", testJsonStr);
+
+    }
 
     void InitLuaEnv()
     {
@@ -22,37 +93,21 @@ public class Test : MonoBehaviour {
         {
             lc = gameObject.AddComponent<LuaClient>();
         }
-        
-        //LuaState state = LuaClient.GetMainState();
-        //LuaFunction testLuaFunc = state.GetFunction("TestFuncArgsTable");
-
-        //object keys = new object[] { "111", "222", "333" };
-        //object args = new object[] { "aaa", "bbb", "ccc" };
-        
-        //testLuaFunc.BeginPCall();
-        //testLuaFunc.Push(keys);
-        //testLuaFunc.Push(args);
-        //testLuaFunc.PCall();
-        //testLuaFunc.EndPCall();
-
-        //LuaActionNode node = new LuaActionNode();
-        //node.Config(Application.dataPath + "/Lua/ActionConfig.lua");
-
     }
 
 	// Use this for initialization
-    void Start()
-    {
-        Debug.Log(typeof(List<>).ToString());
-        //System.Type t = System.Type.GetType("System.Float");
-        InitLuaEnv();
-        FlowGraph graph = GetCustomGraphLua();
-        //FlowGraph graph = GetCustomGraphUpdate();
-        FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
-        fsc.graph = graph;
-        //fsc.StartBehaviour(graph);
+    //void Start()
+    //{
+    //    Debug.Log(typeof(GetVariable<float>).ToString());
+    //    //System.Type t = System.Type.GetType("System.Float");
+    //    InitLuaEnv();
+    //    FlowGraph graph = GetCustomGraphLua();
+    //    //FlowGraph graph = GetCustomGraphUpdate();
+    //    FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
+    //    fsc.graph = graph;
+    //    //fsc.StartBehaviour(graph);
 
-    }
+    //}
 
     //FlowScript GetCustomGraphUpdate()
     //{
@@ -149,73 +204,73 @@ public class Test : MonoBehaviour {
     //}
 
 
-    FlowScript GetCustomGraphLua()
-    {
-        GraphSerializationData data = new GraphSerializationData();
-        data.version = 1.0f;
+    //FlowScript GetCustomGraphLua()
+    //{
+    //    GraphSerializationData data = new GraphSerializationData();
+    //    data.version = 1.0f;
 
-        ///// Nodes
-        RootNode onAwakeNode = new RootNode();
+    //    ///// Nodes
+    //    RootNode onAwakeNode = new RootNode();
 
-        GetVariable<float> getVarSpeed = new GetVariable<float>();
-        getVarSpeed.SetVariable(10.0f);
+    //    GetVariable<float> getVarSpeed = new GetVariable<float>();
+    //    getVarSpeed.SetVariable(10.0f);
 
-        GetVariable<float> getVarTime = new GetVariable<float>();
-        getVarTime.SetVariable(3.0f);
+    //    GetVariable<float> getVarTime = new GetVariable<float>();
+    //    getVarTime.SetVariable(0.0f);
 
-        string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
-        LuaCommandNode getTargets = new LuaCommandNode();
-        getTargets.Config(configFile);
+    //    string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
+    //    LuaCommandNode getTargets = new LuaCommandNode();
+    //    getTargets.Config(configFile);
 
-        LuaActionNode luaNode = new LuaActionNode();
-        configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
-        luaNode.Config(configFile);
+    //    LuaActionNode luaNode = new LuaActionNode();
+    //    configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
+    //    luaNode.Config(configFile);
 
-        data.nodes.Add(onAwakeNode);
-        data.nodes.Add(getVarSpeed);
-        data.nodes.Add(luaNode);
-        data.nodes.Add(getTargets);
-        data.nodes.Add(getVarTime);
+    //    data.nodes.Add(onAwakeNode);
+    //    data.nodes.Add(getVarSpeed);
+    //    data.nodes.Add(luaNode);
+    //    data.nodes.Add(getTargets);
+    //    data.nodes.Add(getVarTime);
 
-        ////// Connections
-        BinderConnection<float> connection1 = new BinderConnection<float>();
-        connection1.sourcePortID = "Value";
-        connection1.sourceNode = getVarSpeed;
-        connection1.targetPortID = "speed";
-        connection1.targetNode = luaNode;
+    //    ////// Connections
+    //    BinderConnection<float> connection1 = new BinderConnection<float>();
+    //    connection1.sourcePortID = "Value";
+    //    connection1.sourceNode = getVarSpeed;
+    //    connection1.targetPortID = "speed";
+    //    connection1.targetNode = luaNode;
 
-        BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
-        connection3.sourcePortID = "target1";
-        connection3.sourceNode = getTargets;
-        connection3.targetPortID = "Targets";
-        connection3.targetNode = luaNode;
+    //    BinderConnection<string[]> connection3 = new BinderConnection<string[]>();
+    //    connection3.sourcePortID = "target1";
+    //    connection3.sourceNode = getTargets;
+    //    connection3.targetPortID = "Targets";
+    //    connection3.targetNode = luaNode;
 
-        BinderConnection<float> connection4 = new BinderConnection<float>();
-        connection4.sourcePortID = "Value";
-        connection4.sourceNode = getVarTime;
-        connection4.targetPortID = "time";
-        connection4.targetNode = luaNode;
+    //    BinderConnection<float> connection4 = new BinderConnection<float>();
+    //    connection4.sourcePortID = "Value";
+    //    connection4.sourceNode = getVarTime;
+    //    connection4.targetPortID = "time";
+    //    connection4.targetNode = luaNode;
 
-        BinderConnection connection2 = new BinderConnection();
-        connection2.sourcePortID = "Once";
-        connection2.sourceNode = onAwakeNode;
-        connection2.targetPortID = "In";
-        connection2.targetNode = luaNode;
-
-
-
-        data.connections.Add(connection1);
-        data.connections.Add(connection2);
-        data.connections.Add(connection3);
-        data.connections.Add(connection4);
+    //    BinderConnection connection2 = new BinderConnection();
+    //    connection2.sourcePortID = "Once";
+    //    connection2.sourceNode = onAwakeNode;
+    //    connection2.targetPortID = "In";
+    //    connection2.targetNode = luaNode;
 
 
-        FlowScript graph = new FlowScript();
-        if (!graph.Deserialize(data, true))
-        {
-            Debug.LogError("Can not Deserialize File");
-        }
-        return graph;
-    }
+
+    //    data.connections.Add(connection1);
+    //    data.connections.Add(connection2);
+    //    data.connections.Add(connection3);
+    //    data.connections.Add(connection4);
+
+
+    //    FlowScript graph = new FlowScript();
+    //    if (!graph.Deserialize(data, true))
+    //    {
+    //        Debug.LogError("Can not Deserialize File");
+    //    }
+    //    return graph;
+    //}
 
 }

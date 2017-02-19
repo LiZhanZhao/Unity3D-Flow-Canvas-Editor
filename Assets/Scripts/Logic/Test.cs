@@ -37,12 +37,6 @@ public class Test : MonoBehaviour {
         configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
         luaNode.Config(configFile);
 
-        onAwakeNode.ID = 1;
-        getVarSpeed.ID = 2;
-        luaNode.ID = 3;
-        getTargets.ID = 4;
-        getVarTime.ID = 5;
-
         data.nodes.Add(onAwakeNode);
         data.nodes.Add(getVarSpeed);
         data.nodes.Add(luaNode);
@@ -85,6 +79,34 @@ public class Test : MonoBehaviour {
         System.IO.File.WriteAllText(Application.dataPath + "/aa.json", testJsonStr);
 
     }
+
+    //void TestDeserializeJson()
+    //{
+    //    GraphSerializationData data = new GraphSerializationData();
+    //    data.version = 1.0f;
+
+    //    ///// Nodes
+    //    MouseEvents meNode = new MouseEvents();
+
+    //    SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
+
+    //    data.nodes.Add(meNode);
+    //    data.nodes.Add(logNodeWrapper);
+
+
+    //    ////// Connections
+    //    BinderConnection connection2 = new BinderConnection();
+    //    connection2.sourcePortID = "Down";
+    //    connection2.sourceNode = meNode;
+    //    connection2.targetPortID = " ";
+    //    connection2.targetNode = logNodeWrapper;
+
+    //    data.connections.Add(connection2);
+
+    //    string testJsonStr = JSONSerializer.Serialize(typeof(GraphSerializationData), data, true);
+    //    System.IO.File.WriteAllText(Application.dataPath + "/aa.json", testJsonStr);
+
+    //}
 
     void InitLuaEnv()
     {

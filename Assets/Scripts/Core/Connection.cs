@@ -6,7 +6,9 @@ namespace NodeCanvas.Framework
     // 连线类
     abstract public partial class Connection
     {
+        [SerializeField]
         private Node _sourceNode;
+        [SerializeField]
         private Node _targetNode;
         private Status _status = Status.Resting;
         private bool _isDisabled;

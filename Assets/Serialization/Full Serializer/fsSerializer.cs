@@ -11,6 +11,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
     public class fsSerializer {
         #region Keys
         private static HashSet<string> _reservedKeywords;
+        // 静态构造函数，初始化_reservedKeywords
         static fsSerializer() {
             _reservedKeywords = new HashSet<string> {
                 Key_ObjectReference,
@@ -282,6 +283,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         private readonly fsCyclicReferenceManager _references;
         private readonly fsLazyCycleDefinitionWriter _lazyReferenceWriter;
 
+        // 构造函数，
         public fsSerializer() {
             _cachedConverterTypeInstances = new Dictionary<Type, fsBaseConverter>();
             _cachedConverters = new Dictionary<Type, fsBaseConverter>();

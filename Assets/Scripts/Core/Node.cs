@@ -8,7 +8,6 @@ using UnityEngine;
 
 
 namespace NodeCanvas.Framework{
-    [ParadoxNotion.Design.SpoofAOT]
     abstract public partial class Node
     {
         private Graph _graph;

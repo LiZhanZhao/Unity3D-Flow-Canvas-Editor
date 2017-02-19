@@ -7,7 +7,9 @@ namespace FlowCanvas
 {
     public class BinderConnection : Connection
     {
+        [SerializeField]
         private string _sourcePortName;
+        [SerializeField]
         private string _targetPortName;
         private Port _sourcePort;
         private Port _targetPort;

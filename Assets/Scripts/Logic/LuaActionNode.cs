@@ -32,8 +32,12 @@ namespace FlowCanvas.Nodes
                 EndAction();
             }
         }
-        //override public void OnGraphStarted() {
-        //}
+
+        public override void OnValidate(Graph flowGraph)
+        {
+            base.OnValidate(flowGraph);
+            _actionKey = GenerateLuaKey(_luaFileName);
+        }
 
         void BeginAction()
         {
@@ -123,20 +127,14 @@ namespace FlowCanvas.Nodes
 
             // valueInput
             _targetValueIn = AddValueInput<string[]>("Targets");
-
             AutoGeneratePort();
             
         }
 
-        override public void Config(string luaFilePath)
+        static string GenerateLuaKey(string luaName)
         {
-            base.Config(luaFilePath);
-            _actionKey = _luaFileName + (counter++).ToString();
+            return luaName + (counter++).ToString();
         }
-
-        
-
-
     }
 }
 

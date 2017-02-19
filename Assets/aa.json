@@ -11,10 +11,12 @@
             "$id": "3"
         },
         {
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
             "$type": "FlowCanvas.Nodes.LuaActionNode",
             "$id": "4"
         },
         {
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/story_command/get_targets.lua",
             "$type": "FlowCanvas.Nodes.LuaCommandNode",
             "$id": "5"
         },

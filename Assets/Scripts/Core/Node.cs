@@ -164,8 +164,8 @@ namespace NodeCanvas.Framework{
         }
 
         
-
         virtual public void OnGraphStarted() { }
+
         // call when create node
         virtual public void OnValidate(Graph assignedGraph) { }
 

@@ -19,7 +19,7 @@ namespace FlowCanvas
         private Dictionary<string, object> _inputPortValues;
 
         // be critical, this is will init inputPorts and outputPorts
-        sealed public override void OnValidate(Graph flowGraph)
+        public override void OnValidate(Graph flowGraph)
         {
             GatherPorts();
         }

@@ -9,6 +9,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// Serialize default values?
         /// </summary>
         //PARADOXNOTION ADDITION
+        // 不存储默认的值
         public static bool SerializeDefaultValues = false;
 
         /// <summary>

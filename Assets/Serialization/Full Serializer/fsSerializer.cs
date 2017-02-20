@@ -147,10 +147,13 @@ namespace ParadoxNotion.Serialization.FullSerializer {
 
         #region Utility Methods
         private static void Invoke_OnBeforeSerialize(List<fsObjectProcessor> processors, Type storageType, object instance) {
+            // 调用fsObjectProcessor中的OnBeforeSerialize
             for (int i = 0; i < processors.Count; ++i) {
                 processors[i].OnBeforeSerialize(storageType, instance);
             }
 
+            // 如果不是Unity objects，但是是继承UnityEngine.ISerializationCallbackReceiver的话，就调用
+            // OnBeforeSerialize
             //PARADOXNOTION ADDITION
             //!!Call only on non-Unity objects, since they are called back anyways by Unity!!
             if (instance is UnityEngine.ISerializationCallbackReceiver && !(instance is UnityEngine.Object) ){
@@ -160,7 +163,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         private static void Invoke_OnAfterSerialize(List<fsObjectProcessor> processors, Type storageType, object instance, ref fsData data) {
             // We run the after calls in reverse order; this significantly reduces the interaction burden between
             // multiple processors - it makes each one much more independent and ignorant of the other ones.
-
+            // 调用fsObjectProcessor的OnAfterSerialize
             for (int i = processors.Count - 1; i >= 0; --i) {
                 processors[i].OnAfterSerialize(storageType, instance, ref data);
             }
@@ -192,6 +195,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// Ensures that the data is a dictionary. If it is not, then it is wrapped inside of one.
         /// </summary>
         private static void EnsureDictionary(fsData data) {
+            // 如何data不是Dict的话，那么就用一个dict来包裹data，就是，data变成dict，data之前的数据就存储在
+            // dict[Key_Content]中
             if (data.IsDictionary == false) {
                 var existingData = data.Clone();
                 data.BecomeDictionary();
@@ -211,6 +216,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
 
             public void WriteDefinition(int id, fsData data) {
                 if (_references.Contains(id)) {
+                    //Ensures that the data is a dictionary. If it is not, then it is wrapped inside of one.
                     EnsureDictionary(data);
                     data.AsDictionary[Key_ObjectDefinition] = new fsData(id.ToString());
                 }
@@ -221,9 +227,13 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             }
 
             public void WriteReference(int id, Dictionary<string, fsData> dict) {
+                // 这里的意思就是，如果_pendingDefinitions中有元素是被引用的话，那么这个元素就要
+                // 写"$id",而引用_pendingDefinitions中有元素的那个对象就要写"$ref"
+
                 // Write the actual definition if necessary
                 if (_pendingDefinitions.ContainsKey(id)) {
                     var data = _pendingDefinitions[id];
+                    //Ensures that the data is a dictionary. If it is not, then it is wrapped inside of one.
                     EnsureDictionary(data);
                     data.AsDictionary[Key_ObjectDefinition] = new fsData(id.ToString());
                     _pendingDefinitions.Remove(id);
@@ -232,7 +242,9 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     _references.Add(id);
                 }
 
+
                 // Write the reference
+                // ["$ref"] = id
                 dict[Key_ObjectReference] = new fsData(id.ToString());
             }
 
@@ -380,9 +392,15 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// </summary>
         private List<fsObjectProcessor> GetProcessors(Type type) {
             List<fsObjectProcessor> processors;
+            // 先看缓存_cachedProcessors
             if (_cachedProcessors.TryGetValue(type, out processors)){
                 return processors;
             }
+
+            // 先检查用户有无定义类似"[fsObject(Processor = typeof(fsRecoveryProcessor<Connection, MissingConnection>))]"
+            // 如果有就处理。
+
+            // 如果用户没有定义"[fsObject(Processor = 。。。]", 就看看_processors，看看有无合适的fsObjectProcessor
 
             // Check to see if the user has defined a custom processor for the type. If they
             // have, then we don't need to scan through all of the processor to check which
@@ -422,6 +440,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     "multiple fsConverters -- please construct a new instance for " + converter);
             }
 
+            // 如果converter是fsDirectConverter类型的话，就存在_availableDirectConverters中,
+            // 如果converter是fsConverter类型的话，就存在_availableConverters中
             // TODO: wrap inside of a ConverterManager so we can control _converters and _cachedConverters lifetime
             if (converter is fsDirectConverter) {
                 var directConverter = (fsDirectConverter)converter;
@@ -435,7 +455,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     "; the type association strategy is unknown. Please use either " +
                     "fsDirectConverter or fsConverter as your base type.");
             }
-
+            // 初始化converter.Serializer
             converter.Serializer = this;
 
             // We need to reset our cached converter set, as it could be invalid with the new
@@ -448,6 +468,9 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// Fetches a converter that can serialize/deserialize the given type.
         /// </summary>
         private fsBaseConverter GetConverter(Type type, Type overrideConverterType) {
+            // 如果overrideConverterType不为空，就直接用overrideConverterType，
+            // 并加入overrideConverterType的实例到_cachedConverterTypeInstances中
+
             // Use an override converter type instead if that's what the user has requested.
             if (overrideConverterType != null) {
                 fsBaseConverter overrideConverter;
@@ -466,6 +489,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 return converter;
             }
 
+            // 检查有无[fsObject] attribute，有的话，就直接用指定的converter
             // Check to see if the user has defined a custom converter for the type. If they
             // have, then we don't need to scan through all of the converters to check which
             // one can process the type; instead, we directly use the specified converter.
@@ -478,6 +502,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 }
             }
 
+            // 检查有无[fsForward] attribute,有的话，就直接用指定的converter
             // Check for a [fsForward] attribute.
             {
                 var attr = fsPortableReflection.GetAttribute<fsForwardAttribute>(type);
@@ -488,7 +513,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 }
             }
 
-
+            // 如果用户没有指定converter，那么就看缓存_cachedConverters，如果没有话就，就再看
+            // _availableConverters和_availableConverters
             // There is no specific converter specified; try all of the general ones to see
             // which ones matches.
             if (_cachedConverters.TryGetValue(type, out converter) == false) {
@@ -554,12 +580,14 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// <returns>If serialization was successful.</returns>
         public fsResult TrySerialize(Type storageType, Type overrideConverterType, object instance, out fsData data) {
             var processors = GetProcessors(instance == null ? storageType : instance.GetType());
-
+            // 主要是是条用processors的OnBeforeSerialize和ISerializationCallbackReceiver.OnBeforeSerialize方法
             Invoke_OnBeforeSerialize(processors, storageType, instance);
 
+            // 如果是null值的情况
             // We always serialize null directly as null
             if (ReferenceEquals(instance, null)) {
                 data = new fsData();
+                // // 调用fsObjectProcessor的OnAfterSerialize
                 Invoke_OnAfterSerialize(processors, storageType, instance, ref data);
                 return fsResult.Success;
             }
@@ -578,22 +606,30 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 _references.Enter();
 
                 // This type does not need cycle support.
+                // 获得instance.GetType()对应的converter
                 var converter = GetConverter(instance.GetType(), overrideConverterType);
+                // 判断是否需要循环，这里是不循环的情况
                 if (converter.RequestCycleSupport(instance.GetType()) == false) {
                     return InternalSerialize_2_Inheritance(storageType, overrideConverterType, instance, out data);
                 }
+
+                // 当instance IsClass || IsInterface; 才会执行下面的
 
                 // We've already serialized this object instance (or it is pending higher up on the call stack).
                 // Just serialize a reference to it to escape the cycle.
                 //
                 // note: We serialize the int as a string to so that we don't lose any information
                 //       in a conversion to/from double.
+
+                // 使用了引用实例的情况,直接返回fsResult.Success
                 if (_references.IsReference(instance)) {
+                    // 用Dict创建一个fsData，
                     data = fsData.CreateDictionary();
                     _lazyReferenceWriter.WriteReference(_references.GetReferenceId(instance), data.AsDictionary);
                     return fsResult.Success;
                 }
 
+                // 简单理解为记录instance到_references中
                 // Mark inside the object graph that we've serialized the instance. We do this *before*
                 // serialization so that if we get back into this function recursively, it'll already
                 // be marked and we can handle the cycle properly without going into an infinite loop.
@@ -629,10 +665,12 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             // we deserialize the object.
             //
             // Note: We allow converters to request that we do *not* add type information.
+
+            // 假如storageType != instance.GetType()的话，就需要存储[$type]
             if (storageType != instance.GetType() &&
                 GetConverter(storageType, overrideConverterType).RequestInheritanceSupport(storageType)) {
 
-                // Add the inheritance metadata
+                // Add the inheritance metadata,继承的数据
                 EnsureDictionary(data);
 
                 data.AsDictionary[Key_InstanceType] = new fsData(instance.GetType().FullName);
@@ -670,6 +708,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
 */
         private fsResult InternalSerialize_4_Converter(Type overrideConverterType, object instance, out fsData data) {
             var instanceType = instance.GetType();
+            // 这里，就会进入不同的converter的TrySerialize中
             return GetConverter(instanceType, overrideConverterType).TrySerialize(instance, out data, instanceType);
         }
 

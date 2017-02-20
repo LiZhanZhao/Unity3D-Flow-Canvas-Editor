@@ -36,6 +36,7 @@ namespace ParadoxNotion.Serialization{
 
             lock (serializerLock)
             {
+                // 初始化的时候，就增加fsUnityObjectConverter
                 if (!init){
                     serializer.AddConverter(new fsUnityObjectConverter());
                     init = true;
@@ -49,6 +50,7 @@ namespace ParadoxNotion.Serialization{
 
                 //serialize the data
                 fsData data;
+                //如果我们准备要序列化一个UnityObject的话，就直接用fsReflectedConverter
                 //We override the UnityObject converter if we serialize a UnityObject directly.
                 //UnityObject converter will still be used for every serialized property found within the object though.
                 var overrideConverterType = typeof(UnityEngine.Object).RTIsAssignableFrom(type)? typeof(fsReflectedConverter) : null;
@@ -83,7 +85,9 @@ namespace ParadoxNotion.Serialization{
                 }
 
                 fsData data = null;
+                //先检查缓冲，看看是不是已经反序列化过了
                 cache.TryGetValue(serializedState, out data);
+
                 if (data == null){
                     data = fsJsonParser.Parse(serializedState);
                     cache[serializedState] = data;                

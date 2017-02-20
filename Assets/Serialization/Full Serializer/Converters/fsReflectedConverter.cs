@@ -19,10 +19,13 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
         }
 
         public override fsResult TrySerialize(object instance, out fsData serialized, Type storageType) {
+            // 传进来的serialized 直接赋值一个Dict
             serialized = fsData.CreateDictionary();
             var result = fsResult.Success;
 
+            // Serializer.Config 就是一些配置
             fsMetaType metaType = fsMetaType.Get(Serializer.Config, instance.GetType());
+
             metaType.EmitAotData();
 
             //PARADOXNOTION ADDITION
@@ -36,8 +39,10 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
 
             for (int i = 0; i < metaType.Properties.Length; ++i) {
                 fsMetaProperty property = metaType.Properties[i];
+                // 不可读的跳过
                 if (property.CanRead == false) continue;
 
+                // 如果是不存储默认值的情况
                 //PARADOXNOTION ADDITION
                 if ( fsGlobalConfig.SerializeDefaultValues == false && defaultInstance != null ){
                     if (Equals( property.Read(instance), property.Read(defaultInstance) )){
@@ -48,6 +53,7 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
 
                 fsData serializedData;
 
+                // property.Read(instance) 理解为从某一个实例读取某一个属性，字段值
                 var itemResult = Serializer.TrySerialize(property.StorageType, property.OverrideConverterType,
                                                          property.Read(instance), out serializedData);
                 result.AddMessages(itemResult);

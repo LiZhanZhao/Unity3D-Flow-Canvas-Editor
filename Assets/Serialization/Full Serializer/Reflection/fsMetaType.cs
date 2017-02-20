@@ -11,14 +11,18 @@ namespace ParadoxNotion.Serialization.FullSerializer {
     /// MetaType contains metadata about a type. This is used by the reflection serializer.
     /// </summary>
     public class fsMetaType {
+        // 理解为缓存
         private static Dictionary<fsConfig, Dictionary<Type, fsMetaType>> _configMetaTypes =
             new Dictionary<fsConfig, Dictionary<Type, fsMetaType>>();
 
         public static fsMetaType Get(fsConfig config, Type type) {
             Dictionary<Type, fsMetaType> metaTypes;
+
+            // 一个config对应一个Dictionary<Type, fsMetaType>
             if (_configMetaTypes.TryGetValue(config, out metaTypes) == false)
                 metaTypes = _configMetaTypes[config] = new Dictionary<Type, fsMetaType>();
 
+            // 一个type 对应一个 fsMetaType
             fsMetaType metaType;
             if (metaTypes.TryGetValue(type, out metaType) == false) {
                 metaType = new fsMetaType(config, type);
@@ -36,11 +40,15 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             _configMetaTypes = new Dictionary<fsConfig, Dictionary<Type, fsMetaType>>();
         }
 
+        // fsMetaType的构造函数
         private fsMetaType(fsConfig config, Type reflectedType) {
+            // 初始化属性ReflectedType
             ReflectedType = reflectedType;
 
             List<fsMetaProperty> properties = new List<fsMetaProperty>();
+            // 收集所有可以序列化的属性与字段，保存到properties中
             CollectProperties(config, properties, reflectedType);
+            // 把properties保存到Properties中
             Properties = properties.ToArray();
 
 #if UNITY_EDITOR || UNITY_STANDALONE
@@ -66,19 +74,23 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             bool requireOptIn = config.DefaultMemberSerialization == fsMemberSerialization.OptIn;
             bool requireOptOut = config.DefaultMemberSerialization == fsMemberSerialization.OptOut;
 
+            // 检查是否有[fsObject] attribute
             fsObjectAttribute attr = fsPortableReflection.GetAttribute<fsObjectAttribute>(reflectedType);
             if (attr != null) {
                 requireOptIn = attr.MemberSerialization == fsMemberSerialization.OptIn;
                 requireOptOut = attr.MemberSerialization == fsMemberSerialization.OptOut;
             }
 
+            // 获得所有的成员，包含方法与属性字段
             MemberInfo[] members = reflectedType.GetDeclaredMembers();
             foreach (var member in members) {
                 // We don't serialize members annotated with any of the ignore serialize attributes
+                // 跳过attribute 是 typeof(NonSerializedAttribute) 或者 typeof(fsIgnoreAttribute) 
                 if (config.IgnoreSerializeAttributes.Any(t => fsPortableReflection.HasAttribute(member, t))) {
                     continue;
                 }
 
+                // 如果不是属性，字段的话，就跳过
                 PropertyInfo property = member as PropertyInfo;
                 FieldInfo field = member as FieldInfo;
 
@@ -87,6 +99,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     continue;
                 }
 
+                // 如果设置了requireOptIn，跳过那些Attribute不是UnityEngine.SerializeField和fsPropertyAttribute的
                 // If an opt-in annotation is required, then skip the property if it doesn't have one
                 // of the serialize attributes
                 if (requireOptIn &&
@@ -95,6 +108,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     continue;
                 }
 
+                // 如果设置了requireOptOut，跳过Attribute是 typeof(NonSerializedAttribute), typeof(fsIgnoreAttribute)的
                 // If an opt-out annotation is required, then skip the property *only if* it has one of
                 // the not serialize attributes
                 if (requireOptOut &&
@@ -103,18 +117,23 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                     continue;
                 }
 
+                // 如果是属性的话，
                 if (property != null) {
+                    // 判断是否可以序列化这个Property
                     if (CanSerializeProperty(config, property, members, requireOptOut)) {
                         properties.Add(new fsMetaProperty(config, property));
                     }
                 }
+                // 如果是字段的话
                 else if (field != null) {
+                    // 判断是否可以序列化这个Field
                     if (CanSerializeField(config, field, requireOptOut)) {
                         properties.Add(new fsMetaProperty(config, field));
                     }
                 }
             }
 
+            // 处理基类，收集基类的属性
             if (reflectedType.Resolve().BaseType != null) {
                 CollectProperties(config, properties, reflectedType.Resolve().BaseType);
             }
@@ -148,7 +167,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             var publicGetMethod = property.GetGetMethod(/*nonPublic:*/ false);
             var publicSetMethod = property.GetSetMethod(/*nonPublic:*/ false);
 
-            // We do not bother to serialize static fields.
+            // We do not bother to serialize static fields or private fields.
             if ((publicGetMethod != null && publicGetMethod.IsStatic) ||
                 (publicSetMethod != null && publicSetMethod.IsStatic)) {
                 return false;

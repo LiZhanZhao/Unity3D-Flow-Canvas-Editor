@@ -30,12 +30,14 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
         }
 
         private void CommonInitialize(fsConfig config) {
+            // 检查是否有[fsProperty] Attribute
             var attr = fsPortableReflection.GetAttribute<fsPropertyAttribute>(_memberInfo);
             if (attr != null) {
                 JsonName = attr.Name;
                 OverrideConverterType = attr.Converter;
             }
 
+            // 获得JsonName
             if (string.IsNullOrEmpty(JsonName)) {
                 JsonName = config.GetJsonNameFromMemberName(MemberName, _memberInfo);
             }
@@ -130,10 +132,11 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
         /// object instance as the context.
         /// </summary>
         public object Read(object context) {
+            // 属性的情况
             if (_memberInfo is PropertyInfo) {
                 return ((PropertyInfo)_memberInfo).GetValue(context, new object[] { });
             }
-
+            // 字段的情况
             else {
                 return ((FieldInfo)_memberInfo).GetValue(context);
             }

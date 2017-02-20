@@ -260,7 +260,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 if (HasDefaultConstructor == false)
                     return false;
 
-                fsAotCompilationManager.AddAotCompilation(ReflectedType, Properties, _isDefaultConstructorPublic);
+                //fsAotCompilationManager.AddAotCompilation(ReflectedType, Properties, _isDefaultConstructorPublic);
                 return true;
             }
 

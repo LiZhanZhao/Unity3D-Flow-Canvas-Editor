@@ -79,6 +79,7 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
                 return fsResult.Success;
             }
 
+            //
             fsMetaType metaType = fsMetaType.Get(Serializer.Config, storageType);
             metaType.EmitAotData();
 
@@ -100,11 +101,13 @@ namespace ParadoxNotion.Serialization.FullSerializer.Internal {
                         deserializedValue = property.Read(instance);
                     }
 */
+                    // 递归下去
                     var itemResult = Serializer.TryDeserialize(propertyData, property.StorageType,
                                                                property.OverrideConverterType, ref deserializedValue);
                     result.AddMessages(itemResult);
                     if (itemResult.Failed) continue;
 
+                    // 往instance的property写入deserializedValue数据
                     property.Write(instance, deserializedValue);
                 }
             }

@@ -56,10 +56,12 @@ namespace ParadoxNotion{
 		private static Dictionary<string, Type> typeMap = new Dictionary<string, Type>();
 		public static Type GetType(string typeFullName, bool fallbackNoNamespace = false, Type fallbackAssignable = null){
 
+            // typeFullName为空就返回
 			if (string.IsNullOrEmpty(typeFullName)){
 				return null;
 			}
 
+            // 查缓存是否有
 			Type type = null;
 			if (typeMap.TryGetValue(typeFullName, out type)){
 				return type;
@@ -73,6 +75,7 @@ namespace ParadoxNotion{
 
 			LateLog(string.Format("<b>(Type Request)</b> Trying Fallback Type match for type '{0}'...\n<i>(This happens if the type can't be resolved by it's full assembly/namespace name)</i>", typeFullName), UnityEngine.LogType.Warning);
 
+            // 处理泛型
             //handle generics now
             type = TryResolveGenericType(typeFullName, fallbackNoNamespace, fallbackAssignable);
             if (type != null){
@@ -113,11 +116,13 @@ namespace ParadoxNotion{
 
 		//direct type look up with it's FullName
 		static Type GetTypeDirect(string typeFullName){
+            // 查找类型
 			var type = Type.GetType(typeFullName);
 			if (type != null){
 				return type;
 			}
 
+            // 
             for (var i = 0; i < loadedAssemblies.Length; i++){
             	var asm = loadedAssemblies[i];
                 try {type = asm.GetType(typeFullName);}

@@ -723,6 +723,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         /// Attempts to deserialize a value from a serialized state.
         /// </summary>
         public fsResult TryDeserialize(fsData data, Type storageType, Type overrideConverterType, ref object result) {
+            // data 为空的情况
             if (data.IsNull) {
                 result = null;
                 var processors = GetProcessors(storageType);
@@ -745,6 +746,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 List<fsObjectProcessor> processors;
                 var r = InternalDeserialize_1_CycleReference(overrideConverterType, data, storageType, ref result, out processors);
                 if (r.Succeeded) {
+                    // 调用processors.OnAfterDeserialize 和 ISerializationCallbackReceiver.OnAfterDeserialize
                     Invoke_OnAfterDeserialize(processors, storageType, result);
                 }
                 return r;
@@ -775,6 +777,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             // time we encounter an object it'll always be the definition. Any times after that
             // it will be a reference. Because of this, if we encounter a reference then we
             // will have *always* already encountered the definition for it.
+
+            // 判断data是否是Dict，并且是否有$ref字段
             if (IsObjectReference(data)) {
                 int refId = int.Parse(data.AsDictionary[Key_ObjectReference].AsString);
                 result = _references.GetReferenceObject(refId);
@@ -839,6 +843,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             // have the correct set of processors to invoke until *after* we have resolved
             // the proper type to use for deserialization.
             processors = GetProcessors(storageType);
+
+            // 调用processors的OnBeforeDeserialize函数
             Invoke_OnBeforeDeserialize(processors, storageType, ref data);
 
             Type objectType = storageType;
@@ -846,6 +852,8 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             // If the serialized state contains type information, then we need to make sure to update our
             // objectType and data to the proper values so that when we construct an object instance later
             // and run deserialization we run it on the proper type.
+
+            // data是否是dict，并且是否包含有 $type 字段
             if (IsTypeSpecified(data)) {
                 fsData typeNameData = data.AsDictionary[Key_InstanceType];
 
@@ -856,11 +864,14 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                         break;
                     }
 
+                    // 取出$type字段的值
                     string typeName = typeNameData.AsString;
                     
                     //PARADOXNOTION ADDITION
                     // Type type = fsTypeCache.GetType(typeName);
                     //Provide storageType for when last resorting to no Namespace match
+
+                    // 根据typeName，返回类型，(这里处理了泛型和其他类型)
                     Type type = fsTypeCache.GetType(typeName, storageType);
                     
                     if (type == null) {
@@ -882,12 +893,16 @@ namespace ParadoxNotion.Serialization.FullSerializer {
             // Construct an object instance if we don't have one already. We also need to construct
             // an instance if the result type is of the wrong type, which may be the case when we
             // have a versioned import graph.
+
+            // 实例化一个实例出来
             if (ReferenceEquals(result, null) || result.GetType() != objectType) {
                 result = GetConverter(objectType, overrideConverterType).CreateInstance(data, objectType);
             }
 
             // We call OnBeforeDeserializeAfterInstanceCreation here because we still want to invoke the
             // method even if the user passed in an existing instance.
+
+            // 调用processors.OnBeforeDeserializeAfterInstanceCreation
             Invoke_OnBeforeDeserializeAfterInstanceCreation(processors, storageType, result, ref data);
 
             // NOTE: It is critically important that we pass the actual objectType down instead of
@@ -900,6 +915,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         }
 
         private fsResult InternalDeserialize_4_Cycles(Type overrideConverterType, fsData data, Type resultType, ref object result) {
+            // 是否有"$id"
             if (IsObjectDefinition(data)) {
                 // NOTE: object references are handled at stage 1
 
@@ -913,6 +929,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
                 // there may be references to itself.
 
                 int sourceId = int.Parse(data.AsDictionary[Key_ObjectDefinition].AsString);
+                // 添加引用
                 _references.AddReferenceWithId(sourceId, result);
             }
 
@@ -921,6 +938,7 @@ namespace ParadoxNotion.Serialization.FullSerializer {
         }
 
         private fsResult InternalDeserialize_5_Converter(Type overrideConverterType, fsData data, Type resultType, ref object result) {
+            // 是否有$content
             if (IsWrappedData(data)) {
                 data = data.AsDictionary[Key_Content];
             }

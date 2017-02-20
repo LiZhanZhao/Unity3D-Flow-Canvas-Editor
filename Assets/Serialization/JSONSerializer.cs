@@ -87,8 +87,9 @@ namespace ParadoxNotion.Serialization{
                 fsData data = null;
                 //先检查缓冲，看看是不是已经反序列化过了
                 cache.TryGetValue(serializedState, out data);
-
+                // 之前没有反序列化过的情况下
                 if (data == null){
+                    // 把一个string 转为一个fsData
                     data = fsJsonParser.Parse(serializedState);
                     cache[serializedState] = data;                
                 }

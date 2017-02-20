@@ -193,7 +193,7 @@ public class Test : MonoBehaviour {
         data.connections.Add(connection2);
 
         string testJsonStr = JSONSerializer.Serialize(typeof(GraphSerializationData), data, true);
-        System.IO.File.WriteAllText(Application.dataPath + "/Resources/aa.byte", testJsonStr);
+        System.IO.File.WriteAllText(Application.dataPath + "/Resources/aa.text", testJsonStr);
 
     }
 

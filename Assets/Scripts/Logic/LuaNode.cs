@@ -183,6 +183,7 @@ namespace FlowCanvas.Nodes
             }
         }
 
+#if UNITY_EDITOR
         /// UnityEditor
         virtual public void Config(string luaFilePath)
         {
@@ -190,6 +191,8 @@ namespace FlowCanvas.Nodes
             _luaFileRelaPath = luaRelaPath;
             _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
         }
+#endif
     }
+
 }
 

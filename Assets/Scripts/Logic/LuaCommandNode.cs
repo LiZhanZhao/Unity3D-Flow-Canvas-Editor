@@ -51,6 +51,7 @@ namespace FlowCanvas.Nodes
             getDataFunc.PCall();
             object data = getDataFunc.CheckObject(t);
             getDataFunc.EndPCall();
+            getDataFunc.Dispose();
             return data;
         }
 

@@ -75,6 +75,7 @@ namespace FlowCanvas.Nodes
             addActionFunc.Push(args);
             addActionFunc.PCall();
             addActionFunc.EndPCall();
+            addActionFunc.Dispose();
         }
 
         bool UpdateAction()
@@ -87,6 +88,7 @@ namespace FlowCanvas.Nodes
             updateActionFunc.PCall();
             bool isFinish = updateActionFunc.CheckBoolean();  
             updateActionFunc.EndPCall();
+            updateActionFunc.Dispose();
             return isFinish;
 
         }
@@ -102,7 +104,7 @@ namespace FlowCanvas.Nodes
             delActionFunc.Push(_actionKey);
             delActionFunc.PCall();
             delActionFunc.EndPCall();
-
+            delActionFunc.Dispose();
             CallFlowOutputs();
         }
 

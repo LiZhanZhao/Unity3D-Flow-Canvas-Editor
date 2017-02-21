@@ -52,15 +52,15 @@ public class Test : MonoBehaviour {
     //}
 
 	// Use this for initialization
-    //void Start()
-    //{
-    //    //InitLuaEnv();
-    //    FlowScript graph = GetCustomGraphDeserialize();
-    //    //FlowGraph graph = GetCustomGraphLua();
-    //    FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
-    //    fsc.StartBehaviour(graph);
+    void Start()
+    {
+        //InitLuaEnv();
+        FlowScript graph = GetCustomGraphDeserialize();
+        //FlowGraph graph = GetCustomGraphLua();
+        FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
+        fsc.StartBehaviour(graph);
 
-    //}
+    }
 
     //FlowScript GetCustomGraphLua()
     //{
@@ -133,7 +133,7 @@ public class Test : MonoBehaviour {
 
     FlowScript GetCustomGraphDeserialize()
     {
-        TextAsset asset = Resources.Load<TextAsset>("aa"); ;
+        TextAsset asset = Resources.Load<TextAsset>("bb"); ;
         FlowScript graph = new FlowScript();
         if (!graph.Deserialize(asset.text, true))
         {
@@ -143,10 +143,10 @@ public class Test : MonoBehaviour {
     }
 
 
-    void Start()
-    {
-        TestSerializeJson();
-    }
+    //void Start()
+    //{
+    //    TestSerializeJson();
+    //}
 
     void TestSerializeJson()
     {

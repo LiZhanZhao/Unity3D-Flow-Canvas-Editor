@@ -6,7 +6,7 @@ using NodeCanvas.Framework;
 using NodeCanvas.Framework.Internal;
 using System.Collections.Generic;
 using FlowCanvas.Nodes;
-using ParadoxNotion.Serialization;
+
 
 public class Test : MonoBehaviour {
 
@@ -52,24 +52,15 @@ public class Test : MonoBehaviour {
     //}
 
 	// Use this for initialization
-    void Start()
-    {
-        //InitLuaEnv();
-        FlowScript graph = GetCustomGraphDeserialize();
-        //FlowGraph graph = GetCustomGraphLua();
-        FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
-        fsc.StartBehaviour(graph);
-
-    }
-
-    //void OnGUI()
+    //void Start()
     //{
-    //    if (GUILayout.Button("Test"))
-    //    {
-            
-    //    }
-    //}
+    //    //InitLuaEnv();
+    //    FlowScript graph = GetCustomGraphDeserialize();
+    //    //FlowGraph graph = GetCustomGraphLua();
+    //    FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
+    //    fsc.StartBehaviour(graph);
 
+    //}
 
     //FlowScript GetCustomGraphLua()
     //{
@@ -142,64 +133,38 @@ public class Test : MonoBehaviour {
 
     FlowScript GetCustomGraphDeserialize()
     {
-        //string jsonPath = Application.dataPath + "/Resources/aa.byte";
-        //string jsonStr = System.IO.File.ReadAllText(jsonPath);
         TextAsset asset = Resources.Load<TextAsset>("aa"); ;
-        string jsonStr = asset.text;
-        GraphSerializationData data = JSONSerializer.Deserialize<GraphSerializationData>(jsonStr);
-
         FlowScript graph = new FlowScript();
-        if (!graph.Deserialize(data, true))
+        if (!graph.Deserialize(asset.text, true))
         {
             Debug.LogError("Can not Deserialize File");
         }
         return graph;
-
-
     }
 
 
-    //void Start()
-    //{
-    //    TestSerializeJson();
-    //}
+    void Start()
+    {
+        TestSerializeJson();
+    }
 
     void TestSerializeJson()
     {
-        GraphSerializationData data = new GraphSerializationData();
-        data.version = 1.0f;
+        FlowScript fs = new FlowScript();
 
-        ///// Nodes
-        RootNode onAwakeNode = new RootNode();
+        RootNode onAwakeNode = fs.AddNode<RootNode>();
 
-        GetVariable<float> getVarFloat = new GetVariable<float>();
+        GetVariable<float> getVarFloat = fs.AddNode<GetVariable<float>>();
         getVarFloat.SetVariable(10.0f);
 
-        SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
-
-        data.nodes.Add(onAwakeNode);
-        data.nodes.Add(getVarFloat);
-        data.nodes.Add(logNodeWrapper);
+        SimplexNodeWrapper<LogValue> logNodeWrapper = fs.AddNode<SimplexNodeWrapper<LogValue>>();
 
         ////// Connections
-        BinderConnection<object> connection1 = new BinderConnection<object>();
-        connection1.sourcePortID = "Value";
-        connection1.sourceNode = getVarFloat;
-        connection1.targetPortID = "Obj";
-        connection1.targetNode = logNodeWrapper;
+        BinderConnection.Create(getVarFloat.GetOutputPort("Value"), logNodeWrapper.GetInputPort("Obj"));
+        BinderConnection.Create(onAwakeNode.GetOutputPort("Once"), logNodeWrapper.GetInputPort(" "));
 
-        BinderConnection connection2 = new BinderConnection();
-        connection2.sourcePortID = "Once";
-        connection2.sourceNode = onAwakeNode;
-        connection2.targetPortID = " ";
-        connection2.targetNode = logNodeWrapper;
-
-        data.connections.Add(connection1);
-        data.connections.Add(connection2);
-
-        string testJsonStr = JSONSerializer.Serialize(typeof(GraphSerializationData), data, true);
-        System.IO.File.WriteAllText(Application.dataPath + "/Resources/aa.text", testJsonStr);
-
+        string testJsonStr = fs.Serialize(true);
+        System.IO.File.WriteAllText(Application.dataPath + "/Resources/aa.json", testJsonStr);
     }
 
 

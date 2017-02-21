@@ -107,7 +107,23 @@ namespace NodeCanvas.Framework{
             protected set { _outConnections = value; }
         }
 
-        
+        public static Node Create(Graph targetGraph, System.Type nodeType, Vector2 pos)
+        {
+
+            if (targetGraph == null)
+            {
+                Debug.LogError("Can't Create a Node without providing a Target Graph");
+                return null;
+            }
+
+            var newNode = (Node)System.Activator.CreateInstance(nodeType);
+
+            newNode.graph = targetGraph;
+            //newNode.nodePosition = pos;
+            newNode.OnValidate(targetGraph);
+            return newNode;
+        }
+
 
         virtual protected void OnReset() { }
         
@@ -163,6 +179,7 @@ namespace NodeCanvas.Framework{
             }
         }
 
+
         
         virtual public void OnGraphStarted() { }
 
@@ -173,7 +190,15 @@ namespace NodeCanvas.Framework{
         virtual public void OnGraphPaused() { }
 
         virtual public void OnGraphStoped() { }
-        virtual public void OnChildDisconnected(int connectionIndex) { }
+        
+        virtual public void OnParentConnected(int connectionIndex) { }
+
         virtual public void OnParentDisconnected(int connectionIndex) { }
+        
+        virtual public void OnChildConnected(int connectionIndex) { }
+
+        virtual public void OnChildDisconnected(int connectionIndex) { }
+
+        virtual public void OnDestroy() { }
     }
 }

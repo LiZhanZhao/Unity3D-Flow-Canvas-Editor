@@ -119,6 +119,102 @@ namespace FlowCanvas
                 (sourcePort as FlowOutput).UnBind();
             }
         }
+
+        public static BinderConnection Create(Port source, Port target)
+        {
+
+            if (source == null || target == null)
+            {
+                Debug.LogError("Source Port or Target Port is null when making a new Binder Connection");
+                return null;
+            }
+
+            //if (!source.CanAcceptConnections())
+            //{
+            //    Debug.LogWarning("Source port can accept no more connections");
+            //    return null;
+            //}
+
+            //if (!target.CanAcceptConnections())
+            //{
+            //    Debug.LogWarning("Target port can accept no more connections");
+            //    return null;
+            //}
+
+            if (source.parent == target.parent)
+            {
+                Debug.LogWarning("Can't connect ports on the same parent node");
+                return null;
+            }
+
+
+            if (source is FlowOutput && !(target is FlowInput))
+            {
+                Debug.LogWarning("Flow ports can only be connected to other Flow ports");
+                return null;
+            }
+
+            if ((source is FlowInput && target is FlowInput) || (source is ValueInput && target is ValueInput))
+            {
+                Debug.LogWarning("Can't connect input to input");
+                return null;
+            }
+
+            if ((source is FlowOutput && target is FlowOutput) || (source is ValueOutput && target is ValueOutput))
+            {
+                Debug.LogWarning("Can't connect output to output");
+                return null;
+            }
+
+            if (!TypeConverter.HasConvertion(source.type, target.type))
+            {
+                Debug.LogWarning(string.Format("Can't connect ports. Type '{0}' is not assignable from Type '{1}' and there exists no internal convertion for those types.", target.type.FriendlyName(), source.type.FriendlyName()));
+                return null;
+            }
+
+            if (source is FlowOutput && target is FlowInput)
+            {
+                var flowBind = new BinderConnection();
+                flowBind.OnCreate(source, target);
+                return flowBind;
+            }
+
+            if (source is ValueOutput && target is ValueInput)
+            {
+                var valueBind = (BinderConnection)System.Activator.CreateInstance(typeof(BinderConnection<>).RTMakeGenericType(new System.Type[] { target.type }));
+                valueBind.OnCreate(source, target);
+                return valueBind;
+            }
+
+            return null;
+        }
+
+        void OnCreate(Port source, Port target)
+        {
+            sourceNode = source.parent;
+            targetNode = target.parent;
+            sourcePortID = source.ID;
+            targetPortID = target.ID;
+            sourceNode.outConnections.Add(this);
+            targetNode.inConnections.Add(this);
+
+            source.connections++;
+            target.connections++;
+            
+            //Bind();
+            
+        }
+
+        public override void OnDestroy()
+        {
+            if (sourcePort != null) //check null for cases like the SwitchInt, where basicaly the source port is null since pin is removed first
+                sourcePort.connections--;
+            if (targetPort != null)
+                targetPort.connections--;
+
+            UnBind();
+            
+        }
     }
 }
 

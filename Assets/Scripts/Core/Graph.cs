@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using NodeCanvas.Framework.Internal;
 using System.Linq;
-
+using ParadoxNotion.Serialization;
+using ParadoxNotion;
 
 namespace NodeCanvas.Framework
 {
@@ -22,8 +23,9 @@ namespace NodeCanvas.Framework
         private float timeStarted;
         abstract public bool requiresAgent { get; }
         abstract public bool requiresPrimeNode { get; }
+        abstract public System.Type baseNodeType { get; }
 
-        
+
 
         public List<Node> allNodes
         {
@@ -49,60 +51,10 @@ namespace NodeCanvas.Framework
 
         virtual protected void OnGraphStoped() { }
 
-        public bool Deserialize(GraphSerializationData data, bool validate)
-        {
-            if (data == null)
-            {
-                return false;
-            }
 
-            try
-            {
-                if (LoadGraphData(data, validate) == true)
-                {
-                    this._deserializationFailed = false;
-                    return true;
-                }
 
-                _deserializationFailed = true;
-                return false;
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
-                _deserializationFailed = true;
-                return false;
-            }
 
-        }
 
-        
-
-        bool LoadGraphData(GraphSerializationData data, bool validate)
-        {
-            if (data == null)
-            {
-                Debug.LogError("Can't Load graph, cause of null GraphSerializationData provided");
-                return false;
-            }
-
-            // data.connections and data.nodes to graph
-            data.Reconstruct(this);
-
-            this._nodes = data.nodes;
-            this._primeNode = data.primeNode;
-
-            //IMPORTANT: Validate should be called in all deserialize cases outside of Unity's 'OnAfterDeserialize',
-            //like for example when loading from json, or manualy calling this outside of OnAfterDeserialize.
-            if (validate)
-            {
-                Validate();
-            }
-
-            return true;
-        }
-
-        
 
         public void Validate()
         {
@@ -136,26 +88,6 @@ namespace NodeCanvas.Framework
         {
             get { return _agent; }
             set { _agent = value; }
-        }
-
-        public void RemoveConnection(Connection connection)
-        {
-
-            //for live editing
-            if (Application.isPlaying)
-            {
-                connection.Reset();
-            }
-
-            connection.OnDestroy();
-            connection.sourceNode.OnChildDisconnected(connection.sourceNode.outConnections.IndexOf(connection));
-            connection.targetNode.OnParentDisconnected(connection.targetNode.inConnections.IndexOf(connection));
-
-            connection.sourceNode.outConnections.Remove(connection);
-            connection.targetNode.inConnections.Remove(connection);
-
-
-            UpdateNodeIDs(false);
         }
 
 
@@ -225,7 +157,7 @@ namespace NodeCanvas.Framework
                 Debug.LogWarning("<b>Graph:</b> Graph is already Active.");
                 return;
             }
-            
+
             if (agent == null && requiresAgent)
             {
                 Debug.LogWarning("<b>Graph:</b> You've tried to start a graph with null Agent.");
@@ -281,7 +213,7 @@ namespace NodeCanvas.Framework
 
         public void UpdateGraph() { OnGraphUpdate(); }
 
-        
+
 
         public void Pause()
         {
@@ -331,7 +263,7 @@ namespace NodeCanvas.Framework
             }
         }
 
-        
+
 
         //void ISerializationCallbackReceiver.OnBeforeSerialize()
         //{
@@ -341,101 +273,148 @@ namespace NodeCanvas.Framework
         //    Deserialize();
         //}
 
-        
 
-//        public void Serialize()
-//        {
-//            if (_objectReferences != null && _objectReferences.Count > 0 && _objectReferences.Any(o => o != null))
-//            { //Unity requires double deserialize for UnityObject refs.
-//                hasDeserialized = false;
-//            }
+        public bool Deserialize(string jsonContext, bool validate)
+        {
+            if (string.IsNullOrEmpty(jsonContext))
+            {
+                return false;
+            }
 
-//#if UNITY_EDITOR //we only serialize in the editor
-//            if (JSONSerializer.applicationPlaying)
-//            {
-//                return;
-//            }
+            try
+            {
+                GraphSerializationData data = JSONSerializer.Deserialize<GraphSerializationData>(jsonContext);
+                if (LoadGraphData(data, validate) == true)
+                {
+                    this._deserializationFailed = false;
+                    return true;
+                }
 
-//            ///Serialize the graph and returns the serialized json string
-//            /// _serializedGraph 保存的就是Json String，注意_objectReferences也参与序列化
-//            _serializedGraph = this.Serialize(false, _objectReferences);
+                _deserializationFailed = true;
+                return false;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
+                _deserializationFailed = true;
+                return false;
+            }
 
-//            //notify owner. This is used for bound graphs
-//            var owner = agent != null && agent is GraphOwner ? (GraphOwner)agent : null;
-//            //if (owner != null)
-//            //{
-//            //    owner.OnGraphSerialized(this);
-//            //}
-//#endif
-//        }
+        }
 
-        //public string Serialize(bool pretyJson, List<UnityEngine.Object> objectReferences)
-        //{
-        //    //if something went wrong on deserialization, dont serialize back, but rather keep what we had
-        //    // 反序列化失败的情况
-        //    if (_deserializationFailed)
-        //    {
-        //        _deserializationFailed = false;
-        //        return _serializedGraph;
-        //    }
 
-        //    //the list to save the references in. If not provided externaly we save into the local list
-        //    if (objectReferences == null)
-        //    {
-        //        objectReferences = this._objectReferences = new List<Object>();
-        //    }
 
-        //    UpdateNodeIDs(true);
-        //    // 这里就把一个Graph的数据填充到GraphSerializationData结构中，再变成Json String
-        //    // 注意这里，objectReferences也传进去的，理解为，也序列化objectReferences
-        //    return JSONSerializer.Serialize(typeof(GraphSerializationData), new GraphSerializationData(this), pretyJson, objectReferences);
-        //}
+        bool LoadGraphData(GraphSerializationData data, bool validate)
+        {
+            if (data == null)
+            {
+                Debug.LogError("Can't Load graph, cause of null GraphSerializationData provided");
+                return false;
+            }
 
-        //public void Deserialize()
-        //{
-        //    if (hasDeserialized && JSONSerializer.applicationPlaying)
-        //    { //avoid double call if not needed (UnityObject refs).
-        //        return;
-        //    }
-        //    hasDeserialized = true;
-        //    this.Deserialize(_serializedGraph, false, _objectReferences);
-        //}
+            // data.connections and data.nodes to graph
+            data.Reconstruct(this);
 
-        //public GraphSerializationData Deserialize(string serializedGraph, bool validate, List<UnityEngine.Object> objectReferences)
-        //{
-        //    if (string.IsNullOrEmpty(serializedGraph))
-        //    {
-        //        return null;
-        //    }
+            this._nodes = data.nodes;
+            this._primeNode = data.primeNode;
 
-        //    //the list to load the references from. If not provided externaly we load from the local list (which is the case most times)
-        //    if (objectReferences == null)
-        //    {
-        //        objectReferences = this._objectReferences;
-        //    }
+            //IMPORTANT: Validate should be called in all deserialize cases outside of Unity's 'OnAfterDeserialize',
+            //like for example when loading from json, or manualy calling this outside of OnAfterDeserialize.
+            if (validate)
+            {
+                Validate();
+            }
 
-        //    try
-        //    {
-        //        //deserialize provided serialized graph into a new GraphSerializationData object and load it
-        //        var data = JSONSerializer.Deserialize<GraphSerializationData>(serializedGraph, objectReferences);
-        //        if (LoadGraphData(data, validate) == true)
-        //        {
-        //            this._deserializationFailed = false;
-        //            this._serializedGraph = serializedGraph;
-        //            this._objectReferences = objectReferences;
-        //            return data;
-        //        }
+            return true;
+        }
 
-        //        _deserializationFailed = true;
-        //        return null;
-        //    }
-        //    catch (System.Exception e)
-        //    {
-        //        //Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()), this);
-        //        Debug.LogError(string.Format("<b>(Deserialization Error:)</b> {0}", e.ToString()));
-        //        _deserializationFailed = true;
-        //        return null;
-        //    }
-        //}
+        public string Serialize(bool pretyJson)
+        {
+            UpdateNodeIDs(true);
+            return JSONSerializer.Serialize(typeof(GraphSerializationData), new GraphSerializationData(this), pretyJson);
+        }
+
+
+        ///Add a new node to this graph
+        public T AddNode<T>() where T : Node
+        {
+            return (T)AddNode(typeof(T));
+        }
+
+        public T AddNode<T>(Vector2 pos) where T : Node
+        {
+            return (T)AddNode(typeof(T), pos);
+        }
+
+        public Node AddNode(System.Type nodeType)
+        {
+            return AddNode(nodeType, new Vector2(50, 50));
+        }
+
+        ///Add a new node to this graph
+        public Node AddNode(System.Type nodeType, Vector2 pos)
+        {
+
+            // 这里baseNodeType是typeof(FlowNode)
+            if (!nodeType.RTIsSubclassOf(baseNodeType))
+            {
+                Debug.LogWarning(nodeType + " can't be added to " + this.GetType().FriendlyName() + " graph");
+                return null;
+            }
+
+            var newNode = Node.Create(this, nodeType, pos);
+
+            allNodes.Add(newNode);
+
+            if (primeNode == null)
+            {
+                primeNode = newNode;
+            }
+
+            UpdateNodeIDs(false);
+            return newNode;
+        }
+
+        public void RemoveNode(Node node, bool recordUndo = true)
+        {
+
+            if (!allNodes.Contains(node))
+            {
+                Debug.LogWarning("Node is not part of this graph");
+                return;
+            }
+
+            //callback
+            node.OnDestroy();
+
+            //disconnect parents
+            foreach (var inConnection in node.inConnections.ToArray())
+            {
+                RemoveConnection(inConnection);
+            }
+
+            //disconnect children
+            foreach (var outConnection in node.outConnections.ToArray())
+            {
+                RemoveConnection(outConnection);
+            }
+
+            allNodes.Remove(node);
+
+            UpdateNodeIDs(false);
+        }
+
+        public void RemoveConnection(Connection connection)
+        {
+            connection.OnDestroy();
+            connection.sourceNode.OnChildDisconnected(connection.sourceNode.outConnections.IndexOf(connection));
+            connection.targetNode.OnParentDisconnected(connection.targetNode.inConnections.IndexOf(connection));
+
+            connection.sourceNode.outConnections.Remove(connection);
+            connection.targetNode.inConnections.Remove(connection);
+
+            UpdateNodeIDs(false);
+        }
+
     }
 }

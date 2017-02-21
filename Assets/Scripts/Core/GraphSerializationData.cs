@@ -6,8 +6,7 @@ using System.Collections.Generic;
 namespace NodeCanvas.Framework.Internal {
     public class GraphSerializationData
     {
-        public float version;
-
+        public float version = 1.0f;
         // 节点列表
         public List<Node> nodes = new List<Node>();
         // 连线列表

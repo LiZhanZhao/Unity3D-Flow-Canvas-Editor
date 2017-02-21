@@ -42,28 +42,33 @@ public class Test : MonoBehaviour {
 
     //}
 
-    void InitLuaEnv()
-    {
-        LuaClient lc = gameObject.GetComponent<LuaClient>();
-        if (lc == null)
-        {
-            lc = gameObject.AddComponent<LuaClient>();
-        }
-    }
+    //void InitLuaEnv()
+    //{
+    //    LuaClient lc = gameObject.GetComponent<LuaClient>();
+    //    if (lc == null)
+    //    {
+    //        lc = gameObject.AddComponent<LuaClient>();
+    //    }
+    //}
 
 	// Use this for initialization
     void Start()
     {
-        Debug.Log(typeof(GetVariable<float>).ToString());
-        //System.Type t = System.Type.GetType("System.Float");
-        InitLuaEnv();
-
-        FlowGraph graph = GetCustomGraphDeserialize();
+        //InitLuaEnv();
+        FlowScript graph = GetCustomGraphDeserialize();
         //FlowGraph graph = GetCustomGraphLua();
         FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
-        fsc.graph = graph;
+        fsc.StartBehaviour(graph);
 
     }
+
+    //void OnGUI()
+    //{
+    //    if (GUILayout.Button("Test"))
+    //    {
+            
+    //    }
+    //}
 
 
     //FlowScript GetCustomGraphLua()

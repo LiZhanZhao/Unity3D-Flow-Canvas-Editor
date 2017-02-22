@@ -55,9 +55,9 @@ public class Test : MonoBehaviour {
     void Start()
     {
         //InitLuaEnv();
-        FlowScript graph = GetCustomGraphDeserialize();
+        FlowGraph graph = GetCustomGraphDeserialize();
         //FlowGraph graph = GetCustomGraphLua();
-        FlowScriptController fsc = gameObject.AddComponent<FlowScriptController>();
+        FlowGraphController fsc = gameObject.AddComponent<FlowGraphController>();
         fsc.StartBehaviour(graph);
 
     }
@@ -131,10 +131,10 @@ public class Test : MonoBehaviour {
     //    return graph;
     //}
 
-    FlowScript GetCustomGraphDeserialize()
+    FlowGraph GetCustomGraphDeserialize()
     {
         TextAsset asset = Resources.Load<TextAsset>("bb"); ;
-        FlowScript graph = new FlowScript();
+        FlowGraph graph = new FlowGraph();
         if (!graph.Deserialize(asset.text, true))
         {
             Debug.LogError("Can not Deserialize File");
@@ -150,7 +150,7 @@ public class Test : MonoBehaviour {
 
     void TestSerializeJson()
     {
-        FlowScript fs = new FlowScript();
+        FlowGraph fs = new FlowGraph();
 
         RootNode onAwakeNode = fs.AddNode<RootNode>();
 

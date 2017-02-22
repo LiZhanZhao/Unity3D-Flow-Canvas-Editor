@@ -22,7 +22,7 @@ public class TestDeserialize : MonoBehaviour {
         getVarSpeed.SetVariable(10.0f);
 
         GetVariable<float> getVarTime = fs.AddNode<GetVariable<float>>();
-        getVarTime.SetVariable(0.0f);
+        getVarTime.SetVariable(5.0f);
 
         LuaCommandNode getTargets = fs.AddNode<LuaCommandNode>();
         string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
@@ -32,11 +32,23 @@ public class TestDeserialize : MonoBehaviour {
         configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/ai_action/rotate.lua";
         luaNode.Config(configFile);
 
+
+        GetVariable<string[]> getActorTypes = fs.AddNode<GetVariable<string[]>>();
+        getActorTypes.SetVariable(new string[] {"A1","A2" });
+
+        GetVariable<string[]> getActorGoNames = fs.AddNode <GetVariable<string[]>>();
+        getActorGoNames.SetVariable(new string[] { "Go1", "Go2" });
+
         ////// Connections
-        BinderConnection.Create(getVarSpeed.GetOutputPort("Value"), luaNode.GetInputPort("speed"));
-        BinderConnection.Create(getTargets.GetOutputPort("target1"), luaNode.GetInputPort("Targets"));
-        BinderConnection.Create(getVarTime.GetOutputPort("Value"), luaNode.GetInputPort("time"));
         BinderConnection.Create(onAwakeNode.GetOutputPort("Once"), luaNode.GetInputPort("In"));
+        BinderConnection.Create(getVarSpeed.GetOutputPort("Value"), luaNode.GetInputPort("speed"));
+        BinderConnection.Create(getVarTime.GetOutputPort("Value"), luaNode.GetInputPort("time"));
+
+        BinderConnection.Create(getTargets.GetOutputPort("target1"), luaNode.GetInputPort("Targets"));
+
+        BinderConnection.Create(getActorTypes.GetOutputPort("Value"), getTargets.GetInputPort("actorTypes"));
+        BinderConnection.Create(getActorGoNames.GetOutputPort("Value"), getTargets.GetInputPort("actorGoNames"));
+        
 
         string testJsonStr = fs.Serialize(true);
         System.IO.File.WriteAllText(Application.dataPath + "/Resources/cc.txt", testJsonStr);

@@ -8,10 +8,7 @@ gStoryManager = nil
 
 --主入口函数。从这里开始lua逻辑
 function Main()					
-	print("**** Hello World ****")
-
 	gStoryManager = StoryManager:New()
-
 end
 
 --场景切换通知
@@ -45,7 +42,8 @@ SMAddAction = function(actKey, actClsName, actTargetsArr, actArgsValueArr)
  	local actTargetsTab = {}
  	local len = actTargetsArr.Length
  	for i = 0, len - 1 do
- 		table.insert(actTargetsTab, actTargetsArr[i])
+ 		-- string to number
+ 		table.insert(actTargetsTab, tonumber(actTargetsArr[i]))
  	end
 
  	print("targets count: ", #actTargetsTab)

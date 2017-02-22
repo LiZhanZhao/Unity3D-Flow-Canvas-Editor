@@ -15,6 +15,10 @@ public class Test : MonoBehaviour {
         {
             lc = gameObject.AddComponent<LuaClient>();
         }
+
+        LuaClient.GetMainState()["__UNITY_EDITOR__"] = true;
+        LuaClient.GetMainState().DoFile("editor/EditorAdapter.lua");
+        
     }
 
 	// Use this for initialization

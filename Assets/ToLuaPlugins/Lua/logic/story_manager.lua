@@ -4,7 +4,6 @@ local DEFAULT_AI_ACTION_DIR = "logic/ai_action/"
 local DEFAULT_STORY_COMMAND_DIR = "logic/story_command/"
 
 CStoryManager.Init = function(self)
-	print("*** StoryManager *** ")
 	self._actions = {}
 end
 

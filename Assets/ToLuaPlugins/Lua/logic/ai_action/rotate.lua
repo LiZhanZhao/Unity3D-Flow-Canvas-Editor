@@ -26,23 +26,24 @@ end
 
 
 AIAction.__DealAction = function (self, target, delta_time)
- --    local targetObj = self:GetObjectGOById(target)
+    local targetObj = self:GetObjectGOById(target)
 
- --    if ( not targetObj ) then
- --        Logger.debug("has no OBJ");
- --        return false
- --    end
+    if ( not targetObj ) then
+        --Logger.debug("has no OBJ");
+        print("has no OBJ", target)
+        return false
+    end
 
-	-- if self.duration == 0 then 
-	-- 	targetObj.transform:Rotate(Vector3.up, self.speed)
-	-- else
-	-- 	targetObj.transform:Rotate(Vector3.up, self.speed * delta_time)
-	-- end
+	if self.duration == 0 then 
+		targetObj.transform:Rotate(Vector3.up, self.speed)
+	else
+		targetObj.transform:Rotate(Vector3.up, self.speed * delta_time)
+	end
     
- --    return true
-
-    print(" rotate __DealAction ", target, "  ", self.running_targets[target].duration)
     return true
+
+    --print(" rotate __DealAction ", target, "  ", self.running_targets[target].duration)
+    --return true
 end
 
 

@@ -21,9 +21,8 @@ public class Test : MonoBehaviour {
     void Start()
     {
         //InitLuaEnv();
-        TextAsset asset = Resources.Load<TextAsset>("bb"); ;
-        FlowGraphController fsc = gameObject.AddComponent<FlowGraphController>();
-        fsc.Play(asset.text);
+        TextAsset asset = Resources.Load<TextAsset>("bb");
+        FlowGraphController.Play(asset.text);
 
     }
 
@@ -95,16 +94,5 @@ public class Test : MonoBehaviour {
     //    }
     //    return graph;
     //}
-
-    FlowGraph GetCustomGraphDeserialize()
-    {
-        TextAsset asset = Resources.Load<TextAsset>("bb"); ;
-        FlowGraph graph = new FlowGraph();
-        if (!graph.Deserialize(asset.text, true))
-        {
-            Debug.LogError("Can not Deserialize File");
-        }
-        return graph;
-    }
     
 }

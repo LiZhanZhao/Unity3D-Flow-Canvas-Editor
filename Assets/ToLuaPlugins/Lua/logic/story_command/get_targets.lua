@@ -51,12 +51,17 @@ Main = function(inputDatas, outputDataKey)
 	        local actor = editor:GetActor(at)
 	        arr:SetValue(actor:GetId(), i)
 	    end
-		return arr
+
+	    local data = {}
+		data.target1 = arr
+		return data[outputDataKey]
 	---------------------editor------------------------
 	else
 		-- 在这里直接用游戏的逻辑代码来或者target Id
 	end
 
+	
+	
 	
     
 

@@ -24,7 +24,7 @@
             "_targetNode": {
                 "$ref": "3"
             },
-            "$type": "FlowCanvas.BinderConnection"
+            "$type": "FlowCanvas.Framework.BinderConnection"
         },
         {
             "_sourcePortName": "Value",
@@ -35,7 +35,7 @@
             "_targetNode": {
                 "$ref": "3"
             },
-            "$type": "FlowCanvas.BinderConnection`1[[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+            "$type": "FlowCanvas.Framework.BinderConnection`1[[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
         }
     ]
 }

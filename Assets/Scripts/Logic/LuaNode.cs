@@ -190,6 +190,7 @@ namespace FlowCanvas.Nodes
             string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
             _luaFileRelaPath = luaRelaPath;
             _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
+            OnValidate(graph);
         }
 #endif
     }

@@ -102,30 +102,32 @@ namespace FlowCanvas.Framework
             set { _graph = (T)value; }
         }
 
-        public void StartBehaviour(T newGraph)
+        protected void StartBehaviour(T newGraph)
         {
             SwitchBehaviour(newGraph);
         }
 
-        public void SwitchBehaviour(T newGraph)
+        protected void SwitchBehaviour(T newGraph)
         {
             SwitchBehaviour(newGraph, null);
         }
 
-        public void SwitchBehaviour(T newGraph, System.Action<bool> callback)
+        protected void SwitchBehaviour(T newGraph, System.Action<bool> callback)
         {
             StopBehaviour();
             graph = newGraph;
             StartBehaviour(callback);
         }
 
-        public void StartBehaviour(System.Action<bool> callback)
+        protected void StartBehaviour(System.Action<bool> callback)
         {
             if (graph != null)
             {
                 graph.StartGraph(this, true, callback);
             }
         }
+
+        
 
 
     }

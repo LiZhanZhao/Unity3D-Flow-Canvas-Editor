@@ -8,39 +8,6 @@ using FlowCanvas.Nodes;
 
 
 public class Test : MonoBehaviour {
-
-    
-
-    
-
-    //void TestDeserializeJson()
-    //{
-    //    GraphSerializationData data = new GraphSerializationData();
-    //    data.version = 1.0f;
-
-    //    ///// Nodes
-    //    MouseEvents meNode = new MouseEvents();
-
-    //    SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
-
-    //    data.nodes.Add(meNode);
-    //    data.nodes.Add(logNodeWrapper);
-
-
-    //    ////// Connections
-    //    BinderConnection connection2 = new BinderConnection();
-    //    connection2.sourcePortID = "Down";
-    //    connection2.sourceNode = meNode;
-    //    connection2.targetPortID = " ";
-    //    connection2.targetNode = logNodeWrapper;
-
-    //    data.connections.Add(connection2);
-
-    //    string testJsonStr = JSONSerializer.Serialize(typeof(GraphSerializationData), data, true);
-    //    System.IO.File.WriteAllText(Application.dataPath + "/aa.json", testJsonStr);
-
-    //}
-
     //void InitLuaEnv()
     //{
     //    LuaClient lc = gameObject.GetComponent<LuaClient>();
@@ -54,10 +21,9 @@ public class Test : MonoBehaviour {
     void Start()
     {
         //InitLuaEnv();
-        FlowGraph graph = GetCustomGraphDeserialize();
-        //FlowGraph graph = GetCustomGraphLua();
+        TextAsset asset = Resources.Load<TextAsset>("bb"); ;
         FlowGraphController fsc = gameObject.AddComponent<FlowGraphController>();
-        fsc.StartBehaviour(graph);
+        fsc.Play(asset.text);
 
     }
 
@@ -140,112 +106,5 @@ public class Test : MonoBehaviour {
         }
         return graph;
     }
-
-
-    //void Start()
-    //{
-    //    TestSerializeJson();
-    //}
-
-    
-
-
-
-    //FlowScript GetCustomGraphUpdate()
-    //{
-    //    GraphSerializationData data = new GraphSerializationData();
-    //    data.version = 1.0f;
-
-    //    ///// Nodes
-    //    MouseEvents meNode = new MouseEvents();
-
-    //    GetVariable<float> getVarFloat = new GetVariable<float>();
-    //    getVarFloat.SetVariable(10.0f);
-
-    //    SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
-
-    //    FinishNode finish = new FinishNode();
-
-    //    data.nodes.Add(meNode);
-    //    data.nodes.Add(getVarFloat);
-    //    data.nodes.Add(logNodeWrapper);
-    //    data.nodes.Add(finish);
-
-    //    ////// Connections
-    //    BinderConnection<object> connection1 = new BinderConnection<object>();
-    //    connection1.sourcePortID = "Value";
-    //    connection1.sourceNode = getVarFloat;
-    //    connection1.targetPortID = "Obj";
-    //    connection1.targetNode = logNodeWrapper;
-
-    //    BinderConnection connection2 = new BinderConnection();
-    //    connection2.sourcePortID = "Down";
-    //    connection2.sourceNode = meNode;
-    //    connection2.targetPortID = " ";
-    //    connection2.targetNode = logNodeWrapper;
-
-    //    BinderConnection connection3 = new BinderConnection();
-    //    connection3.sourceNode = meNode;
-    //    connection3.sourcePortID = "Up";
-    //    connection3.targetNode = finish;
-    //    connection3.targetPortID = "In";
-
-    //    data.connections.Add(connection1);
-    //    data.connections.Add(connection2);
-    //    data.connections.Add(connection3);
-
-
-    //    FlowScript graph = new FlowScript();
-    //    if (!graph.Deserialize(data, true))
-    //    {
-    //        Debug.LogError("Can not Deserialize File");
-    //    }
-    //    return graph;
-    //}
-
-    //FlowScript GetCustomGraphOnce()
-    //{
-    //    GraphSerializationData data = new GraphSerializationData();
-    //    data.version = 1.0f;
-
-    //    ///// Nodes
-    //    ConstructionEvent onAwakeNode = new ConstructionEvent();
-        
-    //    GetVariable<float> getVarFloat = new GetVariable<float>();
-    //    getVarFloat.SetVariable(10.0f);
-
-    //    SimplexNodeWrapper<LogValue> logNodeWrapper = new SimplexNodeWrapper<LogValue>();
-
-    //    data.nodes.Add(onAwakeNode);
-    //    data.nodes.Add(getVarFloat);
-    //    data.nodes.Add(logNodeWrapper);
-
-    //    ////// Connections
-    //    BinderConnection<object> connection1 = new BinderConnection<object>();
-    //    connection1.sourcePortID = "Value";
-    //    connection1.sourceNode = getVarFloat;
-    //    connection1.targetPortID = "Obj";
-    //    connection1.targetNode = logNodeWrapper;
-
-    //    BinderConnection connection2 = new BinderConnection();
-    //    connection2.sourcePortID = "Once";
-    //    connection2.sourceNode = onAwakeNode;
-    //    connection2.targetPortID = " ";
-    //    connection2.targetNode = logNodeWrapper;
-
-    //    data.connections.Add(connection1);
-    //    data.connections.Add(connection2);
-
-
-    //    FlowScript graph = new FlowScript();
-    //    if (!graph.Deserialize(data, true))
-    //    {
-    //        Debug.LogError("Can not Deserialize File");
-    //    }
-    //    return graph;
-    //}
-
-
-    
     
 }

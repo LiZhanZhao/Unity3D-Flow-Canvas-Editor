@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-using NodeCanvas.Framework;
 using ParadoxNotion;
 
-namespace FlowCanvas
+namespace FlowCanvas.Framework
 {
     public class BinderConnection : Connection
     {

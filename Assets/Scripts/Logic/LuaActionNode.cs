@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using FlowCanvas;
-using NodeCanvas.Framework;
 using System.Collections.Generic;
 using System;
 using LuaInterface;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {

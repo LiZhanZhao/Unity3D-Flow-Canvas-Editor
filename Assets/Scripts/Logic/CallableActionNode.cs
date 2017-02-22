@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using ParadoxNotion;
 using ParadoxNotion.Design;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {

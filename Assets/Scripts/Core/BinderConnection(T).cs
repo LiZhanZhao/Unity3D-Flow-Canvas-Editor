@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using ParadoxNotion;
-using NodeCanvas;
 
-namespace FlowCanvas{
+namespace FlowCanvas.Framework
+{
 
 	///Value bindings use the generic version of FlowBinderConnection.
 	///T is always the same at the 'target' ValueInput type.

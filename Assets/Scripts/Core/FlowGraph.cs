@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-using NodeCanvas.Framework;
 using System.Collections.Generic;
 
-namespace FlowCanvas
+namespace FlowCanvas.Framework
 {
 
     public class FlowGraph : Graph {

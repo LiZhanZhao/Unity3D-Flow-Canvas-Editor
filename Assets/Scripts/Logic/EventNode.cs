@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using FlowCanvas.Framework;
+
 namespace FlowCanvas.Nodes
 {
     abstract public class EventNode : FlowNode

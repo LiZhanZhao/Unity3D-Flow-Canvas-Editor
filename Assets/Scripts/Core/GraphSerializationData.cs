@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-namespace NodeCanvas.Framework.Internal {
+namespace FlowCanvas.Framework
+{
     public class GraphSerializationData
     {
         public float version = 1.0f;

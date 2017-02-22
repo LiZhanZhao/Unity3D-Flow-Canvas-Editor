@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using NodeCanvas.Framework;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {

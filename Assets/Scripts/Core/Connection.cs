@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace NodeCanvas.Framework
+namespace FlowCanvas.Framework
 {
     // 连线类
     abstract public partial class Connection

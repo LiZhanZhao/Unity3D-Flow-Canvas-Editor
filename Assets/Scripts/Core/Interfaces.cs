@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace NodeCanvas.Framework
+namespace FlowCanvas.Framework
 {
     public interface IUpdatable
     {

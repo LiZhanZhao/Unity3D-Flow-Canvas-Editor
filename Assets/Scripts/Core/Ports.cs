@@ -1,9 +1,9 @@
 ﻿using System;
-using ParadoxNotion;
 using UnityEngine;
 using System.Reflection;
 
-namespace FlowCanvas{
+namespace FlowCanvas.Framework
+{
 
 	///Delegate for Flow
 	public delegate void FlowHandler(Flow f);

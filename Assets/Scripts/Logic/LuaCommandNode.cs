@@ -4,6 +4,7 @@ using LuaInterface;
 using System.Collections.Generic;
 using ParadoxNotion;
 using System;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {

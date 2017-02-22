@@ -1,4 +1,5 @@
-﻿namespace NodeCanvas {
+﻿namespace FlowCanvas.Framework
+{
 
     /// Core Execution Status enumeration
     public enum Status {

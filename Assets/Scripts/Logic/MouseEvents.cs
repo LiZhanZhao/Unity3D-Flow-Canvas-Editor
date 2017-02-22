@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-//using ParadoxNotion.Design;
-using NodeCanvas.Framework;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes{
 

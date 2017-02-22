@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 
-namespace NodeCanvas.Framework
+namespace FlowCanvas.Framework
 {
 
     ///Singleton. Automatically added when needed, collectively calls methods that needs updating amongst other things relevant to MonoBehaviours

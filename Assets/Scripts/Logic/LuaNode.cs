@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 using ParadoxNotion;
-using NodeCanvas.Framework;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {

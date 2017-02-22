@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NodeCanvas.Framework.Internal;
 using ParadoxNotion;
 using ParadoxNotion.Design;
 using UnityEngine;
 
 
-namespace NodeCanvas.Framework{
+namespace FlowCanvas.Framework
+{
     abstract public partial class Node
     {
         private Graph _graph;

@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using NodeCanvas.Framework;
-using NodeCanvas;
 using System.Linq;
 using System;
 using ParadoxNotion;
 using System.Reflection;
 using ParadoxNotion.Design;
 
-namespace FlowCanvas
+namespace FlowCanvas.Framework
 {
     abstract public class FlowNode : Node
     {

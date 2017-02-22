@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using FlowCanvas;
 using UnityEngine;
-using ParadoxNotion.Design;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes{
 	public class RootNode : FlowNode {

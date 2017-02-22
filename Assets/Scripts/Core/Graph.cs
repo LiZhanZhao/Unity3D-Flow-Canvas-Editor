@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using NodeCanvas.Framework.Internal;
 using System.Linq;
 using ParadoxNotion.Serialization;
 using ParadoxNotion;
 
-namespace NodeCanvas.Framework
+namespace FlowCanvas.Framework
 {
 
     abstract public partial class Graph : ScriptableObject//, ISerializationCallbackReceiver

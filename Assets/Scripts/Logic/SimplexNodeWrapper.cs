@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ParadoxNotion;
 using ParadoxNotion.Design;
-using NodeCanvas.Framework;
+using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes{
 	///Wraps a SimplexNode

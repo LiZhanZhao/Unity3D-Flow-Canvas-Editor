@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using ParadoxNotion;
 
-namespace FlowCanvas
+namespace FlowCanvas.Framework
 {
 
     ///Responsible for internal -connection level- value conversions

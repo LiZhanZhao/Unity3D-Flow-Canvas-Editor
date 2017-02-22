@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NodeCanvas.Framework
+namespace FlowCanvas.Framework
 {
     abstract public class GraphOwner : MonoBehaviour
     {

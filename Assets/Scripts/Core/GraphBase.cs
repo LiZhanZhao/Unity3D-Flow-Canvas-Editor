@@ -51,9 +51,6 @@ namespace FlowCanvas.Framework
         //    Deserialize();
         //}
 
-        virtual public void OnDeserialization() { }
-        virtual public void OnSerialization() { }
-
         public bool Deserialize(string jsonContext, bool validate)
         {
             if (string.IsNullOrEmpty(jsonContext))

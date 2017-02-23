@@ -10,17 +10,10 @@ namespace FlowCanvas.Framework
 
     abstract public partial class Graph : GraphBase //: ScriptableObject//, ISerializationCallbackReceiver
     {
-        //private List<Object> _objectReferences;
-        //private string _serializedGraph;
-        //private bool hasDeserialized = false;
-
-        private List<Node> _nodes = new List<Node>();
-        
         private bool _isRunning;
         public event System.Action<bool> OnFinish;
         private float timeStarted;
         
-
         virtual protected void OnGraphValidate() { }
 
         virtual protected void OnGraphStarted() { }

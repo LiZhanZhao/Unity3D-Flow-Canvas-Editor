@@ -8,7 +8,7 @@ using ParadoxNotion.Design;
 
 namespace FlowCanvas.Framework
 {
-    abstract public class FlowNode : Node
+    abstract public partial class FlowNode : Node
     {
         private Dictionary<string, Port> _inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         private Dictionary<string, Port> _outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
@@ -42,6 +42,9 @@ namespace FlowCanvas.Framework
             _inputPorts.Clear();
             _outputPorts.Clear();
             RegisterPorts();
+#if UNITY_EDITOR
+            OnPortsGatheredInEditor();
+#endif
             ValidateConnections();
         }
 

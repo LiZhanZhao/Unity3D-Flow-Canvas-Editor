@@ -20,28 +20,28 @@ namespace FlowCanvas.Framework
             private set { _nodes = value; }
         }
 
-        public void UpdateNodeIDs(bool alsoReorderList)
-        {
-            var lastID = 0;
+        //public void UpdateNodeIDs(bool alsoReorderList)
+        //{
+        //    var lastID = 0;
 
-            //set the rest starting from nodes without parent(s)
-            var tempList = allNodes.OrderBy(n => n.inConnections.Count != 0).ToList();
-            for (var i = 0; i < tempList.Count; i++)
-            {
-                lastID = tempList[i].AssignIDToGraph(lastID);
-            }
+        //    //set the rest starting from nodes without parent(s)
+        //    var tempList = allNodes.OrderBy(n => n.inConnections.Count != 0).ToList();
+        //    for (var i = 0; i < tempList.Count; i++)
+        //    {
+        //        lastID = tempList[i].AssignIDToGraph(lastID);
+        //    }
 
-            //reset the check
-            for (var i = 0; i < allNodes.Count; i++)
-            {
-                allNodes[i].ResetRecursion();
-            }
+        //    //reset the check
+        //    for (var i = 0; i < allNodes.Count; i++)
+        //    {
+        //        allNodes[i].ResetRecursion();
+        //    }
 
-            if (alsoReorderList)
-            {
-                allNodes = allNodes.OrderBy(node => node.ID).ToList();
-            }
-        }
+        //    if (alsoReorderList)
+        //    {
+        //        allNodes = allNodes.OrderBy(node => node.ID).ToList();
+        //    }
+        //}
 
         //void ISerializationCallbackReceiver.OnBeforeSerialize()
         //{
@@ -107,15 +107,23 @@ namespace FlowCanvas.Framework
             return true;
         }
 
-        
 
-        virtual public void Validate()
+        virtual protected void OnGraphValidate() { }
+
+        public void Validate()
         {
+            for (var i = 0; i < allNodes.Count; i++)
+            {
+                try { allNodes[i].OnValidate(this); } //validation could be critical. we always continue
+                catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
+            }
+
+            OnGraphValidate();
         }
 
         public string Serialize(bool pretyJson)
         {
-            UpdateNodeIDs(true);
+            
             return JSONSerializer.Serialize(typeof(GraphSerializationData), new GraphSerializationData(this), pretyJson);
         }
 
@@ -125,18 +133,18 @@ namespace FlowCanvas.Framework
             return (T)AddNode(typeof(T));
         }
 
-        public T AddNode<T>(Vector2 pos) where T : Node
+        public T AddNode<T>(Rect rect) where T : Node
         {
-            return (T)AddNode(typeof(T), pos);
+            return (T)AddNode(typeof(T), rect);
         }
 
         public Node AddNode(System.Type nodeType)
         {
-            return AddNode(nodeType, new Vector2(50, 50));
+            return AddNode(nodeType, new Rect(50, 50, 100, 100));
         }
 
         ///Add a new node to this graph
-        public Node AddNode(System.Type nodeType, Vector2 pos)
+        public Node AddNode(System.Type nodeType, Rect rect)
         {
             // 这里baseNodeType是typeof(FlowNode)
             if (!nodeType.RTIsSubclassOf(baseNodeType))
@@ -144,9 +152,9 @@ namespace FlowCanvas.Framework
                 Debug.LogWarning(nodeType + " can't be added to " + this.GetType().FriendlyName() + " graph");
                 return null;
             }
-            var newNode = Node.Create(this, nodeType, pos);
+            var newNode = Node.Create(this, nodeType, rect);
+            newNode.ID = allNodes.Count;
             allNodes.Add(newNode);
-            UpdateNodeIDs(false);
             return newNode;
         }
 
@@ -174,8 +182,6 @@ namespace FlowCanvas.Framework
             }
 
             allNodes.Remove(node);
-
-            UpdateNodeIDs(false);
         }
 
         public void RemoveConnection(Connection connection)
@@ -186,8 +192,6 @@ namespace FlowCanvas.Framework
 
             connection.sourceNode.outConnections.Remove(connection);
             connection.targetNode.inConnections.Remove(connection);
-
-            UpdateNodeIDs(false);
         }
 
     }

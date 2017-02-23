@@ -52,6 +52,8 @@ namespace FlowCanvas.Framework
         ///The type of the port
         abstract public Type type { get; }
 
+        public Vector2 pos { get; set; }
+
     }
 
     public class FlowInput : Port

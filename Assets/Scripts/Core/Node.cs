@@ -14,8 +14,8 @@ namespace FlowCanvas.Framework
         private List<Connection> _inConnections = new List<Connection>();
         private List<Connection> _outConnections = new List<Connection>();
         private Status _status = Status.Resting;
-        private string _nodeName;
-        private string _name;
+        
+        
         private int _ID;
         private bool isChecked { get; set; }
         private string _nodeDescription;
@@ -63,32 +63,7 @@ namespace FlowCanvas.Framework
             set { _ID = value; }
         }
 
-        virtual public string name
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(customName))
-                {
-                    return customName;
-                }
-
-                if (string.IsNullOrEmpty(_nodeName))
-                {
-                    var nameAtt = this.GetType().RTGetAttribute<NameAttribute>(false);
-                    _nodeName = nameAtt != null ? nameAtt.name : GetType().FriendlyName().SplitCamelCase();
-                }
-                return _nodeName;
-            }
-            set { customName = value; }
-        }
-
         
-
-        private string customName
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
 
         ///All incomming connections to this node
         public List<Connection> inConnections
@@ -104,7 +79,9 @@ namespace FlowCanvas.Framework
             protected set { _outConnections = value; }
         }
 
-        public static Node Create(GraphBase targetGraph, System.Type nodeType, Vector2 pos)
+        public Node() { }
+
+        public static Node Create(GraphBase targetGraph, System.Type nodeType, Rect rect)
         {
 
             if (targetGraph == null)
@@ -114,9 +91,8 @@ namespace FlowCanvas.Framework
             }
 
             var newNode = (Node)System.Activator.CreateInstance(nodeType);
-
+            newNode.rect = rect;
             newNode.graphBase = targetGraph;
-            //newNode.nodePosition = pos;
             newNode.OnValidate(targetGraph);
             return newNode;
         }
@@ -150,8 +126,8 @@ namespace FlowCanvas.Framework
             }
 
             isChecked = true;
-            lastID++;
             ID = lastID;
+            lastID++;
 
             for (var i = 0; i < outConnections.Count; i++)
             {

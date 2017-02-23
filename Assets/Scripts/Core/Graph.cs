@@ -14,7 +14,7 @@ namespace FlowCanvas.Framework
         public event System.Action<bool> OnFinish;
         private float timeStarted;
         
-        virtual protected void OnGraphValidate() { }
+        
 
         virtual protected void OnGraphStarted() { }
 
@@ -27,16 +27,7 @@ namespace FlowCanvas.Framework
         virtual protected void OnGraphStoped() { }
 
 
-        override public void Validate()
-        {
-            for (var i = 0; i < allNodes.Count; i++)
-            {
-                try { allNodes[i].OnValidate(this); } //validation could be critical. we always continue
-                catch (System.Exception e) { Debug.LogError(e.ToString()); continue; }
-            }
-
-            OnGraphValidate();
-        }
+        
 
 
         public bool isRunning

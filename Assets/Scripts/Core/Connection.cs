@@ -27,9 +27,9 @@ namespace FlowCanvas.Framework
             //protected set { _targetNode = value; }
             set { _targetNode = value; }
         }
-        protected Graph graph
+        protected GraphBase graphBase
         {
-            get { return sourceNode.graph; }
+            get { return sourceNode.graphBase; }
         }
 
         public Status status

@@ -78,7 +78,7 @@ namespace FlowCanvas.Nodes
             return true;
         }
 
-        public override void OnValidate(Graph flowGraph)
+        public override void OnValidate(GraphBase flowGraph)
         {
             base.OnValidate(flowGraph);
 
@@ -190,7 +190,7 @@ namespace FlowCanvas.Nodes
             string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
             _luaFileRelaPath = luaRelaPath;
             _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
-            OnValidate(graph);
+            OnValidate(graphBase);
         }
 #endif
     }

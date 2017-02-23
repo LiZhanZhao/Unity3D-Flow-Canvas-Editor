@@ -32,7 +32,7 @@ namespace FlowCanvas.Nodes
             }
         }
 
-        public override void OnValidate(Graph flowGraph)
+        public override void OnValidate(GraphBase flowGraph)
         {
             base.OnValidate(flowGraph);
             _actionKey = GenerateLuaKey(_luaFileName);

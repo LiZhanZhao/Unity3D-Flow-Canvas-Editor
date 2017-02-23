@@ -70,7 +70,7 @@ namespace FlowCanvas.Framework
             {
                 Debug.LogWarning(string.Format("<color=red>RemoveConnection Source : </color> sourcePort : {0}  bindingType : {1}",
                     sourcePort.type.ToString(), bindingType.ToString()));
-                graph.RemoveConnection(this);
+                graphBase.RemoveConnection(this);
             }
         }
 
@@ -91,7 +91,7 @@ namespace FlowCanvas.Framework
             {
                 Debug.LogWarning(string.Format("<color=red>RemoveConnection Target : </color> targetPort:{0}  bindingType:{1}",
                     targetPort.type.ToString(), bindingType.ToString()));
-                graph.RemoveConnection(this);
+                graphBase.RemoveConnection(this);
             }
         }
 

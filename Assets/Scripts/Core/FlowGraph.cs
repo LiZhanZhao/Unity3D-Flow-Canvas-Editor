@@ -4,10 +4,7 @@ using System.Collections.Generic;
 
 namespace FlowCanvas.Framework
 {
-
     public class FlowGraph : Graph {
-        sealed public override bool requiresAgent { get { return false; } }
-        sealed public override bool requiresPrimeNode { get { return false; } }
         public override System.Type baseNodeType { get { return typeof(FlowNode); } }
 
         private bool hasInitialized;

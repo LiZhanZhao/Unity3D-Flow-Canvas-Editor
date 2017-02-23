@@ -10,23 +10,32 @@ namespace FlowCanvas.Framework
 {
     abstract public partial class Node
     {
-        private Graph _graph;
+        private GraphBase _graphBase;
         private List<Connection> _inConnections = new List<Connection>();
         private List<Connection> _outConnections = new List<Connection>();
-        private bool _isBreakpoint = false;
         private Status _status = Status.Resting;
         private string _nodeName;
         private string _name;
         private int _ID;
         private bool isChecked { get; set; }
-        abstract public bool allowAsPrime { get; }
         private string _nodeDescription;
-        
 
         public Graph graph
         {
-            get { return _graph; }
-            set { _graph = value; }
+            get
+            {
+                if (_graphBase is Graph)
+                {
+                    return _graphBase as Graph;
+                }
+                return null;
+            }
+        }
+
+        public GraphBase graphBase
+        {
+            get { return _graphBase; }
+            set { _graphBase = value; }
         }
 
         virtual public string description
@@ -41,13 +50,6 @@ namespace FlowCanvas.Framework
                 return _nodeDescription;
             }
         }
-
-        public bool isBreakpoint
-        {
-            get { return _isBreakpoint; }
-            set { _isBreakpoint = value; }
-        }
-
         
         public Status status
         {
@@ -88,11 +90,6 @@ namespace FlowCanvas.Framework
             set { _name = value; }
         }
 
-        public Component graphAgent
-        {
-            get { return graph != null ? graph.agent : null; }
-        }
-
         ///All incomming connections to this node
         public List<Connection> inConnections
         {
@@ -107,7 +104,7 @@ namespace FlowCanvas.Framework
             protected set { _outConnections = value; }
         }
 
-        public static Node Create(Graph targetGraph, System.Type nodeType, Vector2 pos)
+        public static Node Create(GraphBase targetGraph, System.Type nodeType, Vector2 pos)
         {
 
             if (targetGraph == null)
@@ -118,7 +115,7 @@ namespace FlowCanvas.Framework
 
             var newNode = (Node)System.Activator.CreateInstance(nodeType);
 
-            newNode.graph = targetGraph;
+            newNode.graphBase = targetGraph;
             //newNode.nodePosition = pos;
             newNode.OnValidate(targetGraph);
             return newNode;
@@ -184,7 +181,7 @@ namespace FlowCanvas.Framework
         virtual public void OnGraphStarted() { }
 
         // call when create node
-        virtual public void OnValidate(Graph assignedGraph) { }
+        virtual public void OnValidate(GraphBase assignedGraph) { }
 
         virtual public void OnGraphUnpaused() { }
         virtual public void OnGraphPaused() { }

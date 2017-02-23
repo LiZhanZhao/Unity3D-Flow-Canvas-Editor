@@ -12,12 +12,11 @@ namespace FlowCanvas.Framework
     {
         private Dictionary<string, Port> _inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         private Dictionary<string, Port> _outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
-        sealed public override bool allowAsPrime { get { return false; } }
 
         private Dictionary<string, object> _inputPortValues;
 
         // be critical, this is will init inputPorts and outputPorts
-        public override void OnValidate(Graph flowGraph)
+        public override void OnValidate(GraphBase flowGraph)
         {
             GatherPorts();
         }

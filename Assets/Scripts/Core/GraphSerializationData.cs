@@ -19,7 +19,7 @@ namespace FlowCanvas.Framework
         public GraphSerializationData() { }
 
         //Construct
-        public GraphSerializationData(Graph graph)
+        public GraphSerializationData(GraphBase graph)
         {
             //connections are serialized seperately and not part of their parent node
             this.nodes = graph.allNodes;
@@ -34,14 +34,13 @@ namespace FlowCanvas.Framework
             }
 
             this.connections = structConnections;
-            this.primeNode = graph.primeNode;
 
             //serialize derived data
             this.derivedData = graph.OnDerivedDataSerialization();
         }
 
         ///MUST reconstruct before using the data
-        public void Reconstruct(Graph graph)
+        public void Reconstruct(GraphBase graph)
         {
 
             //check serialization versions here in the future if needed
@@ -56,7 +55,7 @@ namespace FlowCanvas.Framework
             //re-set the node's owner and ID
             for (var i = 0; i < this.nodes.Count; i++)
             {
-                nodes[i].graph = graph;
+                nodes[i].graphBase = graph;
                 nodes[i].ID = i + 1;
             }
 

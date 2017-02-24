@@ -90,6 +90,7 @@ namespace StoryEditorContext
         {
 
             HandleComiling();
+
             DrawCenterWindow();
             //DrawToolBar();
             //DrawNodeInfoWindow();
@@ -109,30 +110,14 @@ namespace StoryEditorContext
 
         void HandleInputEvents()
         {
-            //HandleLineWithNode();
-            HandleRightClickMenu();
-            HandleScrollWindow();
-            HandleZoomWindow();
-        }
-
-        void HandleRightClickMenu()
-        {
             Event e = Event.current;
             _mousePos = e.mousePosition;
-            // 空白区域右键
-            bool isCanDo = IsInBlankArea(_mousePos);
-            if (isCanDo)
-            {
-                _uiGraph.HandleRightClickMenu(e, _mousePos);
-            }
-        }
 
-        void RightClickMenuCallback(object obj)
-        {
-            ActionMenuElement element = ActionMenuInfo.elementList[(int)obj];
-            //Rect nodeRect = new Rect(_mousePos.x, _mousePos.y, kNodeWidth, kNodeHeight);
-            //Node node = _uiGraph.Create(nodeRect);
-            //node.actionName = element.actionName;
+            _uiGraph.HandleInputEvent(e, _mousePos);
+
+            //HandleLineWithNode();
+            HandleScrollWindow();
+            HandleZoomWindow();
         }
 
         void HandleScrollWindow()

@@ -11,8 +11,6 @@ namespace FlowCanvas.Nodes
     {
         public static UInt32 counter = 0;
         
-        
-
         private FlowInput _flowIn;
         private ValueInput<string[]> _targetValueIn;
 

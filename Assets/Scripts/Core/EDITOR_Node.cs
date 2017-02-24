@@ -25,6 +25,13 @@ namespace FlowCanvas.Framework
         private Port[] orderedInputs;
         private Port[] orderedOutputs;
 
+        private static GUIStyle _centerLabel = null;
+
+        public Node(Rect r)
+        {
+            rect = r;
+        }
+
         private string customName
         {
             get { return _customName; }
@@ -53,12 +60,9 @@ namespace FlowCanvas.Framework
 
         
 
-        public Node(Rect r)
-        {
-            rect = r;
-        }
+        
 
-        public Rect TotalRect
+        public Rect BoundeRect
         {
             get
             {
@@ -72,7 +76,7 @@ namespace FlowCanvas.Framework
         }
 
         
-        private static GUIStyle _centerLabel = null;
+        
 
         private static GUIStyle centerLabel
         {
@@ -88,10 +92,17 @@ namespace FlowCanvas.Framework
             }
         }
 
+        public bool isSelected
+        {
+            get { return UIGraph.currentSelection == this; }
+        }
 
         public void Draw()
         {
+            //rect = GUILayout.Window(ID, rect, DrawContext, string.Empty, (GUIStyle)"window");
             rect = GUILayout.Window(ID, rect, DrawContext, string.Empty, (GUIStyle)"window");
+
+            DrawSelectEffct();
             DrawShadow();
             DrawPort();
         }
@@ -119,6 +130,16 @@ namespace FlowCanvas.Framework
             GUI.skin.label.alignment = TextAnchor.UpperLeft;
         }
 
+        void DrawSelectEffct()
+        {
+            if (isSelected)
+            {
+                GUI.color = new Color(0.7f, 0.7f, 1f, 0.8f);
+                GUI.Box(rect, string.Empty, (GUIStyle)"windowHighlight");
+            }
+            
+        }
+
         void DrawShadow()
         {
             GUI.Box(rect, string.Empty, (GUIStyle)"windowShadow");
@@ -133,6 +154,33 @@ namespace FlowCanvas.Framework
         {
             OnDrawPort();
         }
+
+        public void HandleInputEvent(Event e, Vector2 pos)
+        {
+            if (e.type == EventType.MouseDown && e.button != 2 && rect.Contains(pos))
+            {
+                UIGraph.currentSelection = this;
+            }
+
+            if (e.type == EventType.MouseUp && e.button == 1 && rect.Contains(pos))
+            {
+                ShowSelectedMenu(e, pos);
+            }
+        }
+
+        void ShowSelectedMenu(Event e, Vector2 pos)
+        {
+            var menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Delete (DEL)"), false, () =>{ graphBase.RemoveNode(this); });
+            menu.ShowAsContext();
+
+            //if (inConnections.Count > 0)
+            //    menu.AddItem(new GUIContent(isActive ? "Disable" : "Enable"), false, () => { SetActive(!isActive); });
+
+            e.Use();
+        }
+
+        
 
         #endif
 

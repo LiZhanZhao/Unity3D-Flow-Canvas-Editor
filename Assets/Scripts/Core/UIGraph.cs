@@ -24,6 +24,20 @@ namespace FlowCanvas.Framework
         ///Get a list of ScriptInfos of the baseType excluding: the base type, abstract classes, Obsolete classes and those with the DoNotList attribute, categorized as a list of ScriptInfo
         private Dictionary<Type, List<ScriptInfo>> _cachedInfos = new Dictionary<Type, List<ScriptInfo>>();
 
+        private static object _currentSelection;
+        public static object currentSelection
+        {
+            get
+            {   
+                return _currentSelection;
+            }
+            set
+            {
+                _currentSelection = value;
+            }
+        }
+
+
         public void DrawNodes()
         {
             int nodeCount = allNodes.Count;
@@ -52,8 +66,8 @@ namespace FlowCanvas.Framework
             for (int i = 0; i < allNodes.Count; i++)
             {
                 Node node = allNodes[i];
-                Rect nodeTotalRect = node.TotalRect;
-                if (nodeTotalRect.Contains(pos))
+                Rect nodeBoundleRect = node.BoundeRect;
+                if (nodeBoundleRect.Contains(pos))
                 {
                     return node;
                 }
@@ -231,15 +245,29 @@ namespace FlowCanvas.Framework
 
         GenericMenu GetAddNodeMenu(Vector2 canvasMousePos)
         {
-            //System.Action<System.Type> Selected = (type) => { currentSelection = AddNode(type, canvasMousePos); };
-            System.Action<System.Type> Selected = (type) => { AddNode(type, canvasMousePos); };
+            System.Action<System.Type> Selected = (type) => { currentSelection = AddNode(type, canvasMousePos); };
             var menu = GetTypeSelectionMenu(baseNodeType, Selected);
             //menu = OnCanvasContextMenu(menu, canvasMousePos);
             return menu;
         }
 
+        public void HandleInputEvent(Event e, Vector2 pos)
+        {
+            HandleNodesInputEvent(e, pos);
 
-        public void HandleRightClickMenu(Event e, Vector2 pos)
+            HandleRightClickMenu(e, pos);
+        }
+
+        void HandleNodesInputEvent(Event e, Vector2 pos)
+        {
+            for (int i = 0; i < allNodes.Count; i++)
+            {
+                Node node = allNodes[i];
+                node.HandleInputEvent(e, pos);
+            }
+        }
+
+        void HandleRightClickMenu(Event e, Vector2 pos)
         {
             if (e.type == EventType.ContextClick)
             {

@@ -27,16 +27,18 @@ namespace FlowCanvas.Framework
         private static object _currentSelection;
         public static object currentSelection
         {
-            get
-            {   
+            get{   
                 return _currentSelection;
             }
-            set
-            {
+            set{
                 _currentSelection = value;
             }
         }
 
+        private static Node selectedNode
+        {
+            get { return currentSelection as Node; }
+        }
 
         public void DrawNodes()
         {

@@ -14,6 +14,9 @@ namespace FlowCanvas.Framework
         protected bool _deserializationFailed = false;
         abstract public System.Type baseNodeType { get; }
 
+        private const int kNodeWidth = 200;
+        private const int kNodeHeight = 50;
+
         public List<Node> allNodes
         {
             get { return _nodes; }
@@ -133,18 +136,18 @@ namespace FlowCanvas.Framework
             return (T)AddNode(typeof(T));
         }
 
-        public T AddNode<T>(Rect rect) where T : Node
+        public T AddNode<T>(Vector2 pos) where T : Node
         {
-            return (T)AddNode(typeof(T), rect);
+            return (T)AddNode(typeof(T), pos);
         }
 
         public Node AddNode(System.Type nodeType)
         {
-            return AddNode(nodeType, new Rect(50, 50, 100, 100));
+            return AddNode(nodeType, new Vector2(50, 50));
         }
 
         ///Add a new node to this graph
-        public Node AddNode(System.Type nodeType, Rect rect)
+        public Node AddNode(System.Type nodeType, Vector2 pos)
         {
             // 这里baseNodeType是typeof(FlowNode)
             if (!nodeType.RTIsSubclassOf(baseNodeType))
@@ -152,6 +155,7 @@ namespace FlowCanvas.Framework
                 Debug.LogWarning(nodeType + " can't be added to " + this.GetType().FriendlyName() + " graph");
                 return null;
             }
+            Rect rect = new Rect(pos, new Vector2(kNodeWidth, kNodeHeight));
             var newNode = Node.Create(this, nodeType, rect);
             newNode.ID = allNodes.Count;
             allNodes.Add(newNode);

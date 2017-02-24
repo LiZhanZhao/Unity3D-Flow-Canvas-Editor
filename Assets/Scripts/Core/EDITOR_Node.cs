@@ -17,7 +17,7 @@ namespace FlowCanvas.Framework
 
 #if UNITY_EDITOR
         
-        private const float KNOB_SIZE = 20;
+        private const float KNOB_SIZE = 13;
 
         private string _customName;
         private string _nodeName;
@@ -56,30 +56,6 @@ namespace FlowCanvas.Framework
         public Node(Rect r)
         {
             rect = r;
-        }
-
-        public Rect InputKnobRect
-        {
-            get
-            {
-                return new Rect(
-                    rect.x - KNOB_SIZE,
-                    rect.y + (rect.height - KNOB_SIZE) / 2,
-                    KNOB_SIZE, KNOB_SIZE
-                    );
-            }
-        }
-
-        public Rect OutputKnobRect
-        {
-            get
-            {
-                return new Rect(
-                    rect.x + rect.width,
-                    rect.y + (rect.height - KNOB_SIZE) / 2,
-                    KNOB_SIZE, KNOB_SIZE
-                    );
-            }
         }
 
         public Rect TotalRect

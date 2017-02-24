@@ -12,7 +12,7 @@ namespace FlowCanvas.Framework
     {
         private bool _isRunning;
         public event System.Action<bool> OnFinish;
-        private float timeStarted;
+        //private float timeStarted;
         
         
 
@@ -72,7 +72,7 @@ namespace FlowCanvas.Framework
 
             if (!isPaused)
             {
-                timeStarted = Time.time;
+                //timeStarted = Time.time;
                 OnGraphStarted();
             }
             else

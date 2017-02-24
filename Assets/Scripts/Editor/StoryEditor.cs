@@ -15,9 +15,6 @@ namespace StoryEditorContext
         private const float kNodeInfoWHP = 0.5f;
         private const float kToolbarHeight = 40;
 
-        private const int kNodeWidth = 200;
-        private const int kNodeHeight = 50;
-
         private const string kBgTexturePath = "Assets/Scripts/Editor/Resources/EditorTextures/background.png";
         private const string kCustomGUISkin = "Assets/Scripts/Editor/Resources/NodeCanvasSkin.guiskin";
         private const float kTitleHeight = 21;
@@ -58,10 +55,10 @@ namespace StoryEditorContext
             if (_uiGraph == null)
             {
                 _uiGraph = new UIGraph();
-                Rect rootRect = new Rect(position.width / 2, position.height / 2, kNodeWidth, kNodeHeight);
-                _uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(rootRect);
+                Vector2 pos = new Vector2(position.width / 2, position.height / 2);
+                _uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(pos);
 
-                //LuaCommandNode test =  _uiGraph.AddNode<LuaCommandNode>(rootRect);
+                //LuaCommandNode test = _uiGraph.AddNode<LuaCommandNode>(pos);
                 //string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
                 //test.Config(configFile);
             }
@@ -94,9 +91,9 @@ namespace StoryEditorContext
 
             HandleComiling();
             DrawCenterWindow();
-            DrawToolBar();
-            DrawNodeInfoWindow();
-            DrawPlayInfoWidnow();
+            //DrawToolBar();
+            //DrawNodeInfoWindow();
+            //DrawPlayInfoWidnow();
             DoRepaint();
             
                 
@@ -122,26 +119,18 @@ namespace StoryEditorContext
         {
             Event e = Event.current;
             _mousePos = e.mousePosition;
-
             // 空白区域右键
-            bool isCanDo = (e.type == EventType.MouseDown) && (e.button == 1) && IsInBlankArea(_mousePos);
+            bool isCanDo = IsInBlankArea(_mousePos);
             if (isCanDo)
             {
-                GenericMenu menu = new GenericMenu();
-                for (int i = 0; i < ActionMenuInfo.elementList.Count; i++)
-                {
-                    ActionMenuElement element = ActionMenuInfo.elementList[i];
-                    menu.AddItem(new GUIContent(element.path), false, RightClickMenuCallback, i);
-                }
-                menu.ShowAsContext();
-                e.Use();
+                _uiGraph.HandleRightClickMenu(e, _mousePos);
             }
         }
 
         void RightClickMenuCallback(object obj)
         {
             ActionMenuElement element = ActionMenuInfo.elementList[(int)obj];
-            Rect nodeRect = new Rect(_mousePos.x, _mousePos.y, kNodeWidth, kNodeHeight);
+            //Rect nodeRect = new Rect(_mousePos.x, _mousePos.y, kNodeWidth, kNodeHeight);
             //Node node = _uiGraph.Create(nodeRect);
             //node.actionName = element.actionName;
         }
@@ -370,11 +359,11 @@ namespace StoryEditorContext
         {
             if (_isCanDrawNodeToMouseLine)
             {
-                Rect outputRect = _curveStartPointNode.OutputKnobRect;
-                Vector2 knobPos = outputRect.center;
-                Vector2 mousePos = _mousePos;
-                DrawCurve(knobPos, mousePos);
-                Repaint();
+                //Rect outputRect = _curveStartPointNode.OutputKnobRect;
+                //Vector2 knobPos = outputRect.center;
+                //Vector2 mousePos = _mousePos;
+                //DrawCurve(knobPos, mousePos);
+                //Repaint();
             }
         }
 
@@ -448,43 +437,16 @@ namespace StoryEditorContext
 
         public bool IsInBlankArea(Vector2 mousePos)
         {
-            bool isHitNode = IsHitNode(mousePos);
+            bool isHitNode = _uiGraph.IsHitNode(mousePos);
             return !NodeInfoWindowRect.Contains(mousePos) &&
                 !PlayInfoWindowRect.Contains(mousePos) && !ToolbarRect.Contains(mousePos) && !isHitNode;
         }
 
         public bool IsInNodeArea(Vector2 mousePos)
         {
-            bool isHitNode = IsHitNode(mousePos);
+            bool isHitNode = _uiGraph.IsHitNode(mousePos);
             return !NodeInfoWindowRect.Contains(mousePos) &&
                 !PlayInfoWindowRect.Contains(mousePos) && !ToolbarRect.Contains(mousePos) && isHitNode;
-        }
-
-        bool IsHitNode(Vector2 pos)
-        {
-            if (GetNodeFromPosition(pos) == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        public Node GetNodeFromPosition(Vector2 pos)
-        {
-            //Debug.Log(pos);
-            for (int i = 0; i < _uiGraph.allNodes.Count; i++)
-            {
-                Node node = _uiGraph.allNodes[i];
-                Rect nodeTotalRect = node.TotalRect;
-                if (nodeTotalRect.Contains(pos))
-                {
-                    return node;
-                }
-            }
-            return null;
         }
 
         public Rect ScaleRect(Rect rect, float scale, Vector2 pivotPoint)

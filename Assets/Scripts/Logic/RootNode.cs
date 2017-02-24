@@ -1,8 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
 using FlowCanvas.Framework;
+using ParadoxNotion.Design;
 
 namespace FlowCanvas.Nodes{
+    //[Name("*** Root *** ")]
+    //[Category("Events/Root")]
+    //[DoNotList]
+    //[Description("11111111111111111111.")]
 	public class RootNode : FlowNode {
 
         private FlowOutput once;

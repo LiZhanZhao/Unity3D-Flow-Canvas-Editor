@@ -43,7 +43,7 @@ namespace FlowCanvas.Framework
         ///The number of connections the port currently has
         public int connections { get; set; }
 
-        ///Is the port connected?
+        ///Is the port connected?(已经连了)
         public bool isConnected
         {
             get { return connections > 0; }

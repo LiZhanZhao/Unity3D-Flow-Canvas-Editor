@@ -20,7 +20,6 @@ namespace FlowCanvas.Framework
             for (int i = 0; i < nodeCount; i++)
             {
                 Node node = allNodes[i];
-                // will modify node.rect when the node move
                 node.Draw();
             }
         }

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Linq;
+using ParadoxNotion;
+using System;
 
 namespace FlowCanvas.Framework
 {
@@ -46,7 +48,7 @@ namespace FlowCanvas.Framework
         }
 
 
-        sealed protected override void OnNodeGUI()
+        protected override void OnShowPortName()
         {
 
             GUILayout.BeginHorizontal();
@@ -65,6 +67,14 @@ namespace FlowCanvas.Framework
                     {
                         var enumerableList = typeof(IEnumerable).IsAssignableFrom(inPort.type) && (inPort.type.IsGenericType || inPort.type.IsArray);
                         GUILayout.Label(string.Format("<color={0}>{1}{2}</color>", Color.white, enumerableList ? "#" : string.Empty, inPort.name), leftLabelStyle);
+                    }
+
+                    // 初始化Port.pos
+                    //inPort.pos = new Vector2(inPort.pos.x, GUILayoutUtility.GetLastRect().center.y + rect.y);
+                    
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        inPort.pos = new Vector2(inPort.pos.x, GUILayoutUtility.GetLastRect().center.y + rect.y);
                     }
                 }
             }
@@ -85,11 +95,87 @@ namespace FlowCanvas.Framework
                         var enumerableList = typeof(IEnumerable).IsAssignableFrom(outPort.type) && (outPort.type.IsGenericType || outPort.type.IsArray);
                         GUILayout.Label(string.Format("<color={0}>{1}{2}</color>", Color.white, enumerableList ? "#" : string.Empty, outPort.name), rightLabelStyle);
                     }
+
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        // 初始化Port.pos
+                        outPort.pos = new Vector2(outPort.pos.x, GUILayoutUtility.GetLastRect().center.y + rect.y);
+                    }
+                    
+                    
+                    
                 }
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
         
+        }
+
+        override protected void OnDrawPort()
+        {
+            var e = Event.current;
+            GUI.color = Color.white;
+            GUI.Box(new Rect(rect.x - 8, rect.y + 2, 10, rect.height), string.Empty, (GUIStyle)"nodePortContainer");
+            GUI.Box(new Rect(rect.xMax - 2, rect.y + 2, 10, rect.height), string.Empty, (GUIStyle)"nodePortContainer");
+
+            var portRect = new Rect(0, 0, 10, 10);
+            if (orderedInputs != null)
+            {
+                // Input Port
+                for (var i = 0; i < orderedInputs.Length; i++)
+                {
+                    var port = orderedInputs[i];
+                    portRect.width = port.isConnected ? 12 : 10;
+                    portRect.height = portRect.width;
+                    portRect.center = new Vector2(rect.x - 5, port.pos.y);
+                    port.pos = portRect.center;
+
+                    
+                    //GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
+                    GUI.Box(portRect, string.Empty, (GUIStyle)"nodePortConnected");
+                    GUI.color = Color.white;
+
+                    // Tooltip
+                    if (portRect.Contains(e.mousePosition))
+                    {
+                        //var labelString = (port.isConnected) ? port.type.FriendlyName() : "Can't Connect Here";
+                        var labelString = port.type.FriendlyName();
+                        var size = GUI.skin.GetStyle("box").CalcSize(new GUIContent(labelString));
+                        var r = new Rect(0, 0, size.x + 10, size.y + 5);
+                        r.x = portRect.x - size.x - 10;
+                        r.y = portRect.y - size.y / 2;
+                        GUI.Box(r, labelString);
+                    }
+                }
+
+                // Output Port
+                if (orderedOutputs != null)
+                {
+                    for (var i = 0; i < orderedOutputs.Length; i++)
+                    {
+                        var port = orderedOutputs[i];
+                        portRect.width = port.isConnected ? 12 : 10;
+                        portRect.height = portRect.width;
+                        portRect.center = new Vector2(rect.xMax + 5, port.pos.y);
+                        port.pos = portRect.center;
+                        GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
+                        GUI.color = Color.white;
+
+                        //Tooltip
+                        if (portRect.Contains(e.mousePosition))
+                        {
+                            var labelString = port.type.FriendlyName();
+                            var size = GUI.skin.GetStyle("label").CalcSize(new GUIContent(labelString));
+                            var r = new Rect(0, 0, size.x + 10, size.y + 5);
+                            r.x = portRect.x + 15;
+                            r.y = portRect.y - portRect.height / 2;
+                            GUI.Box(r, labelString);
+                        }
+                    }
+                }
+            }
+
+
         }
     }
 #endif

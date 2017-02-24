@@ -19,9 +19,11 @@ namespace StoryEditorContext
         private const int kNodeHeight = 50;
 
         private const string kBgTexturePath = "Assets/Scripts/Editor/Resources/EditorTextures/background.png";
+        private const string kCustomGUISkin = "Assets/Scripts/Editor/Resources/NodeCanvasSkin.guiskin";
         private const float kTitleHeight = 21;
 
         private Texture2D _girdTex = null;
+        private GUISkin _customGUISkin = null;
         
         private Vector2 _mousePos;
         private bool _isCanScrollWindow = false;
@@ -34,29 +36,34 @@ namespace StoryEditorContext
 
         // editor serialize data
         private UIGraph _uiGraph = null;
+        private bool _willRepaint = true;
 
         [MenuItem("Window/Story Editor")]
         static void CreateEditor()
         {
             StoryEditor se= (StoryEditor)EditorWindow.GetWindow(typeof(StoryEditor));
             se.minSize = new Vector2(800, 600);
+            se._willRepaint = true;
             
         }
         
         void OnEnable()
         {
+            
 
             InitToolRes();
+
+            _willRepaint = true;
 
             if (_uiGraph == null)
             {
                 _uiGraph = new UIGraph();
                 Rect rootRect = new Rect(position.width / 2, position.height / 2, kNodeWidth, kNodeHeight);
-                //_uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(rootRect);
+                _uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(rootRect);
 
-                LuaCommandNode test =  _uiGraph.AddNode<LuaCommandNode>(rootRect);
-                string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
-                test.Config(configFile);
+                //LuaCommandNode test =  _uiGraph.AddNode<LuaCommandNode>(rootRect);
+                //string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
+                //test.Config(configFile);
             }
 
             _zoomPivotPos = new Vector2(position.width / 2, position.height / 2);
@@ -68,19 +75,39 @@ namespace StoryEditorContext
             if (_girdTex == null)
             {
                 _girdTex = AssetDatabase.LoadAssetAtPath(kBgTexturePath, typeof(Texture2D)) as Texture2D;
+                _customGUISkin = AssetDatabase.LoadAssetAtPath<GUISkin>(kCustomGUISkin);
             }
             
         }
 
+        void HandleComiling()
+        {
+            if (EditorApplication.isCompiling)
+            {
+                ShowNotification(new GUIContent("Compiling Please Wait..."));
+                _willRepaint = true;
+                return;
+            }
+        }
         void OnGUI()
         {
+
+            HandleComiling();
             DrawCenterWindow();
             DrawToolBar();
             DrawNodeInfoWindow();
             DrawPlayInfoWidnow();
+            DoRepaint();
             
-            
-            
+                
+        }
+
+        void DoRepaint()
+        {
+            if (_willRepaint || Event.current.type == EventType.MouseMove)
+            {
+                Repaint();
+            }
         }
 
         void HandleInputEvents()
@@ -233,10 +260,18 @@ namespace StoryEditorContext
 
         //}
 
-        
+        void BeginUseSkin()
+        {
+            GUI.skin = _customGUISkin;
+        }
+        void EndUseSkin()
+        {
+            GUI.skin = null;
+        }
 
         void DrawCenterWindow()
         {
+            BeginUseSkin();
             BeginZoomCenterWindow();
             HandleInputEvents();
             DrawGirdBackground();
@@ -244,6 +279,7 @@ namespace StoryEditorContext
             //DrawNodeToMouseLine();
             //DrawNodeConnect();
             EndZoomCenterWidnow();
+            EndUseSkin();
         }
 
         void DrawGraph()

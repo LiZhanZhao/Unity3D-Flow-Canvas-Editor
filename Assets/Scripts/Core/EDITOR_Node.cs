@@ -115,14 +115,15 @@ namespace FlowCanvas.Framework
 
         public void Draw()
         {
-            rect = GUILayout.Window(ID, rect, DrawNodeContext, string.Empty, (GUIStyle)"window");
-            DrawKnob();
+            rect = GUILayout.Window(ID, rect, DrawContext, string.Empty, (GUIStyle)"window");
+            DrawShadow();
+            DrawPort();
         }
 
-        void DrawNodeContext(int id)
+        void DrawContext(int id)
         {
             ShowHeader();
-            ShowPort();
+            ShowPortName();
             GUI.DragWindow();
         }
 
@@ -133,22 +134,28 @@ namespace FlowCanvas.Framework
         }
 
 
-        virtual protected void OnNodeGUI() { }
+        virtual protected void OnShowPortName() { }
 
-        void ShowPort()
+        void ShowPortName()
         {
             GUI.skin.label.richText = true;
-            OnNodeGUI();
+            OnShowPortName();
             GUI.skin.label.alignment = TextAnchor.UpperLeft;
         }
 
-
-
-
-        public void DrawKnob()
+        void DrawShadow()
         {
-            //GUI.DrawTexture(InputKnobRect, _inoutKnobTex);
-            //GUI.DrawTexture(OutputKnobRect, _outputKnobTex);
+            GUI.Box(rect, string.Empty, (GUIStyle)"windowShadow");
+            GUI.color = new Color(1, 1, 1, 0.5f);
+            GUI.Box(new Rect(rect.x + 6, rect.y + 6, rect.width, rect.height), string.Empty, (GUIStyle)"windowShadow");
+        }
+
+        virtual protected void OnDrawPort(){
+        }
+
+        public void DrawPort()
+        {
+            OnDrawPort();
         }
 
         #endif

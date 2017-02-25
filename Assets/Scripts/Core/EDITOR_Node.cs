@@ -157,6 +157,7 @@ namespace FlowCanvas.Framework
 
         public void HandleInputEvent(Event e, Vector2 pos)
         {
+            // is select ?
             if (e.type == EventType.MouseDown && e.button != 2 && rect.Contains(pos))
             {
                 UIGraph.currentSelection = this;

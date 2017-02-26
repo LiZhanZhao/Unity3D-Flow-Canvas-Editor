@@ -116,8 +116,7 @@ namespace StoryEditorContext
             _uiGraph.HandleInputEvent(e, _mousePos);
 
             //HandleLineWithNode();
-            // 需要改
-            //HandleScrollWindow();
+            HandleScrollWindow();
             //HandleZoomWindow();
         }
 
@@ -249,7 +248,7 @@ namespace StoryEditorContext
             BeginUseSkin();
             BeginZoomCenterWindow();
             HandleInputEvents();
-            //DrawGirdBackground();
+            DrawGirdBackground();
             DrawZoomGraph();
             //DrawNodeToMouseLine();
             //DrawNodeConnect();
@@ -294,7 +293,8 @@ namespace StoryEditorContext
                     Rect totalRect = new Rect(0, kTitleHeight, position.width, position.height);
                     totalRect = ScaleRect(totalRect, 1.0f / _uiGraph.zoom, _zoomPivotPos);
 
-                    GUI.BeginGroup(totalRect);
+                    //GUI.BeginGroup(totalRect);
+                    GUI.BeginClip(totalRect);
 
                     Vector2 bgSize = new Vector2(_girdTex.width, _girdTex.height);
                     Vector2 beginPos = new Vector2(_uiGraph.scrollOffset.x % bgSize.x - bgSize.x,
@@ -318,7 +318,8 @@ namespace StoryEditorContext
                         }
                     }
                     
-                    GUI.EndGroup();
+                    //GUI.EndGroup();
+                    GUI.EndClip();
                      
                 }
             }

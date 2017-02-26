@@ -16,7 +16,7 @@ namespace FlowCanvas.Nodes
             Dictionary<string, string> valueOutputconf;
             if (!ParseHeadConfig(fileContext, kBeginConfigValueOutput, kEndConfigValueOutput, out valueOutputconf))
             {
-                Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigValueOutput,
+                Debug.LogError(string.Format("{0} : {1}, {2} error ", luaFileRelaPath, kBeginConfigValueOutput,
                     kEndConfigValueOutput));
             }
 

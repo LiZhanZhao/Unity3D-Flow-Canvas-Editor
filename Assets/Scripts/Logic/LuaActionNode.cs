@@ -17,11 +17,6 @@ namespace FlowCanvas.Nodes
         private string _actionKey = "";
         private bool _isFinish = false;
 
-        public override string name
-        {
-            get { return "LuaNode"; }
-        }
-
         public void Update()
         {
             if (!_isFinish && UpdateAction())

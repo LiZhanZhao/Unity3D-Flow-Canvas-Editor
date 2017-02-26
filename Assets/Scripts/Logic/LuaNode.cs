@@ -26,7 +26,7 @@ namespace FlowCanvas.Nodes
 
         //protected string _luaFilePath = "";
         //[SerializeField]
-        //protected string _luaFileRelaPath = "";
+        [LuaRelaPathField]
         public string luaFileRelaPath = "";
         protected string _luaFileName = "";
         

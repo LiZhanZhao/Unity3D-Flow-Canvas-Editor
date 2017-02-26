@@ -178,8 +178,7 @@ namespace FlowCanvas.Framework
                     {
 
                         //infos.Add(new ScriptInfo(null, scriptName.Replace("<T>", " (T)/" + "Generic Argument"), scriptCategory));
-
-                        var arg1 = subType.GetGenericArguments()[0];
+                        //var arg1 = subType.GetGenericArguments()[0];
                         var types = defaultTypesList;
                         if (extraGenericType != null)
                         {

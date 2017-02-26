@@ -35,19 +35,6 @@ public class EditorUtils {
             field.SetValue(o, GenericField(field.Name, field.GetValue(o), field.FieldType, field, o));
             GUI.backgroundColor = Color.white;
         }
-
-        //GUI.enabled = Application.isPlaying;
-        //foreach (var prop in o.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
-        //{
-        //    if (prop.CanRead && prop.CanWrite)
-        //    {
-        //        if (prop.DeclaringType.GetField("<" + prop.Name + ">k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance) != null)
-        //        {
-        //            GenericField(prop.Name, prop.GetValue(o, null), prop.PropertyType, prop, o);
-        //        }
-        //    }
-        //}
-        //GUI.enabled = true;
     }
 
     public static object GenericField(string name, object value, Type t, MemberInfo member = null, object context = null)
@@ -68,7 +55,8 @@ public class EditorUtils {
         name = name.SplitCamelCase();
 
         IEnumerable<Attribute> attributes = new Attribute[0];
-        
+        attributes = member.GetCustomAttributes(true).Cast<Attribute>();
+
         if (member != null)
         {
             // Name Attribute
@@ -77,6 +65,20 @@ public class EditorUtils {
             {
                 name = nameAtt.name;
             }
+        }
+
+        if (member != null && attributes.Any(a => a is LuaRelaPathFieldAttribute))
+        {
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("xxx"))
+            {
+                string luaPath = EditorUtility.OpenFilePanel("Select Lua file", "", "");
+                return GetLuaRelaPath(luaPath);
+            }
+            EditorGUILayout.TextField(string.Format("{0}:", name), (string)value);
+            EditorGUILayout.EndHorizontal();
+            return value;
+            
         }
 
         if (t == typeof(string))
@@ -126,5 +128,18 @@ public class EditorUtils {
             return EditorGUILayout.CurveField(name, (AnimationCurve)value);
 
         return value;
+    }
+
+    public static string GetLuaRelaPath(string luaFilePath)
+    {
+        bool isLuaExt = luaFilePath.EndsWith(".lua");
+        if (isLuaExt)
+        {
+            string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
+            return luaRelaPath;
+        }
+        return "";
+        
+        
     }
 }

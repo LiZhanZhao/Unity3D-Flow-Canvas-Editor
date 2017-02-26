@@ -124,4 +124,8 @@ namespace ParadoxNotion.Design{
 	//List types are not appended by default for user convenience
 	[AttributeUsage(AttributeTargets.Class)]
 	public class AppendListTypesAttribute : Attribute{}
+
+    // custom
+    [AttributeUsage(AttributeTargets.Field)]
+    public class LuaRelaPathFieldAttribute : Attribute { }
 }

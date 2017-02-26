@@ -116,14 +116,12 @@ namespace StoryEditorContext
             _uiGraph.HandleInputEvent(e, _mousePos);
 
             //HandleLineWithNode();
-            HandleScrollWindow();
-            HandleZoomWindow();
+            HandleScrollWindow(e);
+            HandleZoomWindow(e);
         }
 
-        void HandleScrollWindow()
+        void HandleScrollWindow(Event e)
         {
-            Event e = Event.current;
-            _mousePos = e.mousePosition;
             // 空白区域左键
             bool isLeftMouseDown = (e.type == EventType.MouseDown) && (e.button == 0) && IsInBlankArea(_mousePos);
             if (isLeftMouseDown)
@@ -153,10 +151,8 @@ namespace StoryEditorContext
 
         }
 
-        void HandleZoomWindow()
+        void HandleZoomWindow(Event e)
         {
-            Event e = Event.current;
-            _mousePos = e.mousePosition;
             // 滚轮
             bool isCanZoom = (e.type == EventType.ScrollWheel);
             if (isCanZoom)
@@ -255,7 +251,6 @@ namespace StoryEditorContext
 
             DrawNoZoomGraph();
 
-
             EndUseSkin();
 
 
@@ -292,6 +287,7 @@ namespace StoryEditorContext
                     Rect totalRect = new Rect(0, kTitleHeight, position.width, position.height);
                     totalRect = ScaleRect(totalRect, 1.0f / _uiGraph.zoom, _zoomPivotPos);
 
+                    // 会导致Node Insp 界面出现问题
                     //GUI.BeginGroup(totalRect);
                     GUI.BeginClip(totalRect);
 

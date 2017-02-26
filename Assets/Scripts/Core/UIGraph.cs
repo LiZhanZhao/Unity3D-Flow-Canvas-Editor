@@ -25,6 +25,10 @@ namespace FlowCanvas.Framework
         private Dictionary<Type, List<ScriptInfo>> _cachedInfos = new Dictionary<Type, List<ScriptInfo>>();
 
         private static object _currentSelection;
+
+        private Vector2 _nodeInspectorScrollPos;
+        private Rect _inspectorRect = new Rect(15, 55, 0, 0);
+
         public static object currentSelection
         {
             get{   
@@ -277,6 +281,52 @@ namespace FlowCanvas.Framework
                 menu.ShowAsContext();
                 e.Use();
             }
+
+        }
+
+
+        public void DrawNodeInspector()
+        {
+            if (selectedNode == null)
+            {
+                _inspectorRect.height = 0;
+                return;
+            }
+            //EditorGUIUtility.AddCursorRect(new Rect(_inspectorRect.x, _inspectorRect.y, 330, 30), MouseCursor.Text);
+
+            _inspectorRect.width = 330;
+            _inspectorRect.x = 10;
+            _inspectorRect.y = 30;
+            // draw Shadow
+            GUI.Box(_inspectorRect, "", (GUIStyle)"windowShadow");
+
+            var title = selectedNode.name;
+            var lastSkin = GUI.skin;
+
+            var viewRect = new Rect(_inspectorRect.x, _inspectorRect.y, _inspectorRect.width + 18, Screen.height - _inspectorRect.y - 30);
+            _nodeInspectorScrollPos = GUI.BeginScrollView(viewRect, _nodeInspectorScrollPos, _inspectorRect);
+            GUILayout.BeginArea(_inspectorRect, title, (GUIStyle)"editorPanel");
+            GUILayout.Space(5);
+
+            GUI.skin = null;
+            selectedNode.DrawInspector();
+            // 分割线
+            GUILayout.Box("", GUILayout.Height(5), GUILayout.Width(_inspectorRect.width - 10));
+            GUI.skin = lastSkin;
+            if (Event.current.type == EventType.Repaint)
+            {
+                // 主要看Node.DrawInspector最后的rect
+                _inspectorRect.height = GUILayoutUtility.GetLastRect().yMax + 5;
+            }
+
+
+            GUILayout.EndArea();
+            GUI.EndScrollView();
+
+            //if (GUI.changed)
+            //{
+            //    EditorUtility.SetDirty(this);
+            //}
 
         }
         #endif

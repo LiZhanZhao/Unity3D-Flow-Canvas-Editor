@@ -91,13 +91,24 @@ namespace StoryEditorContext
 
             HandleComiling();
 
+            //var willDirty = false;
+            //if (Event.current.rawType == EventType.MouseUp)
+            //{
+            //    willDirty = true;
+            //}
+
+
             DrawCenterWindow();
             //DrawToolBar();
             //DrawNodeInfoWindow();
             //DrawPlayInfoWidnow();
             DoRepaint();
-            
-                
+
+            //if (willDirty)
+            //{
+            //    _willRepaint = true;
+            //    EditorUtility.SetDirty(_uiGraph);
+            //}
         }
 
         void DoRepaint()
@@ -116,7 +127,8 @@ namespace StoryEditorContext
             _uiGraph.HandleInputEvent(e, _mousePos);
 
             //HandleLineWithNode();
-            HandleScrollWindow();
+            // 需要改
+            //HandleScrollWindow();
             HandleZoomWindow();
         }
 
@@ -249,14 +261,20 @@ namespace StoryEditorContext
             BeginZoomCenterWindow();
             HandleInputEvents();
             DrawGirdBackground();
-            DrawGraph();
+            DrawZoomGraph();
             //DrawNodeToMouseLine();
             //DrawNodeConnect();
             EndZoomCenterWidnow();
+
+            DrawNoZoomGraph();
+
+
             EndUseSkin();
+
+
         }
 
-        void DrawGraph()
+        void DrawZoomGraph()
         {
             BeginWindows();
             if (_uiGraph != null)
@@ -264,8 +282,14 @@ namespace StoryEditorContext
                 _uiGraph.DrawNodes();
             }
             EndWindows();
+        }
 
-
+        void DrawNoZoomGraph()
+        {
+            if (_uiGraph != null)
+            {
+                _uiGraph.DrawNodeInspector();
+            }
         }
         
 

@@ -26,6 +26,8 @@ namespace FlowCanvas.Framework
         private Port[] orderedOutputs;
 
         private static GUIStyle _centerLabel = null;
+        private string _nodeDescription;
+        private string _comment;
 
         public Node(Rect r)
         {
@@ -58,9 +60,24 @@ namespace FlowCanvas.Framework
         }
 
 
-        
+        virtual public string description
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_nodeDescription))
+                {
+                    var descAtt = this.GetType().RTGetAttribute<DescriptionAttribute>(false);
+                    _nodeDescription = descAtt != null ? descAtt.description : "No Description";
+                }
+                return _nodeDescription;
+            }
+        }
 
-        
+        public string nodeComment
+        {
+            get { return _comment; }
+            set { _comment = value; }
+        }
 
         public Rect BoundeRect
         {
@@ -172,7 +189,10 @@ namespace FlowCanvas.Framework
         void ShowSelectedMenu(Event e, Vector2 pos)
         {
             var menu = new GenericMenu();
-            menu.AddItem(new GUIContent("Delete (DEL)"), false, () =>{ graphBase.RemoveNode(this); });
+            menu.AddItem(new GUIContent("Delete (DEL)"), false, () =>{ 
+                graphBase.RemoveNode(this);
+                UIGraph.currentSelection = null;
+            });
             menu.ShowAsContext();
 
             //if (inConnections.Count > 0)
@@ -181,7 +201,36 @@ namespace FlowCanvas.Framework
             e.Use();
         }
 
-        
+        public void DrawInspector()
+        {
+            GUI.backgroundColor = new Color(0.8f, 0.8f, 1);
+            EditorGUILayout.HelpBox(description, MessageType.None);
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.BeginHorizontal();
+
+            customName = EditorGUILayout.TextField(customName);
+            EditorUtils.TextFieldComment(customName, "Name...");
+
+            GUILayout.EndHorizontal();
+
+            GUI.color = new Color(1, 1, 1, 0.5f);
+            nodeComment = EditorGUILayout.TextArea(nodeComment);
+            GUI.color = Color.white;
+            EditorUtils.TextFieldComment(nodeComment, "Comments...");
+
+            OnNodeInspectorGUI();
+
+
+            
+        }
+
+        virtual protected void OnNodeInspectorGUI() { DrawDefaultInspector(); }
+
+        protected void DrawDefaultInspector()
+        {
+            EditorUtils.ShowAutoEditorGUI(this);
+        }
 
         #endif
 

@@ -8,7 +8,7 @@ using FlowCanvas.Nodes;
 
 namespace FlowCanvas.Framework
 {
-    abstract public class GraphBase
+    abstract public class GraphBase : ScriptableObject
     {
         protected List<Node> _nodes = new List<Node>();
         protected bool _deserializationFailed = false;

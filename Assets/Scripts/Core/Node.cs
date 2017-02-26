@@ -18,7 +18,7 @@ namespace FlowCanvas.Framework
         
         private int _ID;
         private bool isChecked { get; set; }
-        private string _nodeDescription;
+        
 
         public Graph graph
         {
@@ -38,18 +38,7 @@ namespace FlowCanvas.Framework
             set { _graphBase = value; }
         }
 
-        virtual public string description
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_nodeDescription))
-                {
-                    var descAtt = this.GetType().RTGetAttribute<DescriptionAttribute>(false);
-                    _nodeDescription = descAtt != null ? descAtt.description : "No Description";
-                }
-                return _nodeDescription;
-            }
-        }
+        
         
         public Status status
         {

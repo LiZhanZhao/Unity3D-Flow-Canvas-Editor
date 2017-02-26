@@ -117,7 +117,7 @@ namespace StoryEditorContext
 
             //HandleLineWithNode();
             HandleScrollWindow();
-            //HandleZoomWindow();
+            HandleZoomWindow();
         }
 
         void HandleScrollWindow()
@@ -251,7 +251,6 @@ namespace StoryEditorContext
             DrawGirdBackground();
             DrawZoomGraph();
             //DrawNodeToMouseLine();
-            //DrawNodeConnect();
             EndZoomCenterWidnow();
 
             DrawNoZoomGraph();
@@ -365,26 +364,6 @@ namespace StoryEditorContext
                 //Repaint();
             }
         }
-
-        //void DrawNodeConnect()
-        //{
-        //    if (_uiGraph != null)
-        //    {
-        //        int nodeCount = _uiGraph.allNodes.Count;
-        //        for (int i = 0; i < nodeCount; i++)
-        //        {
-        //            Node parentNode = _uiGraph.allNodes[i];
-        //            for (int ci = 0; ci < parentNode.childList.Count; ci++)
-        //            {
-        //                int childIndex = parentNode.childList[ci];
-        //                Node childNode = _uiGraph.allNodes[childIndex];
-        //                Debug.Assert(childNode != null);
-        //                DrawCurve(parentNode.OutputKnobRect.center, 
-        //                    childNode.InputKnobRect.center);
-        //            }
-        //        }
-        //    }
-        //}
 
         void DrawToolBar()
         {

@@ -36,6 +36,7 @@ namespace FlowCanvas.Framework
             }
             set{
                 _currentSelection = value;
+                EditorGUI.FocusTextInControl("");
             }
         }
 
@@ -291,7 +292,7 @@ namespace FlowCanvas.Framework
                 _inspectorRect.height = 0;
                 return;
             }
-            //EditorGUIUtility.AddCursorRect(new Rect(_inspectorRect.x, _inspectorRect.y, 330, 30), MouseCursor.Text);
+            EditorGUIUtility.AddCursorRect(new Rect(_inspectorRect.x, _inspectorRect.y, 330, 30), MouseCursor.Text);
 
             _inspectorRect.width = 330;
             _inspectorRect.x = 10;

@@ -69,14 +69,15 @@ public class EditorUtils {
 
         if (member != null && attributes.Any(a => a is LuaRelaPathFieldAttribute))
         {
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("xxx"))
+            //EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.TextField(string.Format("Lua Path:"), (string)value);
+            if (GUILayout.Button("Select"))
             {
                 string luaPath = EditorUtility.OpenFilePanel("Select Lua file", "", "");
+                EditorGUI.FocusTextInControl("");
                 return GetLuaRelaPath(luaPath);
             }
-            EditorGUILayout.TextField(string.Format("{0}:", name), (string)value);
-            EditorGUILayout.EndHorizontal();
+            //EditorGUILayout.EndHorizontal();            
             return value;
             
         }

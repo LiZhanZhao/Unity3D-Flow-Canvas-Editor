@@ -85,30 +85,17 @@ namespace StoryEditorContext
                 _willRepaint = true;
                 return;
             }
+            RemoveNotification();
         }
         void OnGUI()
         {
 
             HandleComiling();
-
-            //var willDirty = false;
-            //if (Event.current.rawType == EventType.MouseUp)
-            //{
-            //    willDirty = true;
-            //}
-
-
             DrawCenterWindow();
             //DrawToolBar();
             //DrawNodeInfoWindow();
             //DrawPlayInfoWidnow();
             DoRepaint();
-
-            //if (willDirty)
-            //{
-            //    _willRepaint = true;
-            //    EditorUtility.SetDirty(_uiGraph);
-            //}
         }
 
         void DoRepaint()
@@ -116,6 +103,8 @@ namespace StoryEditorContext
             if (_willRepaint || Event.current.type == EventType.MouseMove)
             {
                 Repaint();
+                
+                
             }
         }
 
@@ -129,7 +118,7 @@ namespace StoryEditorContext
             //HandleLineWithNode();
             // 需要改
             //HandleScrollWindow();
-            HandleZoomWindow();
+            //HandleZoomWindow();
         }
 
         void HandleScrollWindow()
@@ -260,7 +249,7 @@ namespace StoryEditorContext
             BeginUseSkin();
             BeginZoomCenterWindow();
             HandleInputEvents();
-            DrawGirdBackground();
+            //DrawGirdBackground();
             DrawZoomGraph();
             //DrawNodeToMouseLine();
             //DrawNodeConnect();

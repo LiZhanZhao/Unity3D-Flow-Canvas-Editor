@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using ParadoxNotion;
 using System;
@@ -9,10 +10,13 @@ namespace FlowCanvas.Framework
     abstract public partial class FlowNode
     {
 #if UNITY_EDITOR
-        private Port[] orderedInputs;
-        private Port[] orderedOutputs;
+        private Port[] _orderedInputs;
+        private Port[] _orderedOutputs;
         private static GUIStyle _leftLabelStyle;
         private static GUIStyle _rightLabelStyle;
+
+        // all node is share this
+        
 
         private static GUIStyle leftLabelStyle
         {
@@ -43,8 +47,13 @@ namespace FlowCanvas.Framework
 
         void OnPortsGatheredInEditor()
         {
-            orderedInputs = _inputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowInput) ? 0 : 1).ToArray();
-            orderedOutputs = _outputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowOutput) ? 0 : 1).ToArray();
+            _orderedInputs = _inputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowInput) ? 0 : 1).ToArray();
+            _orderedOutputs = _outputPorts.Values.OrderBy(p => p.GetType() == typeof(FlowOutput) ? 0 : 1).ToArray();
+        }
+
+        static void ConnectPorts(Port source, Port target)
+        {
+            BinderConnection.Create(source, target);
         }
 
 
@@ -53,11 +62,11 @@ namespace FlowCanvas.Framework
 
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
-            if (orderedInputs != null)
+            if (_orderedInputs != null)
             {
-                for (var i = 0; i < orderedInputs.Length; i++)
+                for (var i = 0; i < _orderedInputs.Length; i++)
                 {
-                    var inPort = orderedInputs[i];
+                    var inPort = _orderedInputs[i];
 
                     if (inPort is FlowInput)
                     {
@@ -81,11 +90,11 @@ namespace FlowCanvas.Framework
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();
-            if (orderedOutputs != null)
+            if (_orderedOutputs != null)
             {
-                for (var i = 0; i < orderedOutputs.Length; i++)
+                for (var i = 0; i < _orderedOutputs.Length; i++)
                 {
-                    var outPort = orderedOutputs[i];
+                    var outPort = _orderedOutputs[i];
                     if (outPort is FlowOutput)
                     {
                         GUILayout.Label(string.Format("<b>{0} ►</b>", outPort.name), rightLabelStyle);
@@ -119,20 +128,36 @@ namespace FlowCanvas.Framework
             GUI.Box(new Rect(rect.xMax - 2, rect.y + 2, 10, rect.height), string.Empty, (GUIStyle)"nodePortContainer");
 
             var portRect = new Rect(0, 0, 10, 10);
-            if (orderedInputs != null)
+            if (_orderedInputs != null)
             {
                 // Input Port
-                for (var i = 0; i < orderedInputs.Length; i++)
+                for (var i = 0; i < _orderedInputs.Length; i++)
                 {
-                    var port = orderedInputs[i];
+                    var port = _orderedInputs[i];
+
+                    var canConnect = true;
+                    if ((port == UIGraph.clickedPort) ||
+                        (UIGraph.clickedPort is FlowInput || UIGraph.clickedPort is ValueInput) ||
+                        (port.isConnected && port is ValueInput) ||
+                        (UIGraph.clickedPort != null && UIGraph.clickedPort.parent == port.parent) ||
+                        (UIGraph.clickedPort != null && !TypeConverter.HasConvertion(UIGraph.clickedPort.type, port.type)))
+                    {
+                        canConnect = false;
+                    }
+
                     portRect.width = port.isConnected ? 12 : 10;
                     portRect.height = portRect.width;
                     portRect.center = new Vector2(rect.x - 5, port.pos.y);
                     port.pos = portRect.center;
+                    //port.rect = portRect;
 
-                    
-                    //GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
-                    GUI.Box(portRect, string.Empty, (GUIStyle)"nodePortConnected");
+                    if (UIGraph.clickedPort != null && !canConnect && UIGraph.clickedPort != port)
+                    {
+                        GUI.color = new Color(1, 1, 1, 0.3f);
+                    }
+
+                    GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
+                    //GUI.Box(portRect, string.Empty, (GUIStyle)"nodePortConnected");
                     GUI.color = Color.white;
 
                     // Tooltip
@@ -146,36 +171,144 @@ namespace FlowCanvas.Framework
                         r.y = portRect.y - size.y / 2;
                         GUI.Box(r, labelString);
                     }
+
+
+                    if (e.type == EventType.MouseDown && e.button == 0 && portRect.Contains(e.mousePosition))
+                    {
+                        if (port.CanAcceptConnections())
+                        {
+                            UIGraph.clickedPort = port;
+                            e.Use();
+                        }
+                    }
+
+                    if (e.type == EventType.MouseUp && e.button == 0 && UIGraph.clickedPort != null)
+                    {
+                        if (portRect.Contains(e.mousePosition) && port.CanAcceptConnections())
+                        {
+                            ConnectPorts(UIGraph.clickedPort, port);
+                            UIGraph.clickedPort = null;
+                            e.Use();
+                        }
+                        
+                    }
+
+
                 }
+            }
 
                 // Output Port
-                if (orderedOutputs != null)
+            if (_orderedOutputs != null)
+            {
+                for (var i = 0; i < _orderedOutputs.Length; i++)
                 {
-                    for (var i = 0; i < orderedOutputs.Length; i++)
-                    {
-                        var port = orderedOutputs[i];
-                        portRect.width = port.isConnected ? 12 : 10;
-                        portRect.height = portRect.width;
-                        portRect.center = new Vector2(rect.xMax + 5, port.pos.y);
-                        port.pos = portRect.center;
-                        GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
-                        GUI.color = Color.white;
+                    var port = _orderedOutputs[i];
 
-                        //Tooltip
-                        if (portRect.Contains(e.mousePosition))
+                    var canConnect = true;
+                    if ((port == UIGraph.clickedPort) ||
+                        (UIGraph.clickedPort is FlowOutput || UIGraph.clickedPort is ValueOutput) ||
+                        (port.isConnected && port is FlowOutput) ||
+                        (UIGraph.clickedPort != null && UIGraph.clickedPort.parent == port.parent) ||
+                        (UIGraph.clickedPort != null && !TypeConverter.HasConvertion(port.type, UIGraph.clickedPort.type)))
+                    {
+                        canConnect = false;
+                    }
+
+
+                    portRect.width = port.isConnected ? 12 : 10;
+                    portRect.height = portRect.width;
+                    portRect.center = new Vector2(rect.xMax + 5, port.pos.y);
+                    port.pos = portRect.center;
+                    //port.rect = portRect;
+
+                    if (UIGraph.clickedPort != null && !canConnect && UIGraph.clickedPort != port)
+                    {
+                        GUI.color = new Color(1, 1, 1, 0.3f);
+                    }
+
+                    GUI.Box(portRect, string.Empty, port.isConnected ? (GUIStyle)"nodePortConnected" : (GUIStyle)"nodePortEmpty");
+                    GUI.color = Color.white;
+
+                    //Tooltip
+                    if (portRect.Contains(e.mousePosition))
+                    {
+                        var labelString = port.type.FriendlyName();
+                        var size = GUI.skin.GetStyle("label").CalcSize(new GUIContent(labelString));
+                        var r = new Rect(0, 0, size.x + 10, size.y + 5);
+                        r.x = portRect.x + 15;
+                        r.y = portRect.y - portRect.height / 2;
+                        GUI.Box(r, labelString);
+                    }
+
+
+                    if (e.type == EventType.MouseDown && e.button == 0 && portRect.Contains(e.mousePosition))
+                    {
+                        if (port.CanAcceptConnections())
                         {
-                            var labelString = port.type.FriendlyName();
-                            var size = GUI.skin.GetStyle("label").CalcSize(new GUIContent(labelString));
-                            var r = new Rect(0, 0, size.x + 10, size.y + 5);
-                            r.x = portRect.x + 15;
-                            r.y = portRect.y - portRect.height / 2;
-                            GUI.Box(r, labelString);
+                            UIGraph.clickedPort = port;
+                            e.Use();
                         }
+                    }
+
+                    if (e.type == EventType.MouseUp && e.button == 0 && UIGraph.clickedPort != null)
+                    {
+                        if (portRect.Contains(e.mousePosition) && port.CanAcceptConnections())
+                        {
+                            ConnectPorts(port, UIGraph.clickedPort);
+                            UIGraph.clickedPort = null;
+                            e.Use();
+                        }
+                        
                     }
                 }
             }
 
+            if (UIGraph.clickedPort != null && UIGraph.clickedPort.parent == this)
+            {
+                DrawCurve(UIGraph.clickedPort.pos, e.mousePosition,  (UIGraph.clickedPort is FlowInput || UIGraph.clickedPort is ValueInput));
+                //var xDiff = (UIGraph.clickedPort.pos.x - e.mousePosition.x) * 0.8f;
+                //xDiff = e.mousePosition.x > UIGraph.clickedPort.pos.x ? xDiff : -xDiff;
+                //var tangA = (UIGraph.clickedPort is FlowInput || UIGraph.clickedPort is ValueInput) ? new Vector2(xDiff, 0) : new Vector2(-xDiff, 0);
+                //var tangB = tangA * -1;
+                //UnityEditor.Handles.DrawBezier(UIGraph.clickedPort.pos, e.mousePosition, UIGraph.clickedPort.pos + tangA, e.mousePosition + tangB, new Color(0.5f, 0.5f, 0.8f, 0.8f), null, 3);
+            }
 
+            for (var i = 0; i < outConnections.Count; i++)
+            {
+                var binder = outConnections[i] as BinderConnection;
+                if (binder != null)
+                { //for in case it's MissingConnection
+                    var sourcePort = binder.sourcePort;
+                    var targetPort = binder.targetPort;
+                    if (sourcePort != null && targetPort != null)
+                    {
+                        DrawCurve(sourcePort.pos, targetPort.pos);
+                    }
+                }
+            }
+        }
+
+
+        void DrawCurve(Vector2 start, Vector2 end, bool isInput = false)
+        {
+            var xDiff = (start.x - end.x) * 0.8f;
+            xDiff = end.x > start.x ? xDiff : -xDiff;
+            var tangA = isInput ? new Vector2(xDiff, 0) : new Vector2(-xDiff, 0);
+            var tangB = tangA * -1;
+            UnityEditor.Handles.DrawBezier(start, end, start + tangA, end + tangB, new Color(0.5f, 0.5f, 0.8f, 0.8f), null, 3);
+
+            //Vector3 startPos = new Vector3(start.x, start.y);
+            //Vector3 endPos = new Vector3(end.x, end.y);
+            //Vector3 startTan = startPos;//+ Vector3.right * 50;
+            //Vector3 endTan = endPos;//+ Vector3.left * 50;
+            //Color shadowColor = new Color(0, 0, 0, 0.1f);
+
+            //for (int i = 0; i < 3; i++) // Draw a shadow with 3 shades
+            //    UnityEditor.Handles.DrawBezier(startPos, endPos, startTan, endTan, shadowColor, null, (i + 1) * 4); // increasing width for fading shadow
+            //UnityEditor.Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.black, null, 2);
+        }
+
+        protected override void OnHandleInputEvent(Event e) {
         }
     }
 #endif

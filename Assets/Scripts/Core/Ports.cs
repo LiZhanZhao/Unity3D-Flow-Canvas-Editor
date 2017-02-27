@@ -54,6 +54,22 @@ namespace FlowCanvas.Framework
 
         public Vector2 pos { get; set; }
 
+        //public Rect rect;
+
+        public bool CanAcceptConnections()
+        {
+            if (this is ValueOutput || (this is FlowOutput && !this.isConnected))
+            {
+                return true;
+            }
+            // one FlowInput can connect multi FlowOuput
+            if (this is FlowInput || (this is ValueInput && !this.isConnected))
+            {
+                return true;
+            }
+            return false;
+        }
+
     }
 
     public class FlowInput : Port

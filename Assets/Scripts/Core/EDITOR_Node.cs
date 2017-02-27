@@ -172,6 +172,8 @@ namespace FlowCanvas.Framework
             OnDrawPort();
         }
 
+        protected virtual void OnHandleInputEvent(Event e) { }
+
         public void HandleInputEvent(Event e, Vector2 pos)
         {
             // is select ?
@@ -182,11 +184,14 @@ namespace FlowCanvas.Framework
 
             if (e.type == EventType.MouseUp && e.button == 1 && rect.Contains(pos))
             {
-                ShowSelectedMenu(e, pos);
+                ShowSelectedMenu(e);
             }
+
+            OnHandleInputEvent(e);
+
         }
 
-        void ShowSelectedMenu(Event e, Vector2 pos)
+        void ShowSelectedMenu(Event e)
         {
             var menu = new GenericMenu();
             menu.AddItem(new GUIContent("Delete (DEL)"), false, () =>{ 

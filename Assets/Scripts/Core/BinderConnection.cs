@@ -128,17 +128,17 @@ namespace FlowCanvas.Framework
                 return null;
             }
 
-            //if (!source.CanAcceptConnections())
-            //{
-            //    Debug.LogWarning("Source port can accept no more connections");
-            //    return null;
-            //}
+            if (!source.CanAcceptConnections())
+            {
+                Debug.LogWarning("Source port can accept no more connections");
+                return null;
+            }
 
-            //if (!target.CanAcceptConnections())
-            //{
-            //    Debug.LogWarning("Target port can accept no more connections");
-            //    return null;
-            //}
+            if (!target.CanAcceptConnections())
+            {
+                Debug.LogWarning("Target port can accept no more connections");
+                return null;
+            }
 
             if (source.parent == target.parent)
             {

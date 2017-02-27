@@ -25,7 +25,7 @@ namespace FlowCanvas.Framework
         private Dictionary<Type, List<ScriptInfo>> _cachedInfos = new Dictionary<Type, List<ScriptInfo>>();
 
         private static object _currentSelection;
-
+        private static Port _clickedPort;
         private Vector2 _nodeInspectorScrollPos;
         private Rect _inspectorRect = new Rect(15, 55, 0, 0);
 
@@ -45,6 +45,12 @@ namespace FlowCanvas.Framework
             get { return currentSelection as Node; }
         }
 
+        public static Port clickedPort
+        {
+            get { return _clickedPort; }
+            set { _clickedPort = value; }
+        }
+
         public void DrawNodes()
         {
             int nodeCount = allNodes.Count;
@@ -52,6 +58,17 @@ namespace FlowCanvas.Framework
             {
                 Node node = allNodes[i];
                 node.Draw();
+            }
+            // this is need call after all node.Draw()
+            HandleReleaseClickedPortEvent();
+            
+        }
+
+        private void HandleReleaseClickedPortEvent()
+        {
+            if (Event.current.type == EventType.MouseUp && clickedPort != null)
+            {
+                clickedPort = null;
             }
         }
 
@@ -262,6 +279,8 @@ namespace FlowCanvas.Framework
             HandleNodesInputEvent(e, pos);
 
             HandleRightClickMenu(e, pos);
+
+
         }
 
         void HandleNodesInputEvent(Event e, Vector2 pos)

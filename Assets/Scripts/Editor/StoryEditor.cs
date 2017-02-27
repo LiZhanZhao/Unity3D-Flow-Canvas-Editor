@@ -56,9 +56,9 @@ namespace StoryEditorContext
             {
                 _uiGraph = new UIGraph();
                 Vector2 pos = new Vector2(position.width / 2, position.height / 2);
-                _uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(pos);
+                //_uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(pos);
 
-                //LuaCommandNode test = _uiGraph.AddNode<LuaCommandNode>(pos);
+                LuaCommandNode test = _uiGraph.AddNode<LuaCommandNode>(pos);
                 //string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
                 //test.Config(configFile);
             }

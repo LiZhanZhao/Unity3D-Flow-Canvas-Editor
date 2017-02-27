@@ -24,10 +24,25 @@ namespace FlowCanvas.Nodes
 
         protected const int kConfigArgLength = 3;
 
-        //protected string _luaFilePath = "";
-        //[SerializeField]
+        [SerializeField]
+        protected string _luaFileRelaPath = "";
+
         [LuaRelaPathField]
-        public string luaFileRelaPath = "";
+        [ShowGUIProperty]
+        public string LuaPath
+        {
+            set {
+                if (_luaFileRelaPath != value)
+                {
+                    Debug.Log("set lua path");
+                    _luaFileRelaPath = value;
+                    Config(value);
+                }
+                
+            }
+            get { return _luaFileRelaPath; }
+        }
+
         protected string _luaFileName = "";
         
         protected List<ValueInput> _autoValueInputs = new List<ValueInput>();
@@ -85,9 +100,9 @@ namespace FlowCanvas.Nodes
         {
             base.OnValidate(flowGraph);
 
-            if (!string.IsNullOrEmpty(luaFileRelaPath))
+            if (!string.IsNullOrEmpty(_luaFileRelaPath))
             {
-                _luaFileName = System.IO.Path.GetFileNameWithoutExtension(luaFileRelaPath);
+                _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
             }
         }
         
@@ -99,9 +114,9 @@ namespace FlowCanvas.Nodes
 
         protected void AutoGeneratePort()
         {
-            if (!string.IsNullOrEmpty(luaFileRelaPath))
+            if (!string.IsNullOrEmpty(_luaFileRelaPath))
             {
-                string fileContext = System.IO.File.ReadAllText(luaFileRelaPath);
+                string fileContext = System.IO.File.ReadAllText(_luaFileRelaPath);
                 AutoGenerateValueInput(fileContext);
                 AutoGenerateValueOutput(fileContext);
                 AutoGenerateFlowInput(fileContext);
@@ -115,7 +130,7 @@ namespace FlowCanvas.Nodes
             Dictionary<string, string> valueInputconf;
             if (!ParseHeadConfig(fileContext, kBeginConfigValueInput, kEndConfigValueInput, out valueInputconf))
             {
-                Debug.LogError(string.Format("{0} : {1}, {2} error ", luaFileRelaPath, kBeginConfigValueInput,
+                Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigValueInput,
                     kEndConfigValueInput));
             }
             foreach (KeyValuePair<string, string> conf in valueInputconf)
@@ -174,7 +189,7 @@ namespace FlowCanvas.Nodes
             Dictionary<string, string> flowOutputconf;
             if (!ParseHeadConfig(fileContext, kBeginConfigFlowOutput, kEndConfigFlowOutput, out flowOutputconf))
             {
-                Debug.LogError(string.Format("{0} : {1}, {2} error ", luaFileRelaPath, kBeginConfigFlowOutput,
+                Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigFlowOutput,
                     kEndConfigFlowOutput));
             }
 
@@ -191,8 +206,8 @@ namespace FlowCanvas.Nodes
         virtual public void Config(string luaFilePath)
         {
             string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
-            luaFileRelaPath = luaRelaPath;
-            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(luaFileRelaPath);
+            _luaFileRelaPath = luaRelaPath;
+            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
             OnValidate(graphBase);
         }
 #endif

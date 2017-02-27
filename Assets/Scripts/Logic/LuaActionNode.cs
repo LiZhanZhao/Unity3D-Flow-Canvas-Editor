@@ -17,6 +17,8 @@ namespace FlowCanvas.Nodes
         private string _actionKey = "";
         private bool _isFinish = false;
 
+        
+
         public void Update()
         {
             if (!_isFinish && UpdateAction())

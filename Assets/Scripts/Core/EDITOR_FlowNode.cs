@@ -56,6 +56,15 @@ namespace FlowCanvas.Framework
             BinderConnection.Create(source, target);
         }
 
+        BinderConnection[] GetOutPortConnections(Port port)
+        {
+            return outConnections.Cast<BinderConnection>().Where(c => c.sourcePort == port).ToArray();
+        }
+
+        BinderConnection[] GetInPortConnections(Port port)
+        {
+            return inConnections.Cast<BinderConnection>().Where(c => c.targetPort == port).ToArray();
+        }
 
         protected override void OnShowPortName()
         {
@@ -189,8 +198,18 @@ namespace FlowCanvas.Framework
                             ConnectPorts(UIGraph.clickedPort, port);
                             UIGraph.clickedPort = null;
                             e.Use();
+                        }   
+                    }
+
+                    //input -> delete BinderConnection.targetPort equal to port 
+                    if (port.isConnected && e.type == EventType.ContextClick && portRect.Contains(e.mousePosition))
+                    {
+                        foreach (var c in GetInPortConnections(port))
+                        {
+                            graphBase.RemoveConnection(c);
                         }
-                        
+                        e.Use();
+                        return;
                     }
 
 
@@ -257,8 +276,18 @@ namespace FlowCanvas.Framework
                             ConnectPorts(port, UIGraph.clickedPort);
                             UIGraph.clickedPort = null;
                             e.Use();
+                        }   
+                    }
+
+                    //output -> delete BinderConnection.sourcePort equal to port 
+                    if (e.type == EventType.ContextClick && portRect.Contains(e.mousePosition))
+                    {
+                        foreach (var c in GetOutPortConnections(port))
+                        {
+                            graphBase.RemoveConnection(c);
                         }
-                        
+                        e.Use();
+                        return;
                     }
                 }
             }
@@ -266,18 +295,13 @@ namespace FlowCanvas.Framework
             if (UIGraph.clickedPort != null && UIGraph.clickedPort.parent == this)
             {
                 DrawCurve(UIGraph.clickedPort.pos, e.mousePosition,  (UIGraph.clickedPort is FlowInput || UIGraph.clickedPort is ValueInput));
-                //var xDiff = (UIGraph.clickedPort.pos.x - e.mousePosition.x) * 0.8f;
-                //xDiff = e.mousePosition.x > UIGraph.clickedPort.pos.x ? xDiff : -xDiff;
-                //var tangA = (UIGraph.clickedPort is FlowInput || UIGraph.clickedPort is ValueInput) ? new Vector2(xDiff, 0) : new Vector2(-xDiff, 0);
-                //var tangB = tangA * -1;
-                //UnityEditor.Handles.DrawBezier(UIGraph.clickedPort.pos, e.mousePosition, UIGraph.clickedPort.pos + tangA, e.mousePosition + tangB, new Color(0.5f, 0.5f, 0.8f, 0.8f), null, 3);
             }
 
             for (var i = 0; i < outConnections.Count; i++)
             {
                 var binder = outConnections[i] as BinderConnection;
                 if (binder != null)
-                { //for in case it's MissingConnection
+                {
                     var sourcePort = binder.sourcePort;
                     var targetPort = binder.targetPort;
                     if (sourcePort != null && targetPort != null)

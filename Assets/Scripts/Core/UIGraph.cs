@@ -277,10 +277,7 @@ namespace FlowCanvas.Framework
         public void HandleInputEvent(Event e, Vector2 pos)
         {
             HandleNodesInputEvent(e, pos);
-
             HandleRightClickMenu(e, pos);
-
-
         }
 
         void HandleNodesInputEvent(Event e, Vector2 pos)
@@ -294,7 +291,7 @@ namespace FlowCanvas.Framework
 
         void HandleRightClickMenu(Event e, Vector2 pos)
         {
-            if (e.type == EventType.ContextClick)
+            if (e.type == EventType.ContextClick && !IsHitNode(pos))
             {
                 var menu = GetAddNodeMenu(pos);
                 menu.ShowAsContext();

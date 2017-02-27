@@ -7,6 +7,7 @@ using ParadoxNotion;
 using ParadoxNotion.Design;
 using System.Linq;
 
+#if UNITY_EDITOR
 using UnityEditor;
 public class EditorUtils {
 
@@ -154,3 +155,4 @@ public class EditorUtils {
         return value;
     }
 }
+#endif

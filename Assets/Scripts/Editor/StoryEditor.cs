@@ -95,9 +95,8 @@ namespace StoryEditorContext
 
             HandleComiling();
             DrawCenterWindow();
-            //DrawToolBar();
-            //DrawNodeInfoWindow();
             //DrawPlayInfoWidnow();
+            DrawToolBar();
             DoRepaint();
         }
 
@@ -272,13 +271,46 @@ namespace StoryEditorContext
 
         void DrawToolBar()
         {
-            GUILayout.BeginArea(ToolbarRect, GUI.skin.button);
-            GUILayout.EndArea();
-        }
+            GUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
 
-        void DrawNodeInfoWindow(){
-            GUILayout.BeginArea(NodeInfoWindowRect, GUI.skin.button);
-            GUILayout.EndArea();
+            if (GUILayout.Button("File", EditorStyles.toolbarDropDown, GUILayout.Width(50)))
+            {
+                var menu = new GenericMenu();
+
+                //Import JSON
+                menu.AddItem(new GUIContent("Import JSON"), false, () =>
+                {
+                    if (_uiGraph.allNodes.Count > 0 && !EditorUtility.DisplayDialog("Import Graph", "All current graph information will be lost. Are you sure?", "YES", "NO"))
+                        return;
+
+                    var path = EditorUtility.OpenFilePanel(string.Format("Import '{0}' Graph", this.GetType().Name), "Assets", "json");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        if(!_uiGraph.Deserialize(System.IO.File.ReadAllText(path),true))
+                        {
+                            EditorUtility.DisplayDialog("Import Failure", "Please read the logs for more information", "OK", "");
+                        }
+                    }
+                });
+
+                //Expot JSON
+                menu.AddItem(new GUIContent("Export JSON"), false, () =>
+                {
+                    var path = EditorUtility.SaveFilePanelInProject(string.Format("Export '{0}' Graph", this.GetType().Name), "", "json", "");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        //System.IO.File.WriteAllText(path, this.Serialize(true, null)); //true: pretyJson, null: this._objectReferences
+                        System.IO.File.WriteAllText(path, _uiGraph.Serialize(true));
+                        AssetDatabase.Refresh();
+                    }
+                });
+
+                menu.ShowAsContext();
+            }
+
+            GUILayout.EndHorizontal();
+            GUI.backgroundColor = Color.white;
         }
 
         void DrawPlayInfoWidnow()
@@ -321,15 +353,7 @@ namespace StoryEditorContext
         public bool IsInBlankArea(Vector2 mousePos)
         {
             bool isHitNode = _uiGraph.IsHitNode(mousePos);
-            return !NodeInfoWindowRect.Contains(mousePos) &&
-                !PlayInfoWindowRect.Contains(mousePos) && !ToolbarRect.Contains(mousePos) && !isHitNode;
-        }
-
-        public bool IsInNodeArea(Vector2 mousePos)
-        {
-            bool isHitNode = _uiGraph.IsHitNode(mousePos);
-            return !NodeInfoWindowRect.Contains(mousePos) &&
-                !PlayInfoWindowRect.Contains(mousePos) && !ToolbarRect.Contains(mousePos) && isHitNode;
+            return !isHitNode;
         }
 
         public Rect ScaleRect(Rect rect, float scale, Vector2 pivotPoint)

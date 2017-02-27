@@ -14,20 +14,23 @@ namespace FlowCanvas.Framework
     abstract public partial class Node
     {
         public Rect rect;
+        [SerializeField]
+        private string _customName;
+        [SerializeField]
+        private string _nodeName;
+        [SerializeField]
+        private string _nodeDescription;
+        [SerializeField]
+        private string _comment;
 
 #if UNITY_EDITOR
         
         private const float KNOB_SIZE = 13;
 
-        private string _customName;
-        private string _nodeName;
-
         private Port[] orderedInputs;
         private Port[] orderedOutputs;
 
         private static GUIStyle _centerLabel = null;
-        private string _nodeDescription;
-        private string _comment;
 
         public Node(Rect r)
         {

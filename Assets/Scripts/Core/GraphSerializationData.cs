@@ -8,12 +8,11 @@ namespace FlowCanvas.Framework
     public class GraphSerializationData
     {
         public float version = 1.0f;
-        // 节点列表
         public List<Node> nodes = new List<Node>();
-        // 连线列表
         public List<Connection> connections = new List<Connection>();
-        public Node primeNode = null;
-        public object derivedData;
+        public float zoom;
+        public Vector2 scrollOffset;
+
 
         //required
         public GraphSerializationData() { }
@@ -34,9 +33,7 @@ namespace FlowCanvas.Framework
             }
 
             this.connections = structConnections;
-
-            //serialize derived data
-            this.derivedData = graph.OnDerivedDataSerialization();
+            graph.OnSerialize(this);
         }
 
         ///MUST reconstruct before using the data
@@ -56,11 +53,10 @@ namespace FlowCanvas.Framework
             for (var i = 0; i < this.nodes.Count; i++)
             {
                 nodes[i].graphBase = graph;
-                nodes[i].ID = i + 1;
+                nodes[i].ID = i;
             }
 
-            //deserialize derived data
-            graph.OnDerivedDataDeserialization(derivedData);
+            graph.OnDeserialize(this);
         }
     }
 

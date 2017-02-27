@@ -345,6 +345,18 @@ namespace FlowCanvas.Framework
             //}
 
         }
+
+        public override void OnDeserialize(GraphSerializationData data) {
+            scrollOffset = data.scrollOffset;
+            zoom = data.zoom;
+        }
+
+        public override void OnSerialize(GraphSerializationData data)
+        {
+            data.scrollOffset = scrollOffset;
+            data.zoom = zoom;
+        }
+
         #endif
     }
 }

@@ -81,10 +81,6 @@ namespace FlowCanvas.Framework
             }
 
         }
-        virtual public void OnDerivedDataDeserialization(object data) { }
-
-        // graph -> GraphSerializationData
-        virtual public object OnDerivedDataSerialization() { return null; }
 
 
         bool LoadGraphData(GraphSerializationData data, bool validate)
@@ -198,6 +194,9 @@ namespace FlowCanvas.Framework
             connection.targetNode.inConnections.Remove(connection);
         }
 
+
+        public virtual void OnSerialize(GraphSerializationData data) { }
+        public virtual void OnDeserialize(GraphSerializationData data) { }
     }
 
     

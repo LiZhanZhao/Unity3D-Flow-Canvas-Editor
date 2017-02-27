@@ -103,8 +103,6 @@ namespace StoryEditorContext
             if (_willRepaint || Event.current.type == EventType.MouseMove)
             {
                 Repaint();
-                
-                
             }
         }
 
@@ -115,7 +113,6 @@ namespace StoryEditorContext
 
             _uiGraph.HandleInputEvent(e, _mousePos);
 
-            //HandleLineWithNode();
             HandleScrollWindow(e);
             HandleZoomWindow(e);
         }
@@ -165,71 +162,6 @@ namespace StoryEditorContext
 
         }
 
-
-        //void HandleLineWithNode()
-        //{
-        //    Event e = Event.current;
-        //    _mousePos = e.mousePosition;
-        //    // 左键按到Node
-        //    bool isCanDo = (e.type == EventType.MouseDown) && (e.button == 0) &&
-        //        IsInNodeArea(_mousePos);
-
-        //    if (isCanDo)
-        //    {
-        //        Node node = GetNodeFromPosition(_mousePos);
-        //        Debug.Assert(node != null);
-        //        Rect outputRect = node.OutputKnobRect;
-        //        bool isHitOutputKnob = outputRect.Contains(_mousePos);
-        //        Rect inputRect = node.InputKnobRect;
-        //        bool isHitInputKnob = inputRect.Contains(_mousePos);
-        //        if (isHitOutputKnob)
-        //        {
-        //            _isCanDrawNodeToMouseLine = true;
-        //            _curveStartPointNode = node;
-        //            //Debug.Log("Hit Output Knob");
-        //        }
-
-        //        if (isHitInputKnob)
-        //        {
-        //            int parentIndex = node.parentId;
-        //            if (parentIndex != -1)
-        //            {
-        //                Node parentNode = _uiGraph.nodeList[parentIndex];
-        //                _curveStartPointNode = parentNode;
-        //                _isCanDrawNodeToMouseLine = true;
-        //                Debug.Assert(_curveStartPointNode != null);
-        //                _uiGraph.NodeRemoveChild(_curveStartPointNode, node);
-        //            }
-                    
-                    
-        //        }
-
-        //    }
-
-        //    bool isLeftMouseUp = (e.type == EventType.MouseUp) && (e.button == 0);
-        //    if (isLeftMouseUp)
-        //    {
-        //        bool isInNodeArea = IsInNodeArea(_mousePos);
-        //        if (isInNodeArea)
-        //        {
-        //            Node childNode = GetNodeFromPosition(_mousePos);
-        //            Rect inputRect = childNode.InputKnobRect;
-        //            bool isHitInputKnob = inputRect.Contains(_mousePos);
-        //            if (isHitInputKnob)
-        //            {
-        //                Debug.Assert(_curveStartPointNode != null);
-        //                Debug.Assert(childNode != null);
-        //                _uiGraph.NodeAddChild(_curveStartPointNode, childNode);
-        //            }
-                    
-        //        }
-        //        _isCanDrawNodeToMouseLine = false;
-        //        _curveStartPointNode = null;
-        //    }
-            
-
-        //}
-
         void BeginUseSkin()
         {
             GUI.skin = _customGUISkin;
@@ -246,7 +178,6 @@ namespace StoryEditorContext
             HandleInputEvents();
             DrawGirdBackground();
             DrawZoomGraph();
-            //DrawNodeToMouseLine();
             EndZoomCenterWidnow();
 
             DrawNoZoomGraph();
@@ -333,32 +264,6 @@ namespace StoryEditorContext
             GUI.matrix = _noZoomMatrix;
             
             GUI.BeginGroup(new Rect(0, kTitleHeight, Screen.width, Screen.height));
-        }
-
-
-        //void DrawCurve(Vector2 start, Vector2 end)
-        //{
-        //    Vector3 startPos = new Vector3(start.x, start.y);
-        //    Vector3 endPos = new Vector3(end.x, end.y);
-        //    Vector3 startTan = startPos + Vector3.right * 50;
-        //    Vector3 endTan = endPos + Vector3.left * 50;
-        //    Color shadowColor = new Color(0, 0, 0, 0.1f);
-
-        //    for (int i = 0; i < 3; i++) // Draw a shadow with 3 shades
-        //        Handles.DrawBezier(startPos, endPos, startTan, endTan, shadowColor, null, (i + 1) * 4); // increasing width for fading shadow
-        //    Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.black, null, 2);
-        //}
-
-        void DrawNodeToMouseLine()
-        {
-            if (_isCanDrawNodeToMouseLine)
-            {
-                //Rect outputRect = _curveStartPointNode.OutputKnobRect;
-                //Vector2 knobPos = outputRect.center;
-                //Vector2 mousePos = _mousePos;
-                //DrawCurve(knobPos, mousePos);
-                //Repaint();
-            }
         }
 
         void DrawToolBar()

@@ -67,10 +67,14 @@ public class EditorUtils {
             return value;
         }
 
-        name = name.SplitCamelCase();
+        //name = name.SplitCamelCase();
+        
 
         IEnumerable<Attribute> attributes = new Attribute[0];
-        attributes = member.GetCustomAttributes(true).Cast<Attribute>();
+        if (member != null)
+        {
+            attributes = member.GetCustomAttributes(true).Cast<Attribute>();
+        }
 
         if (member != null)
         {

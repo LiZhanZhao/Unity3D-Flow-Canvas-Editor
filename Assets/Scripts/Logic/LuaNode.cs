@@ -49,6 +49,9 @@ namespace FlowCanvas.Nodes
         protected List<FlowOutput> _autoFlowOuts = new List<FlowOutput>();
 
         protected List<string> _autoValueInputArgNames = new List<string>();
+
+
+        [SerializeField]
         protected List<object> _autoValueInputArgValues = new List<object>();
 
         public bool ParseHeadConfig(string context, string beginConfig, string endConfig,

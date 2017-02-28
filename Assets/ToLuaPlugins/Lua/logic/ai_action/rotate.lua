@@ -2,7 +2,8 @@
 --BEGIN_VALUE_INPUT_CONFIG--
 local config = {
     speed = "System.Single",
-    time = "System.Single"
+    time = "System.Single",
+    test = "System.String"
 }
 --END_VALUE_INPUT_CONFIG--
 

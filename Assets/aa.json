@@ -1,0 +1,23 @@
+{
+    "nodes": [
+        {
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "rect": {
+                "xMin": 528.0,
+                "yMin": 252.0,
+                "xMax": 728.0,
+                "yMax": 395.0
+            },
+            "_customName": "\u64ad\u653e\u7279\u6548",
+            "_nodeName": "Lua Action Node",
+            "_nodeDescription": "No Description",
+            "$type": "FlowCanvas.Nodes.LuaActionNode"
+        }
+    ],
+    "connections": [],
+    "zoom": 1.0,
+    "scrollOffset": {
+        "x": 277.0,
+        "y": 43.0
+    }
+}

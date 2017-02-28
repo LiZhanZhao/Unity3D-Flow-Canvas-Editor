@@ -9,7 +9,7 @@ using FlowCanvas.Nodes;
 
 namespace StoryEditorContext
 {
-    public class StoryEditor : EditorWindow
+    public class StoryEditor : EditorWindow, ISerializationCallbackReceiver
     {
         private const float kNodeInfoWWP = 0.3f;
         private const float kNodeInfoWHP = 0.5f;
@@ -35,6 +35,8 @@ namespace StoryEditorContext
         private UIGraph _uiGraph = null;
         private bool _willRepaint = true;
 
+        private string testtest = "000";
+
         [MenuItem("Window/Story Editor")]
         static void CreateEditor()
         {
@@ -46,29 +48,40 @@ namespace StoryEditorContext
         
         void OnEnable()
         {
-            
-
             InitToolRes();
 
             _willRepaint = true;
-
+            Debug.Log("000000000");
             if (_uiGraph == null)
             {
-                _uiGraph = new UIGraph();
+                Debug.Log("111111111");
+                //_uiGraph = new UIGraph();
+                _uiGraph = ScriptableObject.CreateInstance<UIGraph>();
                 Vector2 pos = new Vector2(position.width / 2, position.height / 2);
                 //_uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(pos);
 
                 //LuaCommandNode test = _uiGraph.AddNode<LuaCommandNode>(pos);
                 //string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
-                //test.Config(configFile);
+                //test.Config(configFile); 
 
                 FinishNode test1 = _uiGraph.AddNode<FinishNode>(pos);
                 MouseEvents e = _uiGraph.AddNode<MouseEvents>(pos);
             }
 
             _zoomPivotPos = new Vector2(position.width / 2, position.height / 2);
-                
         }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            Debug.Log("Editor OnBeforeSerialize");
+            //Serialize();
+        }
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            Debug.Log("Editor OnAfterDeserialize");
+            //Deserialize();
+        }
+
 
         void InitToolRes()
         {
@@ -94,6 +107,13 @@ namespace StoryEditorContext
         {
 
             HandleComiling();
+            //if (_uiGraph != null)
+            //{
+
+            //    Undo.RecordObject(_uiGraph, "xxx");
+            //}
+            
+
             DrawCenterWindow();
             //DrawPlayInfoWidnow();
             DrawToolBar();

@@ -10,9 +10,9 @@ using System.Linq;
 #endif
 namespace FlowCanvas.Framework
 {
-    
+    [System.Serializable]
     public class UIGraph : GraphBase
-    {
+    { 
         public override System.Type baseNodeType { get { return typeof(FlowNode); } }
         public Vector2 scrollOffset;
         public float zoom = 1.0f;
@@ -194,7 +194,6 @@ namespace FlowCanvas.Framework
                     //add the generic types based on constrains and prefered types list
                     if (subType.IsGenericTypeDefinition && subType.GetGenericArguments().Length == 1)
                     {
-
                         //infos.Add(new ScriptInfo(null, scriptName.Replace("<T>", " (T)/" + "Generic Argument"), scriptCategory));
                         //var arg1 = subType.GetGenericArguments()[0];
                         var types = defaultTypesList;
@@ -356,6 +355,8 @@ namespace FlowCanvas.Framework
             data.scrollOffset = scrollOffset;
             data.zoom = zoom;
         }
+
+        
 
         #endif
     }

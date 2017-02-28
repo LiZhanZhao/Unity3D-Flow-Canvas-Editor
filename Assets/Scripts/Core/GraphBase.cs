@@ -46,13 +46,7 @@ namespace FlowCanvas.Framework
         //    }
         //}
 
-        //void ISerializationCallbackReceiver.OnBeforeSerialize()
-        //{
-        //    Serialize();
-        //}
-        //void ISerializationCallbackReceiver.OnAfterDeserialize() {
-        //    Deserialize();
-        //}
+        
 
         public bool Deserialize(string jsonContext, bool validate)
         {
@@ -197,6 +191,8 @@ namespace FlowCanvas.Framework
 
         public virtual void OnSerialize(GraphSerializationData data) { }
         public virtual void OnDeserialize(GraphSerializationData data) { }
+
+        
     }
 
     

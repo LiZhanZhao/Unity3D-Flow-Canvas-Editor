@@ -10,7 +10,6 @@ using System.Linq;
 #endif
 namespace FlowCanvas.Framework
 {
-    [System.Serializable]
     public class UIGraph : GraphBase
     { 
         public override System.Type baseNodeType { get { return typeof(FlowNode); } }

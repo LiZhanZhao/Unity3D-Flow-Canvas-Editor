@@ -11,10 +11,6 @@ namespace StoryEditorContext
 {
     public class StoryEditor : EditorWindow, ISerializationCallbackReceiver
     {
-        private const float kNodeInfoWWP = 0.3f;
-        private const float kNodeInfoWHP = 0.5f;
-        private const float kToolbarHeight = 40;
-
         private const string kBgTexturePath = "Assets/Scripts/Editor/Resources/EditorTextures/background.png";
         private const string kCustomGUISkin = "Assets/Scripts/Editor/Resources/NodeCanvasSkin.guiskin";
         private const float kTitleHeight = 21;
@@ -31,13 +27,16 @@ namespace StoryEditorContext
         private Node _curveStartPointNode = null;
         private bool _isCanDrawNodeToMouseLine = false;
 
-        // editor serialize data
-        private UIGraph _uiGraph = null;
+        // this add static is not serialize _uiGraph
+        private static UIGraph _uiGraph = null;
         private bool _willRepaint = true;
 
-        private string testtest = "000";
+        private const string kSerializeKey = "__StoryEditorSerializeKey";
 
+        //private string _serializeJson = "";
+         
         [MenuItem("Window/Story Editor")]
+
         static void CreateEditor()
         {
             StoryEditor se= (StoryEditor)EditorWindow.GetWindow(typeof(StoryEditor));
@@ -45,41 +44,79 @@ namespace StoryEditorContext
             se._willRepaint = true;
             
         }
-        
+
+        public UIGraph currentGraph
+        {
+            get {
+                if (_uiGraph == null)
+                {
+                    
+                    string serializeJson = "";
+                    if (PlayerPrefs.HasKey(kSerializeKey))
+                    {
+                        serializeJson = PlayerPrefs.GetString(kSerializeKey);
+                    }
+                    if (!string.IsNullOrEmpty(serializeJson))
+                    {
+                        _uiGraph = ScriptableObject.CreateInstance<UIGraph>();
+                        _uiGraph.Deserialize(serializeJson, true);
+                    }
+                }
+                return _uiGraph; 
+            }
+
+
+            set
+            {
+                _uiGraph = value;
+            }
+        }
+
         void OnEnable()
         {
             InitToolRes();
 
-            _willRepaint = true;
-            Debug.Log("000000000");
-            if (_uiGraph == null)
+            if (currentGraph == null)
             {
-                Debug.Log("111111111");
+                currentGraph = ScriptableObject.CreateInstance<UIGraph>();
                 //_uiGraph = new UIGraph();
-                _uiGraph = ScriptableObject.CreateInstance<UIGraph>();
+
                 Vector2 pos = new Vector2(position.width / 2, position.height / 2);
-                //_uiGraph.AddNode<SimplexNodeWrapper<LogValue>>(pos);
-
-                //LuaCommandNode test = _uiGraph.AddNode<LuaCommandNode>(pos);
-                //string configFile = Application.dataPath + "/ToLuaPlugins/Lua/logic/story_command/get_targets.lua";
-                //test.Config(configFile); 
-
-                FinishNode test1 = _uiGraph.AddNode<FinishNode>(pos);
-                MouseEvents e = _uiGraph.AddNode<MouseEvents>(pos);
+                currentGraph.AddNode<RootNode>(pos);
             }
 
+            _willRepaint = true;
             _zoomPivotPos = new Vector2(position.width / 2, position.height / 2);
+            
+            EditorApplication.playmodeStateChanged += PlayModeChange;
+        }
+
+        void OnDisable()
+        {
+            EditorApplication.playmodeStateChanged -= PlayModeChange;
+        }
+
+        void SaveSerializeJson()
+        {
+            // todo : this use _uiGraph rather than currentGraph, because use currentGraph will crash
+            if (_uiGraph != null)
+            {
+                Debug.Log("Serialize Succees !!!!! ");
+                string jsonStr = _uiGraph.Serialize(true);
+                PlayerPrefs.SetString(kSerializeKey, jsonStr);
+            }
+        }
+
+        void PlayModeChange()
+        {
+            SaveSerializeJson();
         }
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            Debug.Log("Editor OnBeforeSerialize");
-            //Serialize();
+            SaveSerializeJson();
         }
-        void ISerializationCallbackReceiver.OnAfterDeserialize()
-        {
-            Debug.Log("Editor OnAfterDeserialize");
-            //Deserialize();
+        void ISerializationCallbackReceiver.OnAfterDeserialize(){
         }
 
 
@@ -105,15 +142,7 @@ namespace StoryEditorContext
         }
         void OnGUI()
         {
-
             HandleComiling();
-            //if (_uiGraph != null)
-            //{
-
-            //    Undo.RecordObject(_uiGraph, "xxx");
-            //}
-            
-
             DrawCenterWindow();
             //DrawPlayInfoWidnow();
             DrawToolBar();
@@ -133,7 +162,7 @@ namespace StoryEditorContext
             Event e = Event.current;
             _mousePos = e.mousePosition;
 
-            _uiGraph.HandleInputEvent(e, _mousePos);
+            currentGraph.HandleInputEvent(e, _mousePos);
 
             HandleScrollWindow(e);
             HandleZoomWindow(e);
@@ -151,11 +180,11 @@ namespace StoryEditorContext
 
             if (_isCanScrollWindow)
             {
-                _uiGraph.scrollOffset += e.delta / 2;
+                currentGraph.scrollOffset += e.delta / 2;
 
-                for (int i = 0; i < _uiGraph.allNodes.Count; i++)
+                for (int i = 0; i < currentGraph.allNodes.Count; i++)
                 {
-                    Node node = _uiGraph.allNodes[i];
+                    Node node = currentGraph.allNodes[i];
                     node.rect.position += e.delta / 2;
                 }
                 Repaint();
@@ -176,8 +205,8 @@ namespace StoryEditorContext
             bool isCanZoom = (e.type == EventType.ScrollWheel);
             if (isCanZoom)
             {
-                _uiGraph.zoom += e.delta.y / 50.0f;
-                _uiGraph.zoom = Mathf.Clamp(_uiGraph.zoom, 0.5f, 2.0f);
+                currentGraph.zoom += e.delta.y / 50.0f;
+                currentGraph.zoom = Mathf.Clamp(currentGraph.zoom, 0.5f, 2.0f);
                 
                 Repaint();
             }
@@ -213,18 +242,18 @@ namespace StoryEditorContext
         void DrawZoomGraph()
         {
             BeginWindows();
-            if (_uiGraph != null)
+            if (currentGraph != null)
             {
-                _uiGraph.DrawNodes();
+                currentGraph.DrawNodes();
             }
             EndWindows();
         }
 
         void DrawNoZoomGraph()
         {
-            if (_uiGraph != null)
+            if (currentGraph != null)
             {
-                _uiGraph.DrawNodeInspector();
+                currentGraph.DrawNodeInspector();
             }
         }
         
@@ -239,20 +268,20 @@ namespace StoryEditorContext
                 {
                     
                     Rect totalRect = new Rect(0, kTitleHeight, position.width, position.height);
-                    totalRect = ScaleRect(totalRect, 1.0f / _uiGraph.zoom, _zoomPivotPos);
+                    totalRect = ScaleRect(totalRect, 1.0f / currentGraph.zoom, _zoomPivotPos);
 
                     // 会导致Node Insp 界面出现问题
                     //GUI.BeginGroup(totalRect);
                     GUI.BeginClip(totalRect);
 
                     Vector2 bgSize = new Vector2(_girdTex.width, _girdTex.height);
-                    Vector2 beginPos = new Vector2(_uiGraph.scrollOffset.x % bgSize.x - bgSize.x,
-                        _uiGraph.scrollOffset.y % bgSize.y - bgSize.y);
+                    Vector2 beginPos = new Vector2(currentGraph.scrollOffset.x % bgSize.x - bgSize.x,
+                        currentGraph.scrollOffset.y % bgSize.y - bgSize.y);
 
                     Rect unitRect = new Rect(beginPos, bgSize);
 
                     // todo : must need zero to scaleRect
-                    unitRect = ScaleRect(unitRect, _uiGraph.zoom, Vector2.zero);
+                    unitRect = ScaleRect(unitRect, currentGraph.zoom, Vector2.zero);
                     Vector2 totalSize = totalRect.size + new Vector2(Mathf.Abs(unitRect.x), Mathf.Abs(unitRect.y));
 
                     int tileX = Mathf.CeilToInt(totalSize.x / unitRect.width);
@@ -278,7 +307,7 @@ namespace StoryEditorContext
         {
             GUI.EndGroup();
             _noZoomMatrix = GUI.matrix;
-            Vector2 scale = new Vector2(_uiGraph.zoom, _uiGraph.zoom);
+            Vector2 scale = new Vector2(currentGraph.zoom, currentGraph.zoom);
             GUIUtility.ScaleAroundPivot(scale, _zoomPivotPos);
             
         }
@@ -301,13 +330,13 @@ namespace StoryEditorContext
                 //Import JSON
                 menu.AddItem(new GUIContent("Import JSON"), false, () =>
                 {
-                    if (_uiGraph.allNodes.Count > 0 && !EditorUtility.DisplayDialog("Import Graph", "All current graph information will be lost. Are you sure?", "YES", "NO"))
+                    if (currentGraph.allNodes.Count > 0 && !EditorUtility.DisplayDialog("Import Graph", "All current graph information will be lost. Are you sure?", "YES", "NO"))
                         return;
 
                     var path = EditorUtility.OpenFilePanel(string.Format("Import '{0}' Graph", this.GetType().Name), "Assets", "json");
                     if (!string.IsNullOrEmpty(path))
                     {
-                        if(!_uiGraph.Deserialize(System.IO.File.ReadAllText(path),true))
+                        if(!currentGraph.Deserialize(System.IO.File.ReadAllText(path),true))
                         {
                             EditorUtility.DisplayDialog("Import Failure", "Please read the logs for more information", "OK", "");
                         }
@@ -321,7 +350,7 @@ namespace StoryEditorContext
                     if (!string.IsNullOrEmpty(path))
                     {
                         //System.IO.File.WriteAllText(path, this.Serialize(true, null)); //true: pretyJson, null: this._objectReferences
-                        System.IO.File.WriteAllText(path, _uiGraph.Serialize(true));
+                        System.IO.File.WriteAllText(path, currentGraph.Serialize(true));
                         AssetDatabase.Refresh();
                     }
                 });
@@ -335,44 +364,13 @@ namespace StoryEditorContext
 
         void DrawPlayInfoWidnow()
         {
-            GUILayout.BeginArea(PlayInfoWindowRect, GUI.skin.button);
-            GUILayout.EndArea();
-        }
-
-
-
-        public Rect NodeInfoWindowRect
-        {
-            // position 就是editorWindow的位置与大小
-            get
-            {
-                return new Rect(position.width * (1 - kNodeInfoWWP),
-                kToolbarHeight,
-                position.width * kNodeInfoWWP,
-                position.height * kNodeInfoWHP);
-            }
-        }
-
-        public Rect PlayInfoWindowRect
-        {
-            get
-            {
-                return new Rect(
-                    position.width * (1 - kNodeInfoWWP),
-                    kToolbarHeight + position.height * kNodeInfoWHP,
-                    position.width * kNodeInfoWWP,
-                    position.height - (kToolbarHeight + position.height * kNodeInfoWHP)
-                    );
-            }
-        }
-        public Rect ToolbarRect
-        {
-            get { return new Rect(0, 0, position.width, kToolbarHeight); }
+            //GUILayout.BeginArea(PlayInfoWindowRect, GUI.skin.button);
+            //GUILayout.EndArea();
         }
 
         public bool IsInBlankArea(Vector2 mousePos)
         {
-            bool isHitNode = _uiGraph.IsHitNode(mousePos);
+            bool isHitNode = currentGraph.IsHitNode(mousePos);
             return !isHitNode;
         }
 

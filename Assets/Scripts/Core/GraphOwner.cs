@@ -14,7 +14,7 @@ namespace FlowCanvas.Framework
         }
 
         abstract public Graph graph { get; set; }
-        private static bool isQuiting;
+        //private static bool isQuiting;
         private bool startCalled = false;
         public EnableAction enableAction = EnableAction.EnableBehaviour;
         public DisableAction disableAction = DisableAction.DisableBehaviour;
@@ -53,15 +53,14 @@ namespace FlowCanvas.Framework
             PauseBehaviour,
             DoNothing
         }
-
         
         protected void OnDisable()
         {
 
-            if (isQuiting)
-            {
-                return;
-            }
+            //if (isQuiting)
+            //{
+            //    return;
+            //}
 
             if (disableAction == DisableAction.DisableBehaviour)
             {

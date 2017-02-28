@@ -7,7 +7,7 @@ namespace FlowCanvas.Nodes{
     //[Name("*** Root *** ")]
     //[Category("Events/Root")]
     //[DoNotList]
-    [Description("11111111111111111111.")]
+    //[Description("11111111111111111111.")]
 	public class RootNode : FlowNode {
 
         private FlowOutput once;

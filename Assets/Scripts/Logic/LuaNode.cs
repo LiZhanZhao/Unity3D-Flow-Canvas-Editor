@@ -110,6 +110,7 @@ namespace FlowCanvas.Nodes
         protected override void RegisterPorts()
         {
             AutoGeneratePort();
+
         }
 
         protected void AutoGeneratePort()

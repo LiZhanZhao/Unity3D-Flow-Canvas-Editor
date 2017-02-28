@@ -13,6 +13,7 @@ namespace FlowCanvas.Nodes
         
         private FlowInput _flowIn;
         private ValueInput<string[]> _targetValueIn;
+        private FlowOutput _flowOut;
 
         private string _actionKey = "";
         private bool _isFinish = false;
@@ -104,10 +105,12 @@ namespace FlowCanvas.Nodes
 
         void CallFlowOutputs()
         {
-            for (int i = 0; i < _autoFlowOuts.Count; i++)
-            {
-                _autoFlowOuts[i].Call(new Flow(1));
-            }
+            //for (int i = 0; i < _autoFlowOuts.Count; i++)
+            //{
+            //    _autoFlowOuts[i].Call(new Flow(1));
+            //}
+
+            _flowOut.Call(new Flow(1));
         }
 
 
@@ -120,6 +123,8 @@ namespace FlowCanvas.Nodes
             {
                 BeginAction();
             });
+
+            _flowOut = AddFlowOutput("Out");
 
             // valueInput
             _targetValueIn = AddValueInput<string[]>("Targets");

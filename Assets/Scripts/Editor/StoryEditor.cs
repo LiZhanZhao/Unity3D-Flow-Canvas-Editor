@@ -32,8 +32,6 @@ namespace StoryEditorContext
         private bool _willRepaint = true;
 
         private const string kSerializeKey = "__StoryEditorSerializeKey";
-
-        //private string _serializeJson = "";
          
         [MenuItem("Window/Story Editor")]
 
@@ -79,8 +77,6 @@ namespace StoryEditorContext
             if (currentGraph == null)
             {
                 currentGraph = ScriptableObject.CreateInstance<UIGraph>();
-                //_uiGraph = new UIGraph();
-
                 Vector2 pos = new Vector2(position.width / 2, position.height / 2);
                 currentGraph.AddNode<RootNode>(pos);
             }
@@ -93,9 +89,15 @@ namespace StoryEditorContext
 
         void OnDisable()
         {
+            
             EditorApplication.playmodeStateChanged -= PlayModeChange;
         }
 
+        void OnDestroy()
+        {            
+            SaveSerializeJson();
+        }
+         
         void SaveSerializeJson()
         {
             // todo : this use _uiGraph rather than currentGraph, because use currentGraph will crash

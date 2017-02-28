@@ -13,17 +13,17 @@ namespace FlowCanvas.Nodes
 
         protected override void AutoGenerateValueOutput(string fileContext)
         {
-            Dictionary<string, string> valueOutputconf;
-            if (!ParseHeadConfig(fileContext, kBeginConfigValueOutput, kEndConfigValueOutput, out valueOutputconf))
+            List<string> argNames, argTypes;
+            if (!ParseHeadConfig(fileContext, kBeginConfigValueOutput, kEndConfigValueOutput, out argNames, out argTypes))
             {
                 Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigValueOutput,
                     kEndConfigValueOutput));
             }
 
-            foreach (KeyValuePair<string, string> conf in valueOutputconf)
+            for (int i = 0; i < argNames.Count; i++)
             {
-                string argName = conf.Key;
-                string argType = conf.Value;
+                string argName = argNames[i];
+                string argType = argTypes[i];
                 Type t = Type.GetType(argType);
                 AddValueOutput(argName, () => { return GetOutputData(argName, t); });
             }

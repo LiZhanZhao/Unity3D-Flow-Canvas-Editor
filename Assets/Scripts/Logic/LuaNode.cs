@@ -8,7 +8,7 @@ using ParadoxNotion.Design;
 namespace FlowCanvas.Nodes
 {
     [DoNotList]
-    public class LuaNode : FlowNode
+    public partial class LuaNode : FlowNode
     {
         protected const string kBeginConfigValueInput = "--BEGIN_VALUE_INPUT_CONFIG--";
         protected const string kEndConfigValueInput = "--END_VALUE_INPUT_CONFIG--";
@@ -46,14 +46,17 @@ namespace FlowCanvas.Nodes
         protected string _luaFileName = "";
         
         protected List<ValueInput> _autoValueInputs = new List<ValueInput>();
-        protected List<string> _autoValueInputArgNames = new List<string>();
-
         protected List<FlowOutput> _autoFlowOuts = new List<FlowOutput>();
 
+        protected List<string> _autoValueInputArgNames = new List<string>();
+        protected List<object> _autoValueInputArgValues = new List<object>();
+
         public bool ParseHeadConfig(string context, string beginConfig, string endConfig,
-           out Dictionary<string, string> resDic)
+           out List<string> argNames, out List<string> argTypes)
         {
-            resDic = new Dictionary<string, string>();
+            
+            argNames = new List<string>();
+            argTypes = new List<string>();
             int beginIndex = context.IndexOf(beginConfig);
             int endIndex = context.IndexOf(endConfig);
 
@@ -88,7 +91,8 @@ namespace FlowCanvas.Nodes
                     string argName = keyValue[0].Trim();
                     string argType = keyValue[1].Trim();
                     argType = argType.Replace("\"", "");
-                    resDic.Add(argName, argType);
+                    argNames.Add(argName);
+                    argTypes.Add(argType);
                 }
                 
             }
@@ -128,23 +132,24 @@ namespace FlowCanvas.Nodes
 
         protected virtual void AutoGenerateValueInput(string fileContext)
         {
-            Dictionary<string, string> valueInputconf;
-            if (!ParseHeadConfig(fileContext, kBeginConfigValueInput, kEndConfigValueInput, out valueInputconf))
+            List<string> argNames, argTypes;
+            if (!ParseHeadConfig(fileContext, kBeginConfigValueInput, kEndConfigValueInput, out argNames, out argTypes))
             {
                 Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigValueInput,
                     kEndConfigValueInput));
             }
-            foreach (KeyValuePair<string, string> conf in valueInputconf)
+            _autoValueInputArgNames.Clear();
+            for (int i = 0; i < argNames.Count;i++)
             {
-                string argName = conf.Key;
-                string argType = conf.Value;
+                string argName = argNames[i];
+                string argType = argTypes[i];
                 Type t = Type.GetType(argType);
                 var portType = typeof(ValueInput<>).RTMakeGenericType(new Type[] { t });
                 var port = (ValueInput)Activator.CreateInstance(portType, new object[] { this, argName, argName });
                 AddValueInput(port, argName);
                 _autoValueInputs.Add(port);
                 _autoValueInputArgNames.Add(argName);
-                
+
             }
         }
 
@@ -187,16 +192,16 @@ namespace FlowCanvas.Nodes
         }
         protected virtual void AutoGenerateFlowOutput(string fileContext)
         {
-            Dictionary<string, string> flowOutputconf;
-            if (!ParseHeadConfig(fileContext, kBeginConfigFlowOutput, kEndConfigFlowOutput, out flowOutputconf))
+            List<string> argNames, argTypes;
+            if (!ParseHeadConfig(fileContext, kBeginConfigFlowOutput, kEndConfigFlowOutput, out argNames, out argTypes))
             {
                 Debug.LogError(string.Format("{0} : {1}, {2} error ", _luaFileRelaPath, kBeginConfigFlowOutput,
                     kEndConfigFlowOutput));
             }
 
-            foreach (KeyValuePair<string, string> conf in flowOutputconf)
+            for (int i = 0; i < argNames.Count; i++)
             {
-                string argName = conf.Key;
+                string argName = argNames[i];
                 FlowOutput flowOut = AddFlowOutput(argName);
                 _autoFlowOuts.Add(flowOut);
             }

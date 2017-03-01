@@ -13,11 +13,9 @@ namespace FlowCanvas.Framework
         private GraphBase _graphBase;
         private List<Connection> _inConnections = new List<Connection>();
         private List<Connection> _outConnections = new List<Connection>();
-        private Status _status = Status.Resting;
-        
         
         private int _ID;
-        private bool isChecked { get; set; }
+        
         
 
         public Graph graph
@@ -39,13 +37,6 @@ namespace FlowCanvas.Framework
         }
 
         
-        
-        public Status status
-        {
-            get { return _status; }
-            protected set { _status = value; }
-        }
-
         public int ID
         {
             get { return _ID; }
@@ -89,37 +80,7 @@ namespace FlowCanvas.Framework
 
         virtual protected void OnReset() { }
         
-        public void Reset(bool recursively = true)
-        {
-
-            if (status == Status.Resting || isChecked)
-                return;
-
-            OnReset();
-            status = Status.Resting;
-
-            isChecked = true;
-            for (var i = 0; i < outConnections.Count; i++)
-            {
-                outConnections[i].Reset(recursively);
-            }
-            isChecked = false;
-        }
-
-        public void ResetRecursion()
-        {
-
-            if (!isChecked)
-            {
-                return;
-            }
-
-            isChecked = false;
-            for (var i = 0; i < outConnections.Count; i++)
-            {
-                outConnections[i].targetNode.ResetRecursion();
-            }
-        }
+        
 
 
         

@@ -134,7 +134,6 @@ namespace FlowCanvas.Framework
 
             for (var i = 0; i < allNodes.Count; i++)
             {
-                allNodes[i].Reset(false);
                 allNodes[i].OnGraphStoped();
             }
 

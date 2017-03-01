@@ -10,10 +10,6 @@ namespace FlowCanvas.Framework
 		///Binds source and target value ports
 		public override void Bind(){
 
-			if (!isActive){
-				return;
-			}
-
 			DoNormalBinding(sourcePort, targetPort);
 			
 		}
@@ -30,7 +26,5 @@ namespace FlowCanvas.Framework
 			(target as ValueInput<T>).BindTo( (ValueOutput)source );
 		}
 
-
-		
 	}
 }

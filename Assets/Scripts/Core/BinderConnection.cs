@@ -99,12 +99,6 @@ namespace FlowCanvas.Framework
 
         virtual public void Bind()
         {
-
-            if (!isActive)
-            {
-                return;
-            }
-
             if (sourcePort is FlowOutput && targetPort is FlowInput)
             {
                 (sourcePort as FlowOutput).BindTo((FlowInput)targetPort);

@@ -10,8 +10,7 @@ namespace FlowCanvas.Framework
         private Node _sourceNode;
         [SerializeField]
         private Node _targetNode;
-        private Status _status = Status.Resting;
-        private bool _isDisabled;
+        
         ///The source node of the connection
         public Node sourceNode
         {
@@ -32,39 +31,9 @@ namespace FlowCanvas.Framework
             get { return sourceNode.graphBase; }
         }
 
-        public Status status
-        {
-            get { return _status; }
-            set { _status = value; }
-        }
-
-        public void Reset(bool recursively = true)
-        {
-            if (status == Status.Resting)
-            {
-                return;
-            }
-            status = Status.Resting;
-            if (recursively)
-            {
-                targetNode.Reset(recursively);
-            }
-        }
-
         virtual public void OnDestroy() { }
 
-        public bool isActive
-        {
-            get { return !_isDisabled; }
-            set
-            {
-                if (!_isDisabled && value == false)
-                {
-                    Reset();
-                }
-                _isDisabled = !value;
-            }
-        }
+        
     }
 }
 

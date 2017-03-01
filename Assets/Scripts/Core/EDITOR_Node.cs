@@ -156,6 +156,7 @@ namespace FlowCanvas.Framework
             {
                 GUI.color = new Color(0.7f, 0.7f, 1f, 0.8f);
                 GUI.Box(rect, string.Empty, (GUIStyle)"windowHighlight");
+                //Rect tempRect = new Rect(rect.position + new Vector2(-10, -10), rect.size + new Vector2(20, 20));
             }
             
         }

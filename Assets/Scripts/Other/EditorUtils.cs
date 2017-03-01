@@ -132,6 +132,9 @@ public class EditorUtils {
         if (t == typeof(AnimationCurve))
             return EditorGUILayout.CurveField(name, (AnimationCurve)value);
 
+        if (t == typeof(GameObject))
+            return EditorGUILayout.ObjectField(name, (GameObject)value, typeof(GameObject), true);
+
         return value;
     }
 }

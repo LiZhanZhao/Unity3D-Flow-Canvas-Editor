@@ -335,7 +335,7 @@ namespace FlowCanvas.Framework
         protected override void OnHandleInputEvent(Event e) {
         }
 
-        override protected void OnNodeInspectorGUI() { }
+        //override protected void OnNodeInspectorGUI() { }
     }
 #endif
 }

@@ -45,17 +45,34 @@ namespace FlowCanvas.Nodes
         {
             _isFinish = false;
             List<object> argValue = new List<object>();
-            foreach (string argName in _autoValueInputArgNames)
+            Debug.Assert(_autoValueInputArgNames.Count == _autoValueInputArgValues.Count);
+            for (int i = 0; i < _autoValueInputArgNames.Count;i++)
             {
+                string argName = _autoValueInputArgNames[i];
                 Port p = GetInputPort(argName);
                 if (p is ValueInput)
                 {
                     ValueInput valueInput = (ValueInput)p;
-                    argValue.Add(valueInput.value);
+                    if (!valueInput.isDefaultValue)
+                    {
+                        argValue.Add(valueInput.value);
+                    }
+                    else
+                    {
+                        argValue.Add(_autoValueInputArgValues[i]);
+                    }
+
                 }
             }
 
-            string targets = _targetValueIn.value;
+            string targets = "";
+            if (!_targetValueIn.isDefaultValue){
+                targets = _targetValueIn.value;
+            }
+            else{
+                targets = _targetsArgValues;
+            }
+
             LuaState state = LuaClient.GetMainState();
             LuaFunction addActionFunc = state.GetFunction("SMAddAction");
             object[] args = argValue.ToArray();

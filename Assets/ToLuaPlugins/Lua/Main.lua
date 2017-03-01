@@ -34,17 +34,17 @@ TestFuncArgsTable = function(keys, args)
     end
 end
 
--- actTargets, actArgsValue -> C# array
-SMAddAction = function(actKey, actClsName, actTargetsArr, actArgsValueArr)
-	-- A1,A2,A3...
-	assert(actTargetsArr)
+-- actArgsValue -> C# array
+-- actTargetsStr ->"A1,A2,A3"
+SMAddAction = function(actKey, actClsName, actTargetsStr, actArgsValueArr)
 	assert(actArgsValueArr)
+
  	local actTargetsTab = {}
- 	local len = actTargetsArr.Length
- 	for i = 0, len - 1 do
- 		-- string to number
- 		table.insert(actTargetsTab, tonumber(actTargetsArr[i]))
- 	end
+
+ 	local list = string.split(actTargetsStr, ',')
+	for key, value in pairs(list) do
+		table.insert(actTargetsTab, value)
+	end
 
  	print("targets count: ", #actTargetsTab)
 

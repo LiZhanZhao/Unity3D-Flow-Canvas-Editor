@@ -25,6 +25,12 @@ namespace FlowCanvas.Nodes{
         {
             if (!called)
             {
+#if UNITY_EDITOR
+                if (graphBase.isRunEditor)
+                {
+                    InitEditorActor();
+                }
+#endif
                 Debug.Log("*** OnAwake ***");
                 called = true;
                 once.Call(new Flow(1));
@@ -47,11 +53,33 @@ namespace FlowCanvas.Nodes{
         }
 
 
+
 #if UNITY_EDITOR
+
+        LuaInterface.LuaFunction _setActor = null;
+        private void InitEditorActor()
+        {
+            _setActor = LuaClient.GetMainState().GetFunction("SetActor");
+            ResetActorGo();
+            for (int i = 0; i < _actorTypes.Count; i++)
+            {
+                SetActor(_actorTypes[i], _actorNames[i], _actorGos[i]);
+            }
+        }
+
+
+        private void SetActor(string aType, string aName, GameObject go)
+        {
+            object[] args = new object[3];
+            args[0] = aType;
+            args[1] = aName;
+            args[2] = go;
+            _setActor.Call(args);
+        }
 
         private List<GameObject> _actorGos = new List<GameObject>();
 
-        override protected void OnNodeInspectorGUI()
+        private void ResetActorGo()
         {
             if (_actorGos.Count != _actorNames.Count)
             {
@@ -61,6 +89,11 @@ namespace FlowCanvas.Nodes{
                     _actorGos.Add(GameObject.Find(_actorNames[i]));
                 }
             }
+        }
+
+        override protected void OnNodeInspectorGUI()
+        {
+            ResetActorGo();
 
             UnityEditor.EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("+"))

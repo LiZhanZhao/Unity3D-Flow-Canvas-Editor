@@ -24,9 +24,10 @@ namespace FlowCanvas.Framework
             }
         }
 
-        public static void Play(string jsonContext)
+        public static void Play(string jsonContext, bool isRunInEditor = false)
         {
-            FlowGraph fg = new FlowGraph();
+            FlowGraph fg = ScriptableObject.CreateInstance<FlowGraph>();
+            fg.isRunEditor = isRunInEditor;
             if (!fg.Deserialize(jsonContext, true))
             {
                 Debug.LogError("Can not Deserialize File");

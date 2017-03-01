@@ -35,18 +35,18 @@ TestFuncArgsTable = function(keys, args)
 end
 
 -- actArgsValue -> C# array
--- actTargetsStr ->"A1,A2,A3"
-SMAddAction = function(actKey, actClsName, actTargetsStr, actArgsValueArr)
+-- actTargetsTypeStr ->"A1,A2,A3"
+SMAddAction = function(actKey, actClsName, actTargetsTypeStr, actArgsValueArr)
 	assert(actArgsValueArr)
 
- 	local actTargetsTab = {}
+ 	local actTargetsTypeTab = {}
 
- 	local list = string.split(actTargetsStr, ',')
+ 	local list = string.split(actTargetsTypeStr, ',')
 	for key, value in pairs(list) do
-		table.insert(actTargetsTab, value)
+		table.insert(actTargetsTypeTab, value)
 	end
 
- 	print("targets count: ", #actTargetsTab)
+ 	print("targets count: ", #actTargetsTypeTab)
 
  	local actArgsValuesTab = {}
  	len = actArgsValueArr.Length
@@ -54,11 +54,11 @@ SMAddAction = function(actKey, actClsName, actTargetsStr, actArgsValueArr)
  		table.insert(actArgsValuesTab, actArgsValueArr[i])
  	end
 
-	gStoryManager:AddAction(actKey, actClsName, actTargetsTab, actArgsValuesTab)
+	gStoryManager:AddAction(actKey, actClsName, actTargetsTypeTab, actArgsValuesTab)
 end
 
 SMUpdateAction = function(actKey, deltaTime)
-	print("*** SMUpdateAction ***")
+	--print("*** SMUpdateAction ***")
 	if gStoryManager:GetAction(actKey) then
 		return gStoryManager:UpdateAction(actKey, deltaTime)
 	else
@@ -70,13 +70,13 @@ SMDelAction = function(actKey)
 	return gStoryManager:DelAction(actKey)
 end
 
-SMGetOutputData = function(moduleName, inputDatasArr, outputDataKey)
-	assert(inputDatasArr)
-	local intputDatasTab = {}
- 	local len = inputDatasArr.Length
- 	for i = 0, len - 1 do
- 		table.insert(intputDatasTab, inputDatasArr[i])
- 	end
+-- SMGetOutputData = function(moduleName, inputDatasArr, outputDataKey)
+-- 	assert(inputDatasArr)
+-- 	local intputDatasTab = {}
+--  	local len = inputDatasArr.Length
+--  	for i = 0, len - 1 do
+--  		table.insert(intputDatasTab, inputDatasArr[i])
+--  	end
 
- 	return gStoryManager:GetOutputData(moduleName, intputDatasTab, outputDataKey)
-end
+--  	return gStoryManager:GetOutputData(moduleName, intputDatasTab, outputDataKey)
+-- end

@@ -151,13 +151,13 @@ end
 --
 editor = CEditor:New()
 
--- SetActor = function(actorType, actorName, actorGO)
---     editor:SetActor(actorType, actorName, actorGO)
--- end
+SetActor = function(actorType, actorName, actorGO)
+    editor:SetActor(actorType, actorName, actorGO)
+end
 
--- DeleteActor = function(actorType)
---     editor:DeleteActor( actorType )
--- end
+DeleteActor = function(actorType)
+    editor:DeleteActor( actorType )
+end
 
 -- EditorRunAI = function( ai_id )
 -- 	local aiObj = gGame:GetAiMgr():CreateAI(ai_id, editor)

@@ -23,6 +23,12 @@ namespace FlowCanvas.Framework
             private set { _nodes = value; }
         }
 
+        private bool _isRunEditor = false;
+        public bool isRunEditor
+        {
+            get { return _isRunEditor; }
+            set { _isRunEditor = value; }
+        }
         //public void UpdateNodeIDs(bool alsoReorderList)
         //{
         //    var lastID = 0;

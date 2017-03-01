@@ -7,18 +7,25 @@ using FlowCanvas.Framework;
 
 namespace FlowCanvas.Nodes
 {
-    public class LuaActionNode : LuaNode, IUpdatable
+    public partial class  LuaActionNode : LuaNode, IUpdatable
     {
         public static UInt32 counter = 0;
         
         private FlowInput _flowIn;
-        private ValueInput<string[]> _targetValueIn;
+        private ValueInput<string> _targetValueIn;
         private FlowOutput _flowOut;
 
         private string _actionKey = "";
         private bool _isFinish = false;
 
-        
+        [SerializeField]
+        private string _targetsArgValues;
+
+        public string TargetArgValues
+        {
+            set { _targetsArgValues = value; }
+            get { return _targetsArgValues; }
+        }
 
         public void Update()
         {
@@ -48,18 +55,7 @@ namespace FlowCanvas.Nodes
                 }
             }
 
-            string[] targets = null ;
-            // if this lua , this will call lua function
-            if (_targetValueIn.value == null)
-            {
-                targets = new string[] { };
-            }
-            else
-            {
-                targets = _targetValueIn.value;
-            }
-            
-
+            string targets = _targetValueIn.value;
             LuaState state = LuaClient.GetMainState();
             LuaFunction addActionFunc = state.GetFunction("SMAddAction");
             object[] args = argValue.ToArray();
@@ -105,11 +101,6 @@ namespace FlowCanvas.Nodes
 
         void CallFlowOutputs()
         {
-            //for (int i = 0; i < _autoFlowOuts.Count; i++)
-            //{
-            //    _autoFlowOuts[i].Call(new Flow(1));
-            //}
-
             _flowOut.Call(new Flow(1));
         }
 
@@ -127,7 +118,8 @@ namespace FlowCanvas.Nodes
             _flowOut = AddFlowOutput("Out");
 
             // valueInput
-            _targetValueIn = AddValueInput<string[]>("Targets");
+            _targetValueIn = AddValueInput<string>("Targets");
+
             AutoGeneratePort();
             
         }

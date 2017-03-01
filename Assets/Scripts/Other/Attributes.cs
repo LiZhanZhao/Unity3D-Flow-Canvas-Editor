@@ -126,9 +126,9 @@ namespace ParadoxNotion.Design{
 	public class AppendListTypesAttribute : Attribute{}
 
     // custom
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class LuaRelaPathFieldAttribute : Attribute { }
+    //[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    //public class LuaRelaPathFieldAttribute : Attribute { }
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public class ShowGUIPropertyAttribute : Attribute{}
+    //[AttributeUsage(AttributeTargets.Property)]
+    //public class ShowGUIPropertyAttribute : Attribute{}
 }

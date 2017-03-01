@@ -3,17 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using FlowCanvas.Framework;
 using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace FlowCanvas.Nodes
 {
     public partial class LuaNode : FlowNode
     {
-        override protected void OnNodeInspectorGUI()
-        {
-            DrawDefaultInspector();
-
-            AutoGenerateGUI();
-        }
+        #if UNITY_EDITOR
+        
 
         protected void AutoGenerateGUI()
         {
@@ -69,6 +68,56 @@ namespace FlowCanvas.Nodes
         }
 
 
+        virtual public void Config(string luaFilePath)
+        {
+            string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
+            _luaFileRelaPath = luaRelaPath;
+            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
+            OnValidate(graphBase);
+        }
 
+        public string LuaPath
+        {
+            set
+            {
+                if (_luaFileRelaPath != value)
+                {
+                    Debug.Log("set lua path");
+                    _luaFileRelaPath = value;
+                    Config(value);
+                }
+
+            }
+            get { return _luaFileRelaPath; }
+        }
+
+        protected void OnLuaPathGUI() {
+                //EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.TextField(string.Format("Lua:"), (string)LuaPath);
+                if (GUILayout.Button("Select"))
+                {
+                    string path = EditorUtility.OpenFilePanel("Select Lua file", "", "");
+                    EditorGUI.FocusTextInControl("");
+
+                    if (!path.EndsWith(".lua")){
+                        if (EditorUtility.DisplayDialog("no lua file", "no lua file", "ok")){
+                            return;
+                        }
+                    }
+                    else{
+                        LuaPath =  path;
+                    }
+                }
+                //EditorGUILayout.EndHorizontal();
+        }
+
+        override protected void OnNodeInspectorGUI()
+        {
+            DrawDefaultInspector();
+            OnLuaPathGUI();
+            AutoGenerateGUI();
+        }
+
+        #endif
     }
 }

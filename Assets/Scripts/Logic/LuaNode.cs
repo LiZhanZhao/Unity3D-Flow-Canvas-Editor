@@ -26,23 +26,6 @@ namespace FlowCanvas.Nodes
 
         [SerializeField]
         protected string _luaFileRelaPath = "";
-
-        [LuaRelaPathField]
-        [ShowGUIProperty]
-        public string LuaPath
-        {
-            set {
-                if (_luaFileRelaPath != value)
-                {
-                    Debug.Log("set lua path");
-                    _luaFileRelaPath = value;
-                    Config(value);
-                }
-                
-            }
-            get { return _luaFileRelaPath; }
-        }
-
         protected string _luaFileName = "";
         
         protected List<ValueInput> _autoValueInputs = new List<ValueInput>();
@@ -209,17 +192,6 @@ namespace FlowCanvas.Nodes
                 _autoFlowOuts.Add(flowOut);
             }
         }
-
-#if UNITY_EDITOR
-        /// UnityEditor
-        virtual public void Config(string luaFilePath)
-        {
-            string luaRelaPath = UnityEditor.FileUtil.GetProjectRelativePath(luaFilePath);
-            _luaFileRelaPath = luaRelaPath;
-            _luaFileName = System.IO.Path.GetFileNameWithoutExtension(_luaFileRelaPath);
-            OnValidate(graphBase);
-        }
-#endif
     }
 
 }

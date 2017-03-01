@@ -122,7 +122,6 @@ namespace FlowCanvas.Framework
 
         public void Stop(bool success = true)
         {
-
             if (!isRunning && !isPaused)
             {
                 return;
@@ -146,6 +145,7 @@ namespace FlowCanvas.Framework
                 OnFinish(success);
                 OnFinish = null;
             }
+            Debug.Log("*** Stop ***");
         }
 
 

@@ -276,6 +276,7 @@ namespace FlowCanvas.Framework
         {
             HandleNodesInputEvent(e, pos);
             HandleRightClickMenu(e, pos);
+
         }
 
         void HandleNodesInputEvent(Event e, Vector2 pos)

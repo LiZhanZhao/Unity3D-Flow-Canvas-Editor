@@ -106,26 +106,6 @@ namespace FlowCanvas.Framework
             isChecked = false;
         }
 
-        public int AssignIDToGraph(int lastID)
-        {
-
-            if (isChecked)
-            {
-                return lastID;
-            }
-
-            isChecked = true;
-            ID = lastID;
-            lastID++;
-
-            for (var i = 0; i < outConnections.Count; i++)
-            {
-                lastID = outConnections[i].targetNode.AssignIDToGraph(lastID);
-            }
-
-            return lastID;
-        }
-
         public void ResetRecursion()
         {
 

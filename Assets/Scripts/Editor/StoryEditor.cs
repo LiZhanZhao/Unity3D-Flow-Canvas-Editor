@@ -391,6 +391,12 @@ namespace StoryEditorContext
         {
             if (!Application.isPlaying) { return; }
 
+            if (!_isInitLuaEnv)
+            {
+                InitLuaEnv();
+                _isInitLuaEnv = true;
+            }
+
             if (_playerAgent == null)
             {
                 _playerAgent = new CsPlayerAgent();
@@ -411,10 +417,7 @@ namespace StoryEditorContext
             //  play
             if (GUILayout.Button(_playIcon, _playerAgent.IsRunning()? pressed : (GUIStyle)"button"))
             {
-                if(!_isInitLuaEnv){
-                    InitLuaEnv();
-                    _isInitLuaEnv = true;
-                }
+                
                 if (!_playerAgent.IsRunning())
                 {
                     string jsonStr = _uiGraph.Serialize(true);

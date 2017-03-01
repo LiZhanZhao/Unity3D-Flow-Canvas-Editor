@@ -26,7 +26,7 @@ public class Test : MonoBehaviour {
     {
         InitLuaEnv();
         TextAsset asset = Resources.Load<TextAsset>("TestJson");
-        FlowGraphController.Play(asset.text, true);
+        FlowGraphPlayer.Play(asset.text, true);
 
     }
     

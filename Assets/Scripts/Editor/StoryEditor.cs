@@ -37,7 +37,9 @@ namespace StoryEditorContext
 
         private const string kSerializeKey = "__StoryEditorSerializeKey";
         private Rect _debugWindowRect = new Rect();
-         
+        private PlayerAgent _playerAgent = null;
+        private static bool _isInitLuaEnv = false;
+
         [MenuItem("Window/Story Editor")]
 
         static void CreateEditor()
@@ -371,9 +373,28 @@ namespace StoryEditorContext
             GUI.backgroundColor = Color.white;
         }
 
+        void InitLuaEnv()
+        {
+            GameObject lcGo = new GameObject("__LuaClient");
+            LuaClient lc = lcGo.GetComponent<LuaClient>();
+            if (lc == null)
+            {
+                lc = lcGo.AddComponent<LuaClient>();
+            }
+
+            LuaClient.GetMainState()["__UNITY_EDITOR__"] = true;
+            LuaClient.GetMainState().DoFile("editor/EditorAdapter.lua");
+
+        }
+
         void DrawDebugWidnow()
         {
             if (!Application.isPlaying) { return; }
+
+            if (_playerAgent == null)
+            {
+                _playerAgent = new CsPlayerAgent();
+            }
 
             _debugWindowRect.x = position.width / 3;
             _debugWindowRect.height = 35;
@@ -387,18 +408,35 @@ namespace StoryEditorContext
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            //if (GUILayout.Button(_playIcon, owner.isRunning || owner.isPaused ? pressed : (GUIStyle)"button"))
-            if (GUILayout.Button(_playIcon, (GUIStyle)"button"))
+            //  play
+            if (GUILayout.Button(_playIcon, _playerAgent.IsRunning()? pressed : (GUIStyle)"button"))
             {
-                //if (owner.isRunning || owner.isPaused) owner.StopBehaviour();
-                //else owner.StartBehaviour();
+                if(!_isInitLuaEnv){
+                    InitLuaEnv();
+                    _isInitLuaEnv = true;
+                }
+                if (!_playerAgent.IsRunning())
+                {
+                    string jsonStr = _uiGraph.Serialize(true);
+                    _playerAgent.Play(jsonStr);
+                }
+                else
+                {
+                    _playerAgent.Stop();
+                }
             }
 
-            //if (GUILayout.Button(_pauseIcon, owner.isPaused ? pressed : (GUIStyle)"button"))
-            if (GUILayout.Button(_pauseIcon, (GUIStyle)"button"))
+            // play and pause
+            if (GUILayout.Button(_pauseIcon, _playerAgent.IsPaused() ? pressed : (GUIStyle)"button"))
             {
-                //if (owner.isPaused) owner.StartBehaviour();
-                //else owner.PauseBehaviour();
+                if (_playerAgent.IsPaused())
+                {
+                    _playerAgent.UnPause();
+                }
+                else
+                {
+                    _playerAgent.Pause();
+                }
             }
 
             GUILayout.FlexibleSpace();

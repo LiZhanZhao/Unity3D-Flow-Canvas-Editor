@@ -5,19 +5,19 @@ namespace FlowCanvas.Framework
 {
 
     ///Add this component on a game object to be controlled by a Flow Graph script (a FlowScript)
-    public class FlowGraphController : GraphOwner<FlowGraph>
+    public class FlowGraphPlayer : GraphOwner<FlowGraph>
     {
-        private static FlowGraphController _current;
-        public static FlowGraphController current
+        private static FlowGraphPlayer _current;
+        public static FlowGraphPlayer current
         {
             get
             {
                 if (_current == null)
                 {
-                    _current = FindObjectOfType<FlowGraphController>();
+                    _current = FindObjectOfType<FlowGraphPlayer>();
                     if (_current == null)
                     {
-                        _current = new GameObject("_FlowGraphController").AddComponent<FlowGraphController>();
+                        _current = new GameObject("_FlowGraphController").AddComponent<FlowGraphPlayer>();
                     }
                 }
                 return _current;
@@ -43,6 +43,11 @@ namespace FlowCanvas.Framework
         public static void Pause()
         {
             current.PauseBehaviour();
+        }
+
+        public static void UnPause()
+        {
+            current.StartBehaviour();
         }
     }
 }

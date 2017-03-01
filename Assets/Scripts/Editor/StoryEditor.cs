@@ -373,6 +373,8 @@ namespace StoryEditorContext
 
         void DrawDebugWidnow()
         {
+            if (!Application.isPlaying) { return; }
+
             _debugWindowRect.x = position.width / 3;
             _debugWindowRect.height = 35;
             _debugWindowRect.width = position.width / 3;

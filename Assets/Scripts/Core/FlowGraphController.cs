@@ -34,5 +34,15 @@ namespace FlowCanvas.Framework
             }
             current.StartBehaviour(fg);
         }
+
+        public static void Stop()
+        {
+            current.StopBehaviour();
+        }
+
+        public static void Pause()
+        {
+            current.PauseBehaviour();
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace FlowCanvas.Framework
         }
 
         
-        public void Post(string msgId, object[] msgArgs)
+        public void Post(string msgId, object[] msgArgs = null)
         {
             _msgQueue.Enqueue(new UIMsg(msgId, msgArgs));
         }

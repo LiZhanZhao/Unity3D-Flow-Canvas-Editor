@@ -13,6 +13,10 @@ namespace StoryEditorContext
     {
         private const string kBgTexturePath = "Assets/Scripts/Editor/Resources/EditorTextures/background.png";
         private const string kCustomGUISkin = "Assets/Scripts/Editor/Resources/NodeCanvasSkin.guiskin";
+
+        readonly public static Texture2D _playIcon = EditorGUIUtility.FindTexture("d_PlayButton");
+        readonly public static Texture2D _pauseIcon = EditorGUIUtility.FindTexture("d_PauseButton");
+
         private const float kTitleHeight = 21;
 
         private Texture2D _girdTex = null;
@@ -32,6 +36,7 @@ namespace StoryEditorContext
         private bool _willRepaint = true;
 
         private const string kSerializeKey = "__StoryEditorSerializeKey";
+        private Rect _debugWindowRect = new Rect();
          
         [MenuItem("Window/Story Editor")]
 
@@ -257,6 +262,8 @@ namespace StoryEditorContext
             {
                 currentGraph.DrawNodeInspector();
             }
+
+            DrawDebugWidnow();
         }
         
 
@@ -364,10 +371,39 @@ namespace StoryEditorContext
             GUI.backgroundColor = Color.white;
         }
 
-        void DrawPlayInfoWidnow()
+        void DrawDebugWidnow()
         {
-            //GUILayout.BeginArea(PlayInfoWindowRect, GUI.skin.button);
-            //GUILayout.EndArea();
+            _debugWindowRect.x = position.width / 3;
+            _debugWindowRect.height = 35;
+            _debugWindowRect.width = position.width / 3;
+            _debugWindowRect.y = position.height - _debugWindowRect.height;
+
+            var pressed = new GUIStyle(GUI.skin.GetStyle("button"));
+            pressed.normal.background = pressed.active.background;
+
+            GUILayout.BeginArea(_debugWindowRect, (GUIStyle)"windowShadow");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            //if (GUILayout.Button(_playIcon, owner.isRunning || owner.isPaused ? pressed : (GUIStyle)"button"))
+            if (GUILayout.Button(_playIcon, (GUIStyle)"button"))
+            {
+                //if (owner.isRunning || owner.isPaused) owner.StopBehaviour();
+                //else owner.StartBehaviour();
+            }
+
+            //if (GUILayout.Button(_pauseIcon, owner.isPaused ? pressed : (GUIStyle)"button"))
+            if (GUILayout.Button(_pauseIcon, (GUIStyle)"button"))
+            {
+                //if (owner.isPaused) owner.StartBehaviour();
+                //else owner.PauseBehaviour();
+            }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
+
         }
 
         public bool IsInBlankArea(Vector2 mousePos)

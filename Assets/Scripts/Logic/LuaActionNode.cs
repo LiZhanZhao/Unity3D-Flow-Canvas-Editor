@@ -17,6 +17,7 @@ namespace FlowCanvas.Nodes
 
         private string _actionKey = "";
         private bool _isFinish = false;
+        private bool _isStart = false;
 
         [SerializeField]
         private string _targetsArgValues;
@@ -29,21 +30,27 @@ namespace FlowCanvas.Nodes
 
         public void Update()
         {
-            if (!_isFinish && UpdateAction())
+            if (_isStart)
             {
-                EndAction();
+                if (!_isFinish && UpdateAction())
+                {
+                    EndAction();
+                }
             }
+            
         }
 
         public override void OnValidate(GraphBase flowGraph)
         {
             base.OnValidate(flowGraph);
-            _actionKey = GenerateLuaKey(_luaFileName);
+            //_actionKey = GenerateLuaKey(_luaFileName);
+            _actionKey = ID.ToString();
         }
 
         void BeginAction()
         {
             _isFinish = false;
+            _isStart = true;
             List<object> argValue = new List<object>();
             Debug.Assert(_autoValueInputArgNames.Count == _autoValueInputArgValues.Count);
             for (int i = 0; i < _autoValueInputArgNames.Count;i++)
@@ -105,7 +112,7 @@ namespace FlowCanvas.Nodes
         {
             Debug.Log("**** C# EndAction");
             _isFinish = true;
-
+            _isStart = false;
             LuaState state = LuaClient.GetMainState();
             LuaFunction delActionFunc = state.GetFunction("SMDelAction");
             delActionFunc.BeginPCall();

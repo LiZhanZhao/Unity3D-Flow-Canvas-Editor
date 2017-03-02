@@ -92,7 +92,7 @@ namespace FlowCanvas.Nodes
         }
 
         protected void OnLuaPathGUI() {
-                //EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.TextField(string.Format("Lua:"), (string)LuaPath);
                 if (GUILayout.Button("Select"))
                 {
@@ -108,7 +108,7 @@ namespace FlowCanvas.Nodes
                         LuaPath =  path;
                     }
                 }
-                //EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndHorizontal();
         }
 
         override protected void OnNodeInspectorGUI()

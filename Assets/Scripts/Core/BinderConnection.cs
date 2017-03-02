@@ -69,7 +69,7 @@ namespace FlowCanvas.Framework
             else
             {
                 Debug.LogWarning(string.Format("<color=red>RemoveConnection Source : </color> sourcePort : {0}  bindingType : {1}",
-                    sourcePort.type.ToString(), bindingType.ToString()));
+                    _sourcePortName.ToString(), bindingType.ToString()));
                 graphBase.RemoveConnection(this);
             }
         }

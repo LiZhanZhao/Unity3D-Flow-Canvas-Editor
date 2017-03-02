@@ -9,11 +9,11 @@ namespace FlowCanvas.Nodes
 {
     public partial class  LuaActionNode : LuaNode, IUpdatable
     {
-        public static UInt32 counter = 0;
+        //public static UInt32 counter = 0;
         
         private FlowInput _flowIn;
         private ValueInput<string> _targetValueIn;
-        private FlowOutput _flowOut;
+        //private FlowOutput _flowOut;
 
         private string _actionKey = "";
         private bool _isFinish = false;
@@ -22,11 +22,17 @@ namespace FlowCanvas.Nodes
         [SerializeField]
         private string _targetsArgValues;
 
+        [SerializeField]
+        private int _flowOutCount = 1;
+        private List<FlowOutput> _flowOutList = new List<FlowOutput>();
+
         public string TargetArgValues
         {
             set { _targetsArgValues = value; }
             get { return _targetsArgValues; }
         }
+
+        
 
         public void Update()
         {
@@ -125,7 +131,11 @@ namespace FlowCanvas.Nodes
 
         void CallFlowOutputs()
         {
-            _flowOut.Call(new Flow(1));
+            //_flowOut.Call(new Flow(1));
+            for (int i = 0; i < _flowOutCount; i++)
+            {
+                _flowOutList[i].Call(new Flow(1));
+            }
         }
 
 
@@ -139,7 +149,9 @@ namespace FlowCanvas.Nodes
                 BeginAction();
             });
 
-            _flowOut = AddFlowOutput("Out");
+            
+            //_flowOut = AddFlowOutput("Out");
+            ResetFlowOutList();
 
             // valueInput
             _targetValueIn = AddValueInput<string>("Targets");
@@ -148,10 +160,19 @@ namespace FlowCanvas.Nodes
             
         }
 
-        static string GenerateLuaKey(string luaName)
+        void ResetFlowOutList()
         {
-            return luaName + (counter++).ToString();
+            _flowOutList.Clear();
+            for (int i = 0; i < _flowOutCount; i++)
+            {
+                _flowOutList.Add(AddFlowOutput(string.Format("Out_{0}", i)));
+            }
         }
+
+        //static string GenerateLuaKey(string luaName)
+        //{
+        //    return luaName + (counter++).ToString();
+        //}
     }
 }
 

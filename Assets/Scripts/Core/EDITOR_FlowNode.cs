@@ -56,12 +56,12 @@ namespace FlowCanvas.Framework
             BinderConnection.Create(source, target);
         }
 
-        BinderConnection[] GetOutPortConnections(Port port)
+        protected BinderConnection[] GetOutPortConnections(Port port)
         {
             return outConnections.Cast<BinderConnection>().Where(c => c.sourcePort == port).ToArray();
         }
 
-        BinderConnection[] GetInPortConnections(Port port)
+        protected BinderConnection[] GetInPortConnections(Port port)
         {
             return inConnections.Cast<BinderConnection>().Where(c => c.targetPort == port).ToArray();
         }

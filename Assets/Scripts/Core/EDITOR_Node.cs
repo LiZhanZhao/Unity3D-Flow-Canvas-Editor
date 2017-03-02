@@ -27,14 +27,19 @@ namespace FlowCanvas.Framework
         
         private const float KNOB_SIZE = 13;
 
-        private Port[] orderedInputs;
-        private Port[] orderedOutputs;
+        private bool _isRunning = false;
 
         private static GUIStyle _centerLabel = null;
 
         public Node(Rect r)
         {
             rect = r;
+        }
+
+        public bool IsRunning
+        {
+            get { return _isRunning; }
+            set { _isRunning = value; }
         }
 
         private string customName
@@ -123,8 +128,10 @@ namespace FlowCanvas.Framework
             rect = GUILayout.Window(ID, rect, DrawContext, string.Empty, (GUIStyle)"window");
 
             DrawSelectEffct();
+            DrawRunningEffect();
             DrawShadow();
             DrawPort();
+            
         }
 
         void DrawContext(int id)
@@ -137,7 +144,9 @@ namespace FlowCanvas.Framework
         void ShowHeader()
         {
             var finalTitle = name;
+            GUILayout.Label(string.Format("<b><size=12><color=#{0}>ID : {1}</color></size></b>", Color.white, ID));
             GUILayout.Label(string.Format("<b><size=12><color=#{0}>{1}</color></size></b>", Color.white, finalTitle), centerLabel);
+            
         }
 
 
@@ -159,6 +168,17 @@ namespace FlowCanvas.Framework
                 //Rect tempRect = new Rect(rect.position + new Vector2(-10, -10), rect.size + new Vector2(20, 20));
             }
             
+        }
+
+        void DrawRunningEffect()
+        {
+            if (IsRunning)
+            {
+                GUI.color = new Color(0f, 0.4f, 0f, 0.8f);
+                Rect bigRect = new Rect(rect.position + new Vector2(-10, -10), rect.size + new Vector2(20, 20));
+                GUI.Box(bigRect, string.Empty, (GUIStyle)"windowHighlight");
+                
+            }
         }
 
         void DrawShadow()

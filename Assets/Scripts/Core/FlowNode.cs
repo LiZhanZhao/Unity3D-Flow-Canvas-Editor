@@ -12,18 +12,12 @@ namespace FlowCanvas.Framework
     {
         private Dictionary<string, Port> _inputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
         private Dictionary<string, Port> _outputPorts = new Dictionary<string, Port>(StringComparer.Ordinal);
-
+        
         // be critical, this is will init inputPorts and outputPorts
         public override void OnValidate(GraphBase flowGraph)
         {
             GatherPorts();
         }
-
-        public BinderConnection GetOutputConnectionForPortID(string ID)
-        {
-            return outConnections.OfType<BinderConnection>().FirstOrDefault(c => c.sourcePortID == ID);
-        }
-
         
 
         public Port GetOutputPort(string ID)
@@ -199,7 +193,11 @@ namespace FlowCanvas.Framework
             return (ValueOutput)(_outputPorts[name] = port);
         }
 
-        
+
+        public BinderConnection GetOutputConnectionForPortID(string ID)
+        {
+            return outConnections.OfType<BinderConnection>().FirstOrDefault(c => c.sourcePortID == ID);
+        }
 
         public BinderConnection GetInputConnectionForPortID(string ID)
         {

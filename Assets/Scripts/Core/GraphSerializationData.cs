@@ -49,11 +49,10 @@ namespace FlowCanvas.Framework
                 connections[i].targetNode.inConnections.Add(connections[i]);
             }
 
-            //re-set the node's owner and ID
+            //re-set the node's owner
             for (var i = 0; i < this.nodes.Count; i++)
             {
                 nodes[i].graphBase = graph;
-                nodes[i].ID = i;
             }
 
             graph.OnDeserialize(this);

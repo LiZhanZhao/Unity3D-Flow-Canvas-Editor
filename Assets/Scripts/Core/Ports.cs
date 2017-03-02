@@ -102,6 +102,14 @@ namespace FlowCanvas.Framework
             {
                 f.ticks++;
                 pointer(f);
+                ////
+                
+#if UNITY_EDITOR
+                BinderConnection connect = parent.GetOutputConnectionForPortID(ID);
+                
+                connect.sourcePort.parent.IsRunning = false;
+                connect.targetPort.parent.IsRunning = true;
+#endif
             }
         }
 

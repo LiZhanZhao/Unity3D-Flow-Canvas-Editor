@@ -14,8 +14,9 @@ namespace FlowCanvas.Framework
         private List<Connection> _inConnections = new List<Connection>();
         private List<Connection> _outConnections = new List<Connection>();
         
+        [SerializeField]
         private int _ID;
-        
+
         
 
         public Graph graph

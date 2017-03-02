@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-
 using FlowCanvas.Framework;
 using FlowCanvas.Nodes;
+using System.Collections.Generic;
 
 
 
@@ -155,6 +155,7 @@ namespace StoryEditorContext
             DrawCenterWindow();
             //DrawPlayInfoWidnow();
             DrawToolBar();
+            UpdateRunningNodes();
             DoRepaint();
         }
 
@@ -338,6 +339,20 @@ namespace StoryEditorContext
             {
                 var menu = new GenericMenu();
 
+                menu.AddItem(new GUIContent("Clear"), false, () =>{
+                    var option = EditorUtility.DisplayDialog(
+                    "What do you want to clear all data ?",
+                    "Please choose one of the following options.",
+                    "Yes",
+                    "No");
+
+                    if (option)
+                    {
+                        _uiGraph = ScriptableObject.CreateInstance<UIGraph>();
+                        SaveSerializeJson();
+                    }
+                });
+
                 //Import JSON
                 menu.AddItem(new GUIContent("Import JSON"), false, () =>
                 {
@@ -469,7 +484,25 @@ namespace StoryEditorContext
             result.y += pivotPoint.y;
             return result;
         }
-        
+
+        void UpdateRunningNodes()
+        {
+            if (_playerAgent != null)
+            {
+                List<int> indexList = _playerAgent.GetRunningNodeIndex();
+                foreach (Node node in currentGraph.allNodes)
+                {
+                    node.IsRunning = false;
+                    foreach (int i in indexList)
+                    {
+                        if (node.ID == i)
+                        {
+                            node.IsRunning = true ;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

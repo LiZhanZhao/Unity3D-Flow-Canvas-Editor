@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace FlowCanvas.Framework
 {
@@ -31,6 +32,11 @@ namespace FlowCanvas.Framework
         public virtual bool IsPaused() 
         {
             return false;
+        }
+
+        public virtual List<int> GetRunningNodeIndex()
+        {
+            return new List<int>();
         }
 
     }

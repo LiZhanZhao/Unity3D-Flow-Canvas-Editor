@@ -182,6 +182,8 @@ namespace FlowCanvas.Framework
             }
 
             allNodes.Remove(node);
+
+            UpdateNodeIDs();
         }
 
         public void RemoveConnection(Connection connection)
@@ -198,6 +200,14 @@ namespace FlowCanvas.Framework
         public virtual void OnSerialize(GraphSerializationData data) { }
         public virtual void OnDeserialize(GraphSerializationData data) { }
 
+        public void UpdateNodeIDs()
+        {
+            for (int i = 0; i < allNodes.Count; i++)
+            {
+                Node node = allNodes[i];
+                node.ID = i;
+            }
+        }
         
     }
 

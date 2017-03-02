@@ -1,53 +1,221 @@
 {
     "nodes": [
         {
-            "_targetsArgValues": "A1,A2",
+            "_actorTypes": [
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6"
+            ],
+            "_actorNames": [
+                "Go1",
+                "Go2",
+                "Go3",
+                "Go4",
+                "Go5",
+                "Go6"
+            ],
+            "rect": {
+                "xMin": 113.4479,
+                "yMin": 241.826,
+                "xMax": 313.4479,
+                "yMax": 312.826
+            },
+            "_nodeName": "Root Node",
+            "_nodeDescription": "No Description",
+            "$type": "FlowCanvas.Nodes.RootNode",
+            "$id": "2"
+        },
+        {
+            "_targetsArgValues": "A1",
+            "_flowOutCount": 3,
             "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
             "_autoValueInputArgValues": [
                 {
-                    "$content": 50.0,
+                    "$content": 100.0,
                     "$type": "System.Single"
                 },
                 {
-                    "$content": 10.0,
+                    "$content": 2.0,
                     "$type": "System.Single"
                 },
                 {
-                    "$content": "13",
+                    "$content": "",
                     "$type": "System.String"
                 }
             ],
             "rect": {
-                "xMin": 696.0,
-                "yMin": 297.0,
-                "xMax": 896.0,
-                "yMax": 440.0
+                "xMin": 392.9946,
+                "yMin": 364.5523,
+                "xMax": 592.995,
+                "yMax": 531.5523
             },
             "_nodeName": "Lua Action Node",
             "_nodeDescription": "No Description",
+            "_ID": 1,
             "$type": "FlowCanvas.Nodes.LuaActionNode",
-            "$id": "2"
+            "$id": "5"
         },
         {
-            "_actorTypes": [
-                "A1",
-                "A2"
-            ],
-            "_actorNames": [
-                "Go1",
-                "Go2"
+            "_targetsArgValues": "A2",
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "_autoValueInputArgValues": [
+                {
+                    "$content": 100.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": 2.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": "",
+                    "$type": "System.String"
+                }
             ],
             "rect": {
-                "xMin": 328.0,
-                "yMin": 365.0,
-                "xMax": 528.0,
-                "yMax": 415.0
+                "xMin": 1040.761,
+                "yMin": 800.133,
+                "xMax": 1240.762,
+                "yMax": 967.133
             },
-            "_customName": "\u5f00\u59cb",
-            "_nodeName": "Root Node",
+            "_nodeName": "Lua Action Node",
             "_nodeDescription": "No Description",
-            "$type": "FlowCanvas.Nodes.RootNode",
-            "$id": "4"
+            "_ID": 2,
+            "$type": "FlowCanvas.Nodes.LuaActionNode",
+            "$id": "7"
+        },
+        {
+            "_targetsArgValues": "A3",
+            "_flowOutCount": 2,
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "_autoValueInputArgValues": [
+                {
+                    "$content": 100.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": 5.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": "",
+                    "$type": "System.String"
+                }
+            ],
+            "rect": {
+                "xMin": 700.835,
+                "yMin": 578.6235,
+                "xMax": 900.835,
+                "yMax": 745.6235
+            },
+            "_nodeName": "Lua Action Node",
+            "_nodeDescription": "No Description",
+            "_ID": 3,
+            "$type": "FlowCanvas.Nodes.LuaActionNode",
+            "$id": "9"
+        },
+        {
+            "_targetsArgValues": "A4",
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "_autoValueInputArgValues": [
+                {
+                    "$content": 100.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": 3.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": "",
+                    "$type": "System.String"
+                }
+            ],
+            "rect": {
+                "xMin": 665.5959,
+                "yMin": 198.5598,
+                "xMax": 865.5959,
+                "yMax": 365.5598
+            },
+            "_nodeName": "Lua Action Node",
+            "_nodeDescription": "No Description",
+            "_ID": 4,
+            "$type": "FlowCanvas.Nodes.LuaActionNode",
+            "$id": "11"
+        },
+        {
+            "rect": {
+                "xMin": 1242.331,
+                "yMin": 61.45071,
+                "xMax": 1442.331,
+                "yMax": 155.4507
+            },
+            "_nodeName": "Finish Node",
+            "_nodeDescription": "No Description",
+            "_ID": 5,
+            "$type": "FlowCanvas.Nodes.FinishNode",
+            "$id": "13"
+        },
+        {
+            "_targetsArgValues": "A5",
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "_autoValueInputArgValues": [
+                {
+                    "$content": 100.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": 5.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": "",
+                    "$type": "System.String"
+                }
+            ],
+            "rect": {
+                "xMin": 956.907,
+                "yMin": 50.1142,
+                "xMax": 1156.907,
+                "yMax": 217.1142
+            },
+            "_nodeName": "Lua Action Node",
+            "_nodeDescription": "No Description",
+            "_ID": 6,
+            "$type": "FlowCanvas.Nodes.LuaActionNode",
+            "$id": "14"
+        },
+        {
+            "_targetsArgValues": "A6",
+            "_luaFileRelaPath": "Assets/ToLuaPlugins/Lua/logic/ai_action/rotate.lua",
+            "_autoValueInputArgValues": [
+                {
+                    "$content": 100.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": 2.0,
+                    "$type": "System.Single"
+                },
+                {
+                    "$content": "",
+                    "$type": "System.String"
+                }
+            ],
+            "rect": {
+                "xMin": 1005.257,
+                "yMin": 446.3115,
+                "xMax": 1205.257,
+                "yMax": 613.3115
+            },
+            "_nodeName": "Lua Action Node",
+            "_nodeDescription": "No Description",
+            "_ID": 7,
+            "$type": "FlowCanvas.Nodes.LuaActionNode",
+            "$id": "16"
         }
     ],
     "connections": [
@@ -55,16 +223,83 @@
             "_sourcePortName": "Once",
             "_targetPortName": "In",
             "_sourceNode": {
-                "$ref": "4"
+                "$ref": "2"
             },
             "_targetNode": {
-                "$ref": "2"
+                "$ref": "5"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_1",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "5"
+            },
+            "_targetNode": {
+                "$ref": "11"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_2",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "5"
+            },
+            "_targetNode": {
+                "$ref": "9"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_0",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "9"
+            },
+            "_targetNode": {
+                "$ref": "16"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_1",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "9"
+            },
+            "_targetNode": {
+                "$ref": "7"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_0",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "11"
+            },
+            "_targetNode": {
+                "$ref": "14"
+            },
+            "$type": "FlowCanvas.Framework.BinderConnection"
+        },
+        {
+            "_sourcePortName": "Out_0",
+            "_targetPortName": "In",
+            "_sourceNode": {
+                "$ref": "14"
+            },
+            "_targetNode": {
+                "$ref": "13"
             },
             "$type": "FlowCanvas.Framework.BinderConnection"
         }
     ],
-    "zoom": 1.0,
+    "zoom": 0.5,
     "scrollOffset": {
-        "x": 332.0
+        "x": -90.82129,
+        "y": -154.7861
     }
 }
